@@ -1,0 +1,23 @@
+cat > src/_includes/base.njk << 'EOF'
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>{{ title }} — Victory Sparkle</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <header>
+    <nav>
+      <a href="/">Home</a>
+      <!-- add real nav links here -->
+    </nav>
+  </header>
+
+  <main>
+    {{ content | safe }}
+  </main>
+</body>
+</html>
+EOF
