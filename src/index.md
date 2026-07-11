@@ -19,7 +19,7 @@
                 <div class="site-title">Victory Sparkle Co.</div>
             </div>
             <nav>
-                <a href="/button-maker/pinpress.html">Button Maker</a>
+                <a href="/apps/pinpress/">Button Maker</a>
                 <a href="#telegram-bots">Telegram Bots</a>
                 <a href="#works-in-progress">Works in Progress</a>
                 <a href="#contact">Contact</a>
@@ -32,7 +32,7 @@
 <!-- BUTTON MAKER -->
 <div id="button-maker" class="content-section">
     <h1>Pinpress</h1>
-    <p>Pinpress is a browser-based tool for quickly laying out custom photo buttons and printing ready-to-cut sheets. Pick your button sizes, drop in your images, and Pinpress will pack everything onto as few pages as possible, to save paper. <a href="button-maker/pinpress.html">Open Pinpress &rarr;</a></p>
+    <p>Pinpress is a browser-based tool for quickly laying out custom photo buttons and printing ready-to-cut sheets. Pick your button sizes, drop in your images, and Pinpress will pack everything onto as few pages as possible, to save paper. <a href="/apps/pinpress/">Open Pinpress &rarr;</a></p>
 </div>
 <!-- END BUTTON MAKER -->
 
