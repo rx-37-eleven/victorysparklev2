@@ -1,0 +1,560 @@
+/* =====================================================================
+   PINPRESS — styles
+   ---------------------------------------------------------------------
+   Design tokens live at the top as CSS variables. Colors and type sizes
+   can be tweaked here without touching layout rules further down.
+   ===================================================================== */
+
+:root {
+  /* Color */
+  --color-bg:           #F8F4FD;
+  --color-surface:      #FFFFFF;
+  --color-primary:      #7C4DCB;
+  --color-primary-dark: #5A35A0;
+  --color-accent-light: #D8C2F5;
+  --color-ink:          #2E1F47;
+  --color-muted:        #8C7AA8;
+  --color-warn:         #B5740E;
+  --color-warn-bg:      #FBEDD7;
+  --color-success:      #3D8F68;
+  --color-border:       #E6DAF7;
+
+  /* Type */
+  --font-display: 'Baloo 2', system-ui, sans-serif;
+  --font-body:    'Work Sans', system-ui, sans-serif;
+
+  /* Layout */
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --shadow-card: 0 2px 0 rgba(46, 31, 71, 0.04), 0 10px 30px rgba(124, 77, 203, 0.10);
+  --shadow-pop:  0 2px 0 rgba(46, 31, 71, 0.25), 0 6px 16px rgba(124, 77, 203, 0.35);
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+
+body {
+  margin: 0;
+  background: var(--color-bg);
+  background-image:
+    radial-gradient(circle at 8% 0%, rgba(124, 77, 203, 0.08), transparent 40%),
+    radial-gradient(circle at 100% 20%, rgba(216, 194, 245, 0.35), transparent 45%);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  line-height: 1.5;
+  padding-bottom: 4rem;
+}
+
+main {
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* ---------------------------------------------------------------------
+   Header & brand mark
+   --------------------------------------------------------------------- */
+.site-header {
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 1rem;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+}
+
+.brand-mark {
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+}
+.brand-mark circle { fill: var(--color-primary); }
+.brand-mark .brand-shine { fill: none; stroke: var(--color-accent-light); stroke-width: 5; stroke-linecap: round; }
+
+.brand-text h1 {
+  font-family: var(--font-display);
+  font-size: 1.9rem;
+  font-weight: 700;
+  margin: 0;
+  color: var(--color-primary-dark);
+}
+.tagline {
+  margin: 0.15rem 0 0;
+  color: var(--color-muted);
+  font-size: 0.95rem;
+}
+
+.test-print-banner {
+  max-width: 880px;
+  margin: 0 auto 1.5rem;
+  padding: 0.9rem 1.5rem;
+  background: var(--color-warn-bg);
+  color: var(--color-warn);
+  border: 1px solid #F0D9A8;
+  border-radius: var(--radius-md);
+  font-size: 0.9rem;
+  margin-left: 1.5rem;
+  margin-right: 1.5rem;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+.test-print-banner[hidden] { display: none; }
+@media (min-width: 944px) {
+  .test-print-banner { margin-left: auto; margin-right: auto; }
+}
+
+.banner-close {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  color: var(--color-warn);
+  font-size: 1.3rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 0.2rem;
+  opacity: 0.7;
+}
+.banner-close:hover { opacity: 1; }
+
+.lib-error-banner {
+  max-width: 880px;
+  margin: 0 1.5rem 1.5rem;
+  padding: 0.9rem 1.5rem;
+  background: #FBE0E0;
+  color: #9A2E2E;
+  border: 1px solid #F0B8B8;
+  border-radius: var(--radius-md);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+@media (min-width: 944px) {
+  .lib-error-banner { margin-left: auto; margin-right: auto; }
+}
+
+/* ---------------------------------------------------------------------
+   Cards / steps
+   --------------------------------------------------------------------- */
+.card {
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  padding: 1.75rem;
+}
+
+.step-card-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.step-card-header h2 {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  margin: 0 0 0.2rem;
+  color: var(--color-ink);
+}
+.step-desc {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: 0.95rem;
+}
+
+/* The step-badge is the page's signature motif: it reads as a tiny
+   pinback button (a round metal shell with a highlight, plus a small
+   clasp nub) rather than a generic numbered circle — fitting, since the
+   whole app exists to lay out exactly that physical object. */
+.step-badge {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.05rem;
+  color: #fff;
+  background: radial-gradient(circle at 32% 28%, #B98AE8, var(--color-primary) 55%, var(--color-primary-dark) 100%);
+  box-shadow: var(--shadow-pop);
+  opacity: 0.45;
+}
+.step-badge.active { opacity: 1; }
+.step-badge::after {
+  content: '';
+  position: absolute;
+  bottom: -5px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 10px;
+  height: 6px;
+  border-radius: 0 0 3px 3px;
+  background: var(--color-primary-dark);
+}
+
+/* ---------------------------------------------------------------------
+   Step 1 — quantities
+   --------------------------------------------------------------------- */
+.quantity-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  margin-bottom: 1.25rem;
+}
+
+.quantity-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.qty-icon { flex-shrink: 0; }
+
+.qty-info { flex: 1; min-width: 0; }
+.qty-label { font-weight: 600; color: var(--color-ink); }
+.qty-sub { font-size: 0.82rem; color: var(--color-muted); }
+
+.qty-stepper {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-shrink: 0;
+}
+.qty-step-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  background: var(--color-accent-light);
+  color: var(--color-primary-dark);
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+.qty-step-btn:hover { background: var(--color-primary); color: #fff; }
+.qty-input {
+  width: 3.2rem;
+  text-align: center;
+  padding: 0.4rem 0.2rem;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  /* Hide the browser's own up/down spinner — the round plus/minus
+     buttons next to this field are the only steppers we want shown. */
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+.qty-input::-webkit-outer-spin-button,
+.qty-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.toggle-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.7rem;
+  margin: 0.5rem 0 1.5rem;
+  cursor: pointer;
+}
+.toggle-row input { position: absolute; opacity: 0; width: 0; height: 0; }
+.toggle-track {
+  width: 38px;
+  height: 22px;
+  border-radius: 999px;
+  background: var(--color-border);
+  position: relative;
+  flex-shrink: 0;
+  margin-top: 0.15rem;
+  transition: background 0.15s ease;
+}
+.toggle-thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(46,31,71,0.3);
+  transition: transform 0.15s ease;
+}
+.toggle-row input:checked + .toggle-track { background: var(--color-primary); }
+.toggle-row input:checked + .toggle-track .toggle-thumb { transform: translateX(16px); }
+.toggle-label { font-size: 0.9rem; color: var(--color-ink); }
+.toggle-hint { display: block; font-size: 0.8rem; color: var(--color-muted); }
+
+/* ---------------------------------------------------------------------
+   Buttons
+   --------------------------------------------------------------------- */
+.btn-primary, .btn-secondary {
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.95rem;
+  border-radius: 999px;
+  padding: 0.7rem 1.5rem;
+  border: none;
+  cursor: pointer;
+}
+.btn-primary {
+  background: var(--color-primary);
+  color: #fff;
+  box-shadow: var(--shadow-pop);
+}
+.btn-primary:hover:not(:disabled) { background: var(--color-primary-dark); }
+.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; box-shadow: none; }
+.btn-large { padding: 0.9rem 2rem; font-size: 1.05rem; }
+
+.btn-secondary {
+  background: var(--color-accent-light);
+  color: var(--color-primary-dark);
+}
+.btn-secondary:hover { background: #c7aaef; }
+
+.step-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  flex-wrap: wrap;
+}
+
+button:focus-visible, input:focus-visible {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* ---------------------------------------------------------------------
+   Step 2 — slots grid
+   --------------------------------------------------------------------- */
+.slots-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 1.25rem;
+}
+
+.slot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  padding: 0.75rem;
+  border-radius: var(--radius-md);
+  transition: background 0.12s ease;
+}
+.slot:hover, .slot.drag-over { background: var(--color-bg); }
+
+.slot-canvas-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.slot-canvas-wrap canvas { display: block; }
+
+.slot-upload-hint {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-primary);
+  text-align: center;
+  pointer-events: none;
+}
+.slot-upload-hint[hidden] { display: none; }
+
+.slot-lowres-badge {
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  background: var(--color-warn-bg);
+  color: var(--color-warn);
+  border: 1px solid #F0D9A8;
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  padding: 0.15rem 0.45rem;
+  border-radius: 999px;
+}
+
+.slot-label {
+  font-size: 0.85rem;
+  color: var(--color-ink);
+  text-align: center;
+}
+.slot-number { color: var(--color-muted); }
+
+/* ---------------------------------------------------------------------
+   Step 3 — generate
+   --------------------------------------------------------------------- */
+.summary-list {
+  list-style: none;
+  margin: 0 0 1rem;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  color: var(--color-ink);
+}
+.summary-pages { color: var(--color-primary-dark); margin-top: 0.4rem; }
+
+.generate-warning {
+  background: var(--color-warn-bg);
+  color: var(--color-warn);
+  border: 1px solid #F0D9A8;
+  border-radius: var(--radius-md);
+  padding: 0.75rem 1rem;
+  font-size: 0.9rem;
+}
+
+.generate-status {
+  margin-top: 1rem;
+  font-size: 0.9rem;
+  color: var(--color-muted);
+}
+
+/* ---------------------------------------------------------------------
+   Editor modal
+   --------------------------------------------------------------------- */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(46, 31, 71, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  z-index: 100;
+}
+/* The [hidden] attribute and the class above both set `display`, and
+   they have equal CSS specificity — without this rule, the class's
+   `display: flex` would always win and the modal would never hide. */
+.modal-overlay[hidden] { display: none; }
+
+.modal {
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  width: 100%;
+  max-width: 460px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(46, 31, 71, 0.35);
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.1rem 1.25rem;
+  border-bottom: 1px solid var(--color-border);
+}
+.modal-header h3 {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  margin: 0;
+}
+.icon-btn {
+  background: none;
+  border: none;
+  font-size: 1.4rem;
+  line-height: 1;
+  color: var(--color-muted);
+  cursor: pointer;
+  padding: 0.2rem 0.5rem;
+}
+.icon-btn:hover { color: var(--color-ink); }
+
+.modal-body {
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.stage-container {
+  display: inline-block;
+  border-radius: 12px;
+  overflow: hidden;
+  background:
+    linear-gradient(45deg, #f0eaf9 25%, transparent 25%, transparent 75%, #f0eaf9 75%),
+    linear-gradient(45deg, #f0eaf9 25%, #fff 25%, #fff 75%, #f0eaf9 75%);
+  background-size: 16px 16px;
+  background-position: 0 0, 8px 8px;
+}
+
+.editor-controls {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.slider-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.85rem;
+  color: var(--color-muted);
+}
+.slider-row span:first-child { width: 4rem; flex-shrink: 0; }
+.slider-row input[type="range"] { flex: 1; accent-color: var(--color-primary); }
+
+.editor-duplicate {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding-top: 0.6rem;
+  border-top: 1px solid var(--color-border);
+  font-size: 0.85rem;
+  color: var(--color-muted);
+}
+.editor-duplicate .qty-stepper { flex-shrink: 0; }
+.editor-duplicate-label { line-height: 1.3; }
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  border-top: 1px solid var(--color-border);
+}
+
+/* ---------------------------------------------------------------------
+   Small screens
+   --------------------------------------------------------------------- */
+@media (max-width: 480px) {
+  .card { padding: 1.25rem; }
+  .quantity-row { flex-wrap: wrap; }
+  .step-actions { flex-direction: column-reverse; }
+  .step-actions .btn-primary, .step-actions .btn-secondary { width: 100%; }
+}

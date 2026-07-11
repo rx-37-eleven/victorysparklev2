@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pinpress — Button Sheet Maker</title>
+<meta name="description" content="Lay out custom photo buttons and print a ready-to-cut sheet.">
+
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='28' fill='%237C4DCB'/%3E%3Cpath d='M18 22a18 14 0 0 1 28 0' stroke='%23D8C2F5' stroke-width='5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
+
+<!-- Google Fonts: Baloo 2 (display/headings) + Work Sans (body/UI) -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="buttonstyle.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="brand">
+    <svg class="brand-mark" viewBox="0 0 64 64" aria-hidden="true">
+      <circle cx="32" cy="32" r="28"/>
+      <path class="brand-shine" d="M18 22a18 14 0 0 1 28 0"/>
+    </svg>
+    <div class="brand-text">
+      <h1>Pinpress</h1>
+      <p class="tagline">Lay out your photos, print a ready-to-cut sheet</p>
+    </div>
+  </div>
+</header>
+
+<div class="test-print-banner" id="test-print-banner">
+  <span><strong>Before a bulk run:</strong> print one test sheet and check the punch sizes against your own cutter.
+  The sizes here are common conventions, not a guarantee for every machine.</span>
+  <button type="button" id="test-print-banner-close" class="banner-close" aria-label="Dismiss this message">×</button>
+</div>
+
+<p id="lib-error-banner" class="lib-error-banner" hidden></p>
+
+<main>
+
+  <!-- STEP 1 — Quantities -->
+  <section id="step-quantities" class="card step-card">
+    <div class="step-card-header">
+      <div class="step-badge">1</div>
+      <div>
+        <h2>Pick your sizes</h2>
+        <p class="step-desc">How many of each button do you want to print?</p>
+      </div>
+    </div>
+
+    <form id="quantities-form">
+      <div id="quantity-rows" class="quantity-rows"></div>
+
+      <label class="toggle-row">
+        <input type="checkbox" id="edge-margin-toggle">
+        <span class="toggle-track"><span class="toggle-thumb"></span></span>
+        <span class="toggle-label">
+          Full edge margins (½")
+          <span class="toggle-hint">Turn this on if your printer can't print edge-to-edge.</span>
+        </span>
+      </label>
+
+      <button type="submit" class="btn-primary">Continue to photos →</button>
+    </form>
+  </section>
+
+  <!-- STEP 2 — Assign & edit -->
+  <section id="step-slots" class="card step-card" hidden>
+    <div class="step-card-header">
+      <div class="step-badge">2</div>
+      <div>
+        <h2>Add your photos</h2>
+        <p class="step-desc">Click or drop an image onto each slot, then drag, zoom, and rotate it to fit.</p>
+      </div>
+    </div>
+
+    <div id="slots-grid" class="slots-grid"></div>
+
+    <div class="step-actions">
+      <button type="button" id="back-to-quantities" class="btn-secondary">← Edit sizes</button>
+      <button type="button" id="continue-to-generate" class="btn-primary">Continue to print →</button>
+    </div>
+  </section>
+
+  <!-- STEP 3 — Generate -->
+  <section id="step-generate" class="card step-card" hidden>
+    <div class="step-card-header">
+      <div class="step-badge">3</div>
+      <div>
+        <h2>Print your sheet</h2>
+        <p class="step-desc">We'll pack every button onto as few US Letter pages as possible.</p>
+      </div>
+    </div>
+
+    <div id="generate-summary" class="generate-summary"></div>
+    <p id="generate-warning" class="generate-warning" hidden></p>
+
+    <div class="step-actions">
+      <button type="button" id="back-to-slots" class="btn-secondary">← Edit photos</button>
+      <button type="button" id="generate-btn" class="btn-primary btn-large">Generate PDF</button>
+    </div>
+
+    <p id="generate-status" class="generate-status" hidden></p>
+  </section>
+
+</main>
+
+<!-- Editor modal -->
+<div id="editor-modal" class="modal-overlay" hidden>
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="editor-title">Edit button</h3>
+      <button type="button" id="editor-close" class="icon-btn" aria-label="Close editor">×</button>
+    </div>
+
+    <div class="modal-body">
+      <div id="editor-stage-container" class="stage-container"></div>
+
+      <div class="editor-controls">
+        <label class="slider-row">
+          <span>Zoom</span>
+          <input type="range" id="zoom-slider" min="100" max="400" value="100">
+        </label>
+        <label class="slider-row">
+          <span>Rotate</span>
+          <input type="range" id="rotate-slider" min="-180" max="180" value="0">
+        </label>
+
+        <button type="button" id="editor-upload-btn" class="btn-secondary">Replace photo</button>
+        <input type="file" id="editor-upload-input" accept="image/*" hidden>
+
+        <div class="editor-duplicate" id="editor-duplicate" hidden>
+          <span class="editor-duplicate-label">Also use this photo for</span>
+          <div class="qty-stepper">
+            <button type="button" class="qty-step-btn" id="duplicate-minus" aria-label="Decrease">−</button>
+            <input type="number" class="qty-input" id="duplicate-count" min="0" value="0" inputmode="numeric" aria-label="Number of additional slots to fill">
+            <button type="button" class="qty-step-btn" id="duplicate-plus" aria-label="Increase">+</button>
+          </div>
+          <span class="editor-duplicate-label" id="editor-duplicate-suffix">more empty slot(s)</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button type="button" id="editor-cancel" class="btn-secondary">Cancel</button>
+      <button type="button" id="editor-done" class="btn-primary">Done</button>
+    </div>
+  </div>
+</div>
+
+<!-- CDN libraries, pinned versions, no build step. Served from jsDelivr,
+     which mirrors npm packages directly (more reliable for exact pinned
+     patch versions than some other CDNs). The onerror attributes let
+     app.js detect and report a failed load instead of failing silently. -->
+<script src="https://cdn.jsdelivr.net/npm/konva@9.3.6/konva.min.js" onerror="window.__libLoadFailed='Konva'"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js" onerror="window.__libLoadFailed='jsPDF'"></script>
+
+<script src="buttonapp.js" defer></script>
+</body>
+</html>
