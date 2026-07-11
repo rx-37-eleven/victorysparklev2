@@ -1,23 +1,48 @@
-cat > src/_includes/base.njk << 'EOF'
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <title>{{ title }} — Victory Sparkle</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="/css/style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&family=DynaPuff:wght@500&family=Miniver&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.png">
+    <title>{% if title %}{{ title }} · {% endif %}Victory Sparkle Co.</title>
+    <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
-  <header>
-    <nav>
-      <a href="/">Home</a>
-      <!-- add real nav links here -->
-    </nav>
-  </header>
+    <header>
+        <div class="header-content">
+            <div class="logo-section">
+                <div class="profile-image"><img src="/images/Vlogo.png"></div>
+                <div class="site-title">Victory Sparkle Co.</div>
+            </div>
+            <nav>
+                <a href="#button-maker">Button Maker</a>
+                <a href="#coding-projects">Coding Projects</a>
+                <a href="#pinterest">Works in Progress</a>
+                <a href="#contact">Contact</a>
+            </nav>
+        </div>
+    </header>
 
-  <main>
-    {{ content | safe }}
-  </main>
+    <main>
+        {{ content | safe }}
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <p>&copy; 2025 Victory Sparkle Co. All rights reserved.</p>
+            <div class="footer-links">
+                <a href="#button-maker">Button Maker</a>
+                <a href="#coding-projects">Coding Projects</a>
+                <a href="#pinterest">Works in Progress</a>
+                <a href="#contact">Contact</a>
+            </div>
+            <div><br> <p><em>Semper Desiderari, Princess Sandy</em></p></div>
+        </div>
+    </footer>
+    <script async defer src="//assets.pinterest.com/js/pinit.js"></script>
 </body>
 </html>
-EOF

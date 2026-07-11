@@ -1,7 +1,40 @@
-cat > src/index.md << 'EOF'
----
-title: Victory Sparkle
-layout: base.njk
----
-Site is live. Content migration coming soon.
-EOF
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&family=DynaPuff:wght@500&family=Miniver&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.png">
+    <title>{% if title %}{{ title }} · {% endif %}Victory Sparkle Co.</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <div class="logo-section">
+                <div class="profile-image"><img src="/images/Vlogo.png"></div>
+                <div class="site-title">Victory Sparkle Co.</div>
+            </div>
+            <nav>
+                <a href="#button-maker">Button Maker</a>
+                <a href="#telegram-bots">Telegram Bots</a>
+                <a href="#works-in-progress">Works in Progress</a>
+                <a href="#contact">Contact</a>
+            </nav>
+        </div>
+    </header>
+
+
+    <footer>
+        <div class="footer-content">
+            <p>&copy; Victory Sparkle Co.</p>
+            <div class="footer-links">
+                <a href="#contact">Contact</a>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
