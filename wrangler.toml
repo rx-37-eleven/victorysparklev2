@@ -1,0 +1,16 @@
+# Victory Sparkle Co. — Cloudflare Pages configuration
+#
+#
+#
+# Note: if you configure the D1 binding here AND in the Cloudflare
+# dashboard (Pages project → Settings → Bindings), the dashboard
+# setting wins. Simplest to configure it in exactly one place.
+
+name = "victorysparkle"                 # match your existing Pages project name
+pages_build_output_dir = "_site"            # match your existing output dir
+compatibility_date = "2026-07-04"
+
+[[d1_databases]]
+binding = "DB"                          # functions/api/*.js read this as env.DB
+database_name = "victory-blog"
+database_id = "7d24eaa5-6c9b-4b37-8f60-c1e86b0126db"
