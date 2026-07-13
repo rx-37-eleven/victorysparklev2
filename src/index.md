@@ -8,7 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&family=DynaPuff:wght@500&family=Miniver&display=swap" rel="stylesheet">
     <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.png">
-    <title>{% if title %}{{ title }} · {% endif %}Victory Sparkle Co.</title>
+        <a href="/"><title>{% if title %}{{ title }} · {% endif %}Victory Sparkle Co.</title></a>
     <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
