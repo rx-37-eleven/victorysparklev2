@@ -1,9 +1,9 @@
 {
   "legend": {
-    "visited": { "label": "Visited", "color": "#7C4DCB" },
-    "lived": { "label": "Lived there", "color": "#3D8F68" },
-    "planned": { "label": "Trip planned", "color": "#D8C2F5" },
-    "none": { "label": "Not yet", "color": "#EFEAF6" }
+    "visited": { "label": "Visited", "color": "#c372f2" },
+    "lived": { "label": "Lived there", "color": "#f272bb" },
+    "planned": { "label": "Trip planned", "color": "#72bbf2" },
+    "none": { "label": "Not yet", "color": "#e8faea" }
   },
   "defaultStatus": "none",
   "states": {
