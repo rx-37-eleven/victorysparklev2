@@ -1,0 +1,27 @@
+---
+layout: base.njk
+title: Travel Map
+permalink: /map/
+---
+<div class="content-section travel-map-page">
+  <h1>Where I've Been</h1>
+  <p>Hover or tap a state to see its status — click a legend row to highlight all states in that category.</p>
+
+  <div class="travel-map-wrap">
+    {% include "us-map.svg" %}
+  </div>
+
+  <ul class="map-legend" id="map-legend">
+    {% for key, entry in travelmap.legend %}
+    <li class="map-legend-row" data-status="{{ key }}" tabindex="0" role="button">
+      <span class="map-legend-swatch" style="background-color: {{ entry.color }};"></span>
+      <span class="map-legend-label">{{ entry.label }}</span>
+      <span class="map-legend-count">{{ legendCounts[key] }}</span>
+    </li>
+    {% endfor %}
+  </ul>
+
+  <div class="map-tooltip" id="map-tooltip" hidden></div>
+</div>
+
+<script src="/js/map.js" defer></script>

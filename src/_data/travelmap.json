@@ -1,0 +1,14 @@
+{
+  "legend": {
+    "visited": { "label": "Visited", "color": "#7C4DCB" },
+    "lived": { "label": "Lived there", "color": "#3D8F68" },
+    "planned": { "label": "Trip planned", "color": "#D8C2F5" },
+    "none": { "label": "Not yet", "color": "#EFEAF6" }
+  },
+  "defaultStatus": "none",
+  "states": {
+    "PA": "visited",
+    "NY": "visited",
+    "MD": "lived"
+  }
+}

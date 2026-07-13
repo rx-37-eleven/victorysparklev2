@@ -1,0 +1,74 @@
+---
+layout: base.njk
+title: Cool Web Resources
+permalink: /resources/
+---
+{#
+  HOW TO ADD A RESOURCE (no code changes needed):
+  1. Open src/_data/resources.json on GitHub and click the pencil icon.
+  2. Add a new object: {"title", "url", "dateAdded" (YYYY-MM-DD), "tags" (array), "note" (optional), "image" (optional, see src/images/resources/README.txt)}.
+  3. Commit — Cloudflare Pages rebuilds automatically and the new tile appears, sorted by date.
+#}
+<div class="content-section resources-page">
+  <h1>Cool Web Resources</h1>
+  <p>A running list of neat little tools and sites worth bookmarking.</p>
+
+  <div class="resources-layout">
+    <div class="resources-main">
+      <p class="resource-count" id="resource-count" aria-hidden="false">
+        Showing {{ resources.length }} of {{ resources.length }} resource{% if resources.length != 1 %}s{% endif %}
+      </p>
+
+      <div class="resource-grid" id="resource-grid" aria-live="polite">
+        {% for resource in resources | sort(true, false, 'dateAdded') %}
+        <article class="resource-tile" data-tags="{{ resource.tags | join(' ') }}">
+          <a href="{{ resource.url }}" target="_blank" rel="noopener noreferrer" class="resource-tile-link">
+            <div class="resource-tile-image-wrap">
+              {% if resource.image %}
+              <img
+                src="{{ resource.image }}"
+                alt=""
+                class="resource-tile-image"
+                loading="lazy"
+                onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+              >
+              <div class="resource-tile-image resource-tile-placeholder" style="display:none">✨</div>
+              {% else %}
+              <div class="resource-tile-image resource-tile-placeholder">✨</div>
+              {% endif %}
+            </div>
+            <h2 class="resource-tile-title">{{ resource.title }}</h2>
+          </a>
+          {% if resource.note %}<p class="resource-tile-note">{{ resource.note }}</p>{% endif %}
+          <time datetime="{{ resource.dateAdded }}" class="resource-tile-date">Added {{ resource.dateAdded | readableDate }}</time>
+          <div class="resource-tile-tags">
+            {% for tag in resource.tags %}
+            <button type="button" class="tag-chip" data-tag="{{ tag }}" aria-pressed="false">{{ tag }}</button>
+            {% endfor %}
+          </div>
+        </article>
+        {% endfor %}
+      </div>
+
+      <p class="resource-empty-state" id="resource-empty-state" hidden>
+        No resources match those tags yet. Try clearing a filter.
+      </p>
+    </div>
+
+    <aside class="tag-sidebar" aria-label="Filter resources by tag">
+      <button type="button" class="clear-filters-btn" id="clear-filters-btn" hidden>Clear filters</button>
+      <h2 class="tag-sidebar-title">Tags</h2>
+      <ul class="tag-list">
+        {% for item in resourceTags %}
+        <li>
+          <button type="button" class="tag-chip sidebar-tag" data-tag="{{ item.tag }}" aria-pressed="false">
+            {{ item.tag }} ({{ item.count }})
+          </button>
+        </li>
+        {% endfor %}
+      </ul>
+    </aside>
+  </div>
+</div>
+
+<script src="/js/resources.js" defer></script>

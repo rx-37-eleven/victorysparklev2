@@ -23,6 +23,8 @@
                 <a href="#telegram-bots">Telegram Bots</a>
                 <a href="#works-in-progress">Works in Progress</a>
                 <a href="#contact">Contact</a>
+                <a href="/resources/">Resources</a>
+                <a href="/map/">Travel Map</a>
             </nav>
         </div>
     </header>
@@ -99,6 +101,8 @@
             <p>&copy; Victory Sparkle Co.</p>
             <div class="footer-links">
                 <a href="#contact">Contact</a>
+                <a href="/resources/">Resources</a>
+                <a href="/map/">Travel Map</a>
             </div>
         </div>
     </footer>
