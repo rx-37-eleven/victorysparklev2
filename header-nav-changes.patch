@@ -1,0 +1,479 @@
+diff --git a/src/_includes/base.njk b/src/_includes/base.njk
+index 7d11f0c..e18e812 100644
+--- a/src/_includes/base.njk
++++ b/src/_includes/base.njk
+@@ -14,17 +14,39 @@
+ <body>
+     <header>
+         <div class="header-content">
+-            <div class="logo-section">
+-                <div class="profile-image"><img src="/images/Vlogo.png"></div>
++            <a href="/" class="logo-section" aria-label="Victory Sparkle Co. home">
++                <div class="profile-image"><img src="/images/Vlogo.png" alt=""></div>
+                 <div class="site-title">Victory Sparkle Co.</div>
+-            </div>
+-            <nav>
+-                <a href="/apps/pinpress/">Button Maker</a>
+-                <a href="#coding-projects">Coding Projects</a>
+-                <a href="#pinterest">Works in Progress</a>
+-                <a href="#contact">Contact</a>
+-                <a href="/resources/">Resources</a>
+-                <a href="/map/">Travel Map</a>
++            </a>
++            <nav class="main-nav">
++                <div class="nav-item">
++                    <button type="button" class="nav-trigger" aria-expanded="false">Make</button>
++                    <div class="nav-dropdown">
++                        <a href="/apps/pinpress/">Pinpress</a>
++                        <a href="/resources/">Resources</a>
++                        <a href="https://www.pinterest.com/victorysparkle/website-board/" target="_blank" rel="noopener noreferrer">Pinterest</a>
++                    </div>
++                </div>
++                <div class="nav-item">
++                    <button type="button" class="nav-trigger" aria-expanded="false">Code</button>
++                    <div class="nav-dropdown">
++                        <a href="/#coding-projects">Telegram Bots</a>
++                    </div>
++                </div>
++                <div class="nav-item">
++                    <button type="button" class="nav-trigger" aria-expanded="false">Enjoy</button>
++                    <div class="nav-dropdown">
++                        <span class="nav-placeholder">Coming soon</span>
++                    </div>
++                </div>
++                <div class="nav-item">
++                    <button type="button" class="nav-trigger" aria-expanded="false">Contact</button>
++                    <div class="nav-dropdown">
++                        <a href="/blog/">Blog</a>
++                        <a href="/map/">Travel Map</a>
++                        <a href="/contact/">Contact</a>
++                    </div>
++                </div>
+             </nav>
+         </div>
+     </header>
+@@ -37,16 +59,17 @@
+         <div class="footer-content">
+             <p>&copy; 2025 Victory Sparkle Co. All rights reserved.</p>
+             <div class="footer-links">
+-                <a href="/apps/pinpress/">Button Maker</a>
+-                <a href="#coding-projects">Coding Projects</a>
+-                <a href="#pinterest">Works in Progress</a>
+-                <a href="#contact">Contact</a>
++                <a href="/apps/pinpress/">Pinpress</a>
++                <a href="/#coding-projects">Telegram Bots</a>
+                 <a href="/resources/">Resources</a>
+                 <a href="/map/">Travel Map</a>
++                <a href="/blog/">Blog</a>
++                <a href="/contact/">Contact</a>
+             </div>
+             <div><br> <p><em>Semper Desiderari, Princess Sandy</em></p></div>
+         </div>
+     </footer>
+     <script async defer src="//assets.pinterest.com/js/pinit.js"></script>
++    <script src="/js/nav.js" defer></script>
+ </body>
+ </html>
+diff --git a/src/apps/pinpress/index.html b/src/apps/pinpress/index.html
+index 16c723f..d5bf05d 100644
+--- a/src/apps/pinpress/index.html
++++ b/src/apps/pinpress/index.html
+@@ -21,15 +21,39 @@
+ 
+ <header>
+     <div class="header-content">
+-        <div class="logo-section">
+-            <div class="profile-image"><img src="/images/Vlogo.png"></div>
++        <a href="/" class="logo-section" aria-label="Victory Sparkle Co. home">
++            <div class="profile-image"><img src="/images/Vlogo.png" alt=""></div>
+             <div class="site-title">Victory Sparkle Co.</div>
+-        </div>
+-        <nav>
+-            <a href="/apps/pinpress/">Button Maker</a>
+-            <a href="/#coding-projects">Coding Projects</a>
+-            <a href="/#works-in-progress">Works in Progress</a>
+-            <a href="/#contact">Contact</a>
++        </a>
++        <nav class="main-nav">
++            <div class="nav-item">
++                <button type="button" class="nav-trigger" aria-expanded="false">Make</button>
++                <div class="nav-dropdown">
++                    <a href="/apps/pinpress/">Pinpress</a>
++                    <a href="/resources/">Resources</a>
++                    <a href="https://www.pinterest.com/victorysparkle/website-board/" target="_blank" rel="noopener noreferrer">Pinterest</a>
++                </div>
++            </div>
++            <div class="nav-item">
++                <button type="button" class="nav-trigger" aria-expanded="false">Code</button>
++                <div class="nav-dropdown">
++                    <a href="/#coding-projects">Telegram Bots</a>
++                </div>
++            </div>
++            <div class="nav-item">
++                <button type="button" class="nav-trigger" aria-expanded="false">Enjoy</button>
++                <div class="nav-dropdown">
++                    <span class="nav-placeholder">Coming soon</span>
++                </div>
++            </div>
++            <div class="nav-item">
++                <button type="button" class="nav-trigger" aria-expanded="false">Contact</button>
++                <div class="nav-dropdown">
++                    <a href="/blog/">Blog</a>
++                    <a href="/map/">Travel Map</a>
++                    <a href="/contact/">Contact</a>
++                </div>
++            </div>
+         </nav>
+     </div>
+ </header>
+@@ -163,5 +187,6 @@
+ <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js" onerror="window.__libLoadFailed='jsPDF'"></script>
+ 
+ <script src="buttonapp.js" defer></script>
++<script src="/js/nav.js" defer></script>
+ </body>
+ </html>
+diff --git a/src/blog.njk b/src/blog.njk
+new file mode 100644
+index 0000000..82da772
+--- /dev/null
++++ b/src/blog.njk
+@@ -0,0 +1,9 @@
++---
++layout: base.njk
++title: Blog
++permalink: /blog/
++---
++<div class="content-section">
++    <h1>Blog</h1>
++    <p>Coming soon! Check back for posts.</p>
++</div>
+diff --git a/src/contact.njk b/src/contact.njk
+new file mode 100644
+index 0000000..c228c67
+--- /dev/null
++++ b/src/contact.njk
+@@ -0,0 +1,28 @@
++---
++layout: base.njk
++title: Contact
++permalink: /contact/
++---
++<div id="contact" class="content-section">
++    <h1>Contact Us</h1>
++    <p>Did you meet me at an event, or someone recommended me to you? Feel free to reach out! I love to help out with projects, talk shop, brainstorm, and spread joy.</p>
++    <br>
++    <div class="social-buttons">
++        <a href="mailto:contact@victorysparkle.com" class="social-btn email-btn" title="Email Us">
++            <svg viewBox="0 0 24 24" fill="currentColor" width="32" height="32">
++                <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
++            </svg>
++        </a>
++        <a href="https://www.facebook.com/people/Victory-Sparkle-Co/61580601000673/" class="social-btn facebook-btn" target="_blank" rel="noopener noreferrer" title="Facebook">
++            <svg viewBox="0 0 24 24" fill="currentColor" width="32" height="32">
++                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
++            </svg>
++        </a>
++        <a href="https://instagram.com/victorysparkle" class="social-btn instagram-btn" target="_blank" rel="noopener noreferrer" title="Instagram">
++            <svg viewBox="0 0 24 24" fill="currentColor" width="32" height="32">
++                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
++            </svg>
++        </a>
++    </div>
++    <br>
++</div>
+diff --git a/src/css/style.css b/src/css/style.css
+index b48475a..c4e57f6 100644
+--- a/src/css/style.css
++++ b/src/css/style.css
+@@ -31,6 +31,8 @@ header {
+     display: flex;
+     align-items: center;
+     gap: 15px;
++    text-decoration: none;
++    color: inherit;
+ }
+ 
+ .profile-image {
+@@ -62,25 +64,99 @@ header {
+     font-family: "miniver";
+ }
+ 
+-nav {
++.main-nav {
+     display: flex;
+-    gap: 30px;
++    gap: 10px;
++}
++
++.nav-item {
++    position: relative;
+ }
+ 
+-nav a {
++.nav-trigger {
++    background: none;
++    border: none;
++    cursor: pointer;
+     color: #5a3d7f;
+-    text-decoration: none;
++    font-family: "Comic Neue", sans-serif;
+     font-size: 16px;
+     font-weight: 700;
+     padding: 10px 15px;
+     border-radius: 8px;
+     transition: all 0.3s ease;
++    display: inline-flex;
++    align-items: center;
++    gap: 6px;
++}
++
++.nav-trigger::after {
++    content: "\25BE";
++    font-size: 12px;
+ }
+ 
+-nav a:hover {
++.nav-trigger:hover,
++.nav-trigger:focus-visible,
++.nav-item.open > .nav-trigger {
+     background-color: rgba(255, 255, 255, 0.5);
+     color: #3d2456;
+-    transform: translateY(-2px);
++}
++
++.nav-dropdown {
++    position: absolute;
++    top: 100%;
++    left: 0;
++    background: #ffffff;
++    border-radius: 10px;
++    box-shadow: 0 8px 20px rgba(138, 108, 189, 0.3);
++    padding: 8px;
++    margin-top: 6px;
++    min-width: 180px;
++    display: flex;
++    flex-direction: column;
++    gap: 2px;
++    opacity: 0;
++    visibility: hidden;
++    transform: translateY(-8px);
++    transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
++    z-index: 100;
++}
++
++@media (hover: hover) and (pointer: fine) {
++    .nav-item:hover .nav-dropdown {
++        opacity: 1;
++        visibility: visible;
++        transform: translateY(0);
++    }
++}
++
++.nav-item.open .nav-dropdown,
++.nav-item:focus-within .nav-dropdown {
++    opacity: 1;
++    visibility: visible;
++    transform: translateY(0);
++}
++
++.nav-dropdown a,
++.nav-dropdown .nav-placeholder {
++    color: #5a3d7f;
++    text-decoration: none;
++    font-size: 15px;
++    font-weight: 600;
++    padding: 8px 12px;
++    border-radius: 6px;
++    white-space: nowrap;
++    display: block;
++}
++
++.nav-dropdown a:hover {
++    background-color: rgba(122, 92, 173, 0.12);
++    color: #3d2456;
++}
++
++.nav-dropdown .nav-placeholder {
++    color: #a89bb8;
++    font-style: italic;
++    cursor: default;
+ }
+ 
+ main {
+@@ -258,10 +334,38 @@ p a:hover {
+         gap: 20px;
+     }
+ 
+-    nav {
+-        flex-wrap: wrap;
++    .main-nav {
++        flex-direction: column;
++        width: 100%;
++        gap: 5px;
++    }
++
++    .nav-item {
++        width: 100%;
++    }
++
++    .nav-trigger {
++        width: 100%;
+         justify-content: center;
+-        gap: 15px;
++    }
++
++    .nav-dropdown {
++        position: static;
++        opacity: 1;
++        visibility: visible;
++        transform: none;
++        box-shadow: none;
++        margin-top: 0;
++        max-height: 0;
++        padding: 0 12px;
++        overflow: hidden;
++        transition: max-height 0.25s ease, padding 0.25s ease;
++        align-items: center;
++    }
++
++    .nav-item.open .nav-dropdown {
++        max-height: 300px;
++        padding: 8px 12px;
+     }
+ 
+     .gallery-grid {
+diff --git a/src/index.md b/src/index.md
+index ad297ab..7617429 100644
+--- a/src/index.md
++++ b/src/index.md
+@@ -1,36 +1,8 @@
+-<!DOCTYPE html>
+-<html lang="en">
+-<head>
+-    <meta charset="UTF-8">
+-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+-    <link rel="preconnect" href="https://fonts.googleapis.com">
+-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+-    <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&family=DynaPuff:wght@500&family=Miniver&display=swap" rel="stylesheet">
+-    <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.png">
+-    <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.png">
+-        <a href="/"><title>{% if title %}{{ title }} · {% endif %}Victory Sparkle Co.</title></a>
+-    <link rel="stylesheet" href="/css/style.css">
+-</head>
+-<body>
+-    <header>
+-        <div class="header-content">
+-            <div class="logo-section">
+-                <div class="profile-image"><img src="/images/Vlogo.png"></div>
+-                <div class="site-title">Victory Sparkle Co.</div>
+-            </div>
+-            <nav>
+-                <a href="/apps/pinpress/">Button Maker</a>
+-                <a href="#telegram-bots">Telegram Bots</a>
+-                <a href="#works-in-progress">Works in Progress</a>
+-                <a href="#contact">Contact</a>
+-                <a href="/resources/">Resources</a>
+-                <a href="/map/">Travel Map</a>
+-            </nav>
+-        </div>
+-    </header>
+-
+-<body>
+-    <main>
++---
++layout: base.njk
++title: Home
++permalink: /
++---
+ <!-- BUTTON MAKER -->
+ <div id="button-maker" class="content-section">
+     <h1>Pinpress</h1>
+@@ -68,43 +40,3 @@
+        href="https://www.pinterest.com/victorysparkle/website-board/"></a>
+ </div>
+ <!-- END WORKS IN PROGRESS -->
+-
+-<div id="contact" class="content-section">
+-            <h1>Contact Us</h1>
+-            <p>Did you meet me at an event, or someone recommended me to you? Feel free to reach out! I love to help out with projects, talk shop, brainstorm, and spread joy.</p>
+-            <br>
+-            <div class="social-buttons">
+-                <a href="mailto:contact@victorysparkle.com" class="social-btn email-btn" title="Email Us">
+-                    <svg viewBox="0 0 24 24" fill="currentColor" width="32" height="32">
+-                        <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+-                    </svg>
+-                </a>
+-                <a href="https://www.facebook.com/people/Victory-Sparkle-Co/61580601000673/" class="social-btn facebook-btn" target="_blank" rel="noopener noreferrer" title="Facebook">
+-                    <svg viewBox="0 0 24 24" fill="currentColor" width="32" height="32">
+-                        <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+-                    </svg>
+-                </a>
+-                <a href="https://instagram.com/victorysparkle" class="social-btn instagram-btn" target="_blank" rel="noopener noreferrer" title="Instagram">
+-                    <svg viewBox="0 0 24 24" fill="currentColor" width="32" height="32">
+-                        <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+-                    </svg>
+-                </a>
+-            </div>
+-            <br>
+-                      
+-        </div>
+-
+-</main>
+-
+-    <footer>
+-        <div class="footer-content">
+-            <p>&copy; Victory Sparkle Co.</p>
+-            <div class="footer-links">
+-                <a href="#contact">Contact</a>
+-                <a href="/resources/">Resources</a>
+-                <a href="/map/">Travel Map</a>
+-            </div>
+-        </div>
+-    </footer>
+-</body>
+-</html>
+diff --git a/src/js/nav.js b/src/js/nav.js
+new file mode 100644
+index 0000000..9ac0bf7
+--- /dev/null
++++ b/src/js/nav.js
+@@ -0,0 +1,38 @@
++// Header dropdown menus (Make / Code / Enjoy / Contact).
++// CSS handles hover-to-open on mouse/trackpad; this handles click/tap
++// (touch screens, and mouse users who just click instead of hovering)
++// plus closing on outside click and Escape.
++document.addEventListener("DOMContentLoaded", function () {
++  var items = Array.prototype.slice.call(document.querySelectorAll(".nav-item"));
++  if (!items.length) return;
++
++  function closeAll(except) {
++    items.forEach(function (item) {
++      if (item === except) return;
++      item.classList.remove("open");
++      var trigger = item.querySelector(".nav-trigger");
++      if (trigger) trigger.setAttribute("aria-expanded", "false");
++    });
++  }
++
++  items.forEach(function (item) {
++    var trigger = item.querySelector(".nav-trigger");
++    if (!trigger) return;
++
++    trigger.addEventListener("click", function (e) {
++      e.preventDefault();
++      var isOpen = item.classList.contains("open");
++      closeAll(item);
++      item.classList.toggle("open", !isOpen);
++      trigger.setAttribute("aria-expanded", String(!isOpen));
++    });
++  });
++
++  document.addEventListener("click", function (e) {
++    if (!e.target.closest(".nav-item")) closeAll();
++  });
++
++  document.addEventListener("keydown", function (e) {
++    if (e.key === "Escape") closeAll();
++  });
++});
