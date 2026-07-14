@@ -69,54 +69,75 @@
 
 <main>
 
-  <!-- STEP 1 — Quantities -->
-  <section id="step-quantities" class="card step-card">
+  <!-- STEP 1 — Upload photos -->
+  <section id="step-photos" class="card step-card">
     <div class="step-card-header">
       <div class="step-badge">1</div>
       <div>
-        <h2>Pick your sizes</h2>
-        <p class="step-desc">How many of each button do you want to print?</p>
+        <h2>Add your photos</h2>
+        <p class="step-desc">Upload every photo you want to turn into a button. You'll pick sizes next.</p>
       </div>
     </div>
 
-    <form id="quantities-form">
-      <div id="quantity-rows" class="quantity-rows"></div>
+    <div id="photo-dropzone" class="dropzone">
+      <p>Drag photos here, or</p>
+      <button type="button" id="choose-photos-btn" class="btn-secondary">Choose photos</button>
+      <input type="file" id="photo-file-input" accept="image/*" multiple hidden>
+    </div>
 
-      <label class="toggle-row">
-        <input type="checkbox" id="edge-margin-toggle">
-        <span class="toggle-track"><span class="toggle-thumb"></span></span>
-        <span class="toggle-label">
-          Full edge margins (½")
-          <span class="toggle-hint">Turn this on if your printer can't print edge-to-edge.</span>
-        </span>
-      </label>
+    <p id="photo-errors" class="generate-warning" hidden></p>
 
-      <button type="submit" class="btn-primary">Continue to photos →</button>
-    </form>
+    <div id="photo-grid" class="slots-grid photo-grid"></div>
+
+    <div class="step-actions">
+      <span></span>
+      <button type="button" id="step1-continue" class="btn-primary" disabled>Continue to sizes →</button>
+    </div>
   </section>
 
-  <!-- STEP 2 — Assign & edit -->
-  <section id="step-slots" class="card step-card" hidden>
+  <!-- STEP 2 — Sizes & quantity per photo -->
+  <section id="step-sizes" class="card step-card" hidden>
     <div class="step-card-header">
       <div class="step-badge">2</div>
       <div>
-        <h2>Add your photos</h2>
-        <p class="step-desc">Click or drop an image onto each slot, then drag, zoom, and rotate it to fit.</p>
+        <h2>Pick sizes for each photo</h2>
+        <p class="step-desc">How many of each size do you want, per photo? A photo can be used at more than one size.</p>
       </div>
     </div>
 
-    <div id="slots-grid" class="slots-grid"></div>
+    <div id="sizes-rows"></div>
+
+    <p id="step2-totals" class="totals-line">No buttons yet — add a quantity below.</p>
+    <p id="step2-warning" class="generate-warning" hidden></p>
 
     <div class="step-actions">
-      <button type="button" id="back-to-quantities" class="btn-secondary">← Edit sizes</button>
-      <button type="button" id="continue-to-generate" class="btn-primary">Continue to print →</button>
+      <button type="button" id="back-to-photos" class="btn-secondary">← Edit photos</button>
+      <button type="button" id="step2-continue" class="btn-primary" disabled>Continue to alignment →</button>
     </div>
   </section>
 
-  <!-- STEP 3 — Generate -->
-  <section id="step-generate" class="card step-card" hidden>
+  <!-- STEP 3 — Align & crop -->
+  <section id="step-align" class="card step-card" hidden>
     <div class="step-card-header">
       <div class="step-badge">3</div>
+      <div>
+        <h2>Align each button</h2>
+        <p class="step-desc">Click a tile to drag, zoom, and rotate it to fit. This step is optional — every button already starts centered and filled.</p>
+      </div>
+    </div>
+
+    <div id="groups-grid" class="slots-grid"></div>
+
+    <div class="step-actions">
+      <button type="button" id="back-to-sizes" class="btn-secondary">← Edit sizes</button>
+      <button type="button" id="step3-continue" class="btn-primary">Continue to print →</button>
+    </div>
+  </section>
+
+  <!-- STEP 4 — Print -->
+  <section id="step-print" class="card step-card" hidden>
+    <div class="step-card-header">
+      <div class="step-badge">4</div>
       <div>
         <h2>Print your sheet</h2>
         <p class="step-desc">We'll pack every button onto as few US Letter pages as possible.</p>
@@ -126,8 +147,17 @@
     <div id="generate-summary" class="generate-summary"></div>
     <p id="generate-warning" class="generate-warning" hidden></p>
 
+    <label class="toggle-row">
+      <input type="checkbox" id="edge-margin-toggle">
+      <span class="toggle-track"><span class="toggle-thumb"></span></span>
+      <span class="toggle-label">
+        Full edge margins (½")
+        <span class="toggle-hint">Turn this on if your printer can't print edge-to-edge.</span>
+      </span>
+    </label>
+
     <div class="step-actions">
-      <button type="button" id="back-to-slots" class="btn-secondary">← Edit photos</button>
+      <button type="button" id="back-to-align" class="btn-secondary">← Edit alignment</button>
       <button type="button" id="generate-btn" class="btn-primary btn-large">Generate PDF</button>
     </div>
 
@@ -146,6 +176,7 @@
 
     <div class="modal-body">
       <div id="editor-stage-container" class="stage-container"></div>
+      <p class="editor-caption">Dashed line = visible area once pressed. Everything outside it wraps around the edge.</p>
 
       <div class="editor-controls">
         <label class="slider-row">
@@ -157,18 +188,13 @@
           <input type="range" id="rotate-slider" min="-180" max="180" value="0">
         </label>
 
-        <button type="button" id="editor-upload-btn" class="btn-secondary">Replace photo</button>
-        <input type="file" id="editor-upload-input" accept="image/*" hidden>
+        <label class="toggle-row">
+          <input type="checkbox" id="face-guide-toggle" checked>
+          <span class="toggle-track"><span class="toggle-thumb"></span></span>
+          <span class="toggle-label">Show face guide</span>
+        </label>
 
-        <div class="editor-duplicate" id="editor-duplicate" hidden>
-          <span class="editor-duplicate-label">Also use this photo for</span>
-          <div class="qty-stepper">
-            <button type="button" class="qty-step-btn" id="duplicate-minus" aria-label="Decrease">−</button>
-            <input type="number" class="qty-input" id="duplicate-count" min="0" value="0" inputmode="numeric" aria-label="Number of additional slots to fill">
-            <button type="button" class="qty-step-btn" id="duplicate-plus" aria-label="Increase">+</button>
-          </div>
-          <span class="editor-duplicate-label" id="editor-duplicate-suffix">more empty slot(s)</span>
-        </div>
+        <button type="button" id="editor-reset" class="btn-secondary">Reset position</button>
       </div>
     </div>
 
