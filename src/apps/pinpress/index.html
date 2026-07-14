@@ -21,15 +21,39 @@
 
 <header>
     <div class="header-content">
-        <div class="logo-section">
-            <div class="profile-image"><img src="/images/Vlogo.png"></div>
+        <a href="/" class="logo-section" aria-label="Victory Sparkle Co. home">
+            <div class="profile-image"><img src="/images/Vlogo.png" alt=""></div>
             <div class="site-title">Victory Sparkle Co.</div>
-        </div>
-        <nav>
-            <a href="/apps/pinpress/">Button Maker</a>
-            <a href="/#coding-projects">Coding Projects</a>
-            <a href="/#works-in-progress">Works in Progress</a>
-            <a href="/#contact">Contact</a>
+        </a>
+        <nav class="main-nav">
+            <div class="nav-item">
+                <button type="button" class="nav-trigger" aria-expanded="false">Make</button>
+                <div class="nav-dropdown">
+                    <a href="/apps/pinpress/">Pinpress</a>
+                    <a href="/resources/">Resources</a>
+                    <a href="https://www.pinterest.com/victorysparkle/website-board/" target="_blank" rel="noopener noreferrer">Pinterest</a>
+                </div>
+            </div>
+            <div class="nav-item">
+                <button type="button" class="nav-trigger" aria-expanded="false">Code</button>
+                <div class="nav-dropdown">
+                    <a href="/#coding-projects">Telegram Bots</a>
+                </div>
+            </div>
+            <div class="nav-item">
+                <button type="button" class="nav-trigger" aria-expanded="false">Enjoy</button>
+                <div class="nav-dropdown">
+                    <span class="nav-placeholder">Coming soon</span>
+                </div>
+            </div>
+            <div class="nav-item">
+                <button type="button" class="nav-trigger" aria-expanded="false">Contact</button>
+                <div class="nav-dropdown">
+                    <a href="/blog/">Blog</a>
+                    <a href="/map/">Travel Map</a>
+                    <a href="/contact/">Contact</a>
+                </div>
+            </div>
         </nav>
     </div>
 </header>
@@ -163,5 +187,6 @@
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js" onerror="window.__libLoadFailed='jsPDF'"></script>
 
 <script src="buttonapp.js" defer></script>
+<script src="/js/nav.js" defer></script>
 </body>
 </html>

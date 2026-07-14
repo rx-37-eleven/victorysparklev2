@@ -31,6 +31,8 @@ header {
     display: flex;
     align-items: center;
     gap: 15px;
+    text-decoration: none;
+    color: inherit;
 }
 
 .profile-image {
@@ -62,25 +64,99 @@ header {
     font-family: "miniver";
 }
 
-nav {
+.main-nav {
     display: flex;
-    gap: 30px;
+    gap: 10px;
 }
 
-nav a {
+.nav-item {
+    position: relative;
+}
+
+.nav-trigger {
+    background: none;
+    border: none;
+    cursor: pointer;
     color: #5a3d7f;
-    text-decoration: none;
+    font-family: "Comic Neue", sans-serif;
     font-size: 16px;
     font-weight: 700;
     padding: 10px 15px;
     border-radius: 8px;
     transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
 }
 
-nav a:hover {
+.nav-trigger::after {
+    content: "\25BE";
+    font-size: 12px;
+}
+
+.nav-trigger:hover,
+.nav-trigger:focus-visible,
+.nav-item.open > .nav-trigger {
     background-color: rgba(255, 255, 255, 0.5);
     color: #3d2456;
-    transform: translateY(-2px);
+}
+
+.nav-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 8px 20px rgba(138, 108, 189, 0.3);
+    padding: 8px;
+    margin-top: 6px;
+    min-width: 180px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-8px);
+    transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
+    z-index: 100;
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .nav-item:hover .nav-dropdown {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+    }
+}
+
+.nav-item.open .nav-dropdown,
+.nav-item:focus-within .nav-dropdown {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.nav-dropdown a,
+.nav-dropdown .nav-placeholder {
+    color: #5a3d7f;
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: 600;
+    padding: 8px 12px;
+    border-radius: 6px;
+    white-space: nowrap;
+    display: block;
+}
+
+.nav-dropdown a:hover {
+    background-color: rgba(122, 92, 173, 0.12);
+    color: #3d2456;
+}
+
+.nav-dropdown .nav-placeholder {
+    color: #a89bb8;
+    font-style: italic;
+    cursor: default;
 }
 
 main {
@@ -258,10 +334,38 @@ p a:hover {
         gap: 20px;
     }
 
-    nav {
-        flex-wrap: wrap;
+    .main-nav {
+        flex-direction: column;
+        width: 100%;
+        gap: 5px;
+    }
+
+    .nav-item {
+        width: 100%;
+    }
+
+    .nav-trigger {
+        width: 100%;
         justify-content: center;
-        gap: 15px;
+    }
+
+    .nav-dropdown {
+        position: static;
+        opacity: 1;
+        visibility: visible;
+        transform: none;
+        box-shadow: none;
+        margin-top: 0;
+        max-height: 0;
+        padding: 0 12px;
+        overflow: hidden;
+        transition: max-height 0.25s ease, padding 0.25s ease;
+        align-items: center;
+    }
+
+    .nav-item.open .nav-dropdown {
+        max-height: 300px;
+        padding: 8px 12px;
     }
 
     .gallery-grid {
