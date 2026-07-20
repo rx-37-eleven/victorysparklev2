@@ -740,3 +740,134 @@ p a:hover {
         padding: 6px 12px;
     }
 }
+
+/* ===== BLOG ===== */
+
+.blog-status {
+    font-style: italic;
+}
+
+.blog-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-top: 25px;
+    padding: 0;
+}
+
+.blog-list-item {
+    background: white;
+    border-radius: 15px;
+    padding: 20px 25px;
+    box-shadow: 0 4px 15px rgba(138, 108, 189, 0.15);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.blog-list-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(138, 108, 189, 0.25);
+}
+
+.blog-list-title {
+    display: block;
+    color: #5a3d7f;
+    font-size: 24px;
+    font-weight: 700;
+    text-decoration: none;
+    font-family: "DynaPuff", "Comic Neue", sans-serif;
+}
+
+.blog-list-title:hover {
+    text-decoration: underline;
+}
+
+.blog-list-date {
+    display: block;
+    color: #8a7aa0;
+    font-size: 13px;
+    margin-top: 6px;
+}
+
+.blog-list-excerpt {
+    color: #6b5786;
+    font-size: 16px;
+    margin-top: 10px;
+    line-height: 1.5;
+}
+
+.blog-back-link {
+    display: inline-block;
+    color: #5a3d7f;
+    font-weight: 700;
+    text-decoration: none;
+    margin-bottom: 20px;
+}
+
+.blog-back-link:hover {
+    text-decoration: underline;
+}
+
+.blog-post-date {
+    display: block;
+    color: #8a7aa0;
+    font-size: 14px;
+    margin-bottom: 20px;
+}
+
+.blog-post-body {
+    color: #6b5786;
+    font-size: 18px;
+    line-height: 1.7;
+}
+
+.blog-post-body h1,
+.blog-post-body h2,
+.blog-post-body h3 {
+    color: #5a3d7f;
+    margin: 24px 0 12px;
+}
+
+.blog-post-body p {
+    margin-bottom: 16px;
+    font-size: inherit;
+    color: inherit;
+}
+
+.blog-post-body ul,
+.blog-post-body ol {
+    margin: 0 0 16px 24px;
+}
+
+.blog-post-body img {
+    max-width: 100%;
+    border-radius: 10px;
+}
+
+.blog-post-body blockquote {
+    border-left: 4px solid #d7afed;
+    padding-left: 16px;
+    margin: 16px 0;
+    color: #8a7aa0;
+    font-style: italic;
+}
+
+.blog-post-body code {
+    background: rgba(138, 108, 189, 0.12);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.9em;
+}
+
+.blog-post-body pre {
+    background: rgba(138, 108, 189, 0.08);
+    padding: 16px;
+    border-radius: 10px;
+    overflow-x: auto;
+    margin-bottom: 16px;
+}
+
+.blog-post-body pre code {
+    background: none;
+    padding: 0;
+}
