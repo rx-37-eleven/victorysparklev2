@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Seamless Tile Maker — Victory Sparkle Co.</title>
+<meta name="description" content="Upload an image and instantly swap its quadrants to set up a seamless repeating tile. Free, client-side, no upload to a server.">
+
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect x='4' y='4' width='26' height='26' fill='%237C4DCB'/%3E%3Crect x='34' y='4' width='26' height='26' fill='%23D8C2F5'/%3E%3Crect x='4' y='34' width='26' height='26' fill='%23D8C2F5'/%3E%3Crect x='34' y='34' width='26' height='26' fill='%237C4DCB'/%3E%3C/svg%3E">
+
+<!-- Google Fonts: Baloo 2 (display/headings) + Work Sans (body/UI) — same as Pinpress, for a consistent look across apps -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="/css/style.css">
+
+<style>
+  :root {
+    --color-bg:           #F8F4FD;
+    --color-surface:      #FFFFFF;
+    --color-primary:      #7C4DCB;
+    --color-primary-dark: #5A35A0;
+    --color-accent-light: #D8C2F5;
+    --color-ink:          #2E1F47;
+    --color-muted:        #8C7AA8;
+    --color-warn:         #B5740E;
+    --color-warn-bg:      #FBEDD7;
+    --color-border:       #E6DAF7;
+    --font-display: 'Baloo 2', system-ui, sans-serif;
+    --font-body:    'Work Sans', system-ui, sans-serif;
+    --radius-md: 16px;
+    --radius-lg: 24px;
+    --shadow-card: 0 2px 0 rgba(46, 31, 71, 0.04), 0 10px 30px rgba(124, 77, 203, 0.10);
+  }
+
+  * { box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  }
+
+  body {
+    margin: 0;
+    background: var(--color-bg);
+    background-image:
+      radial-gradient(circle at 8% 0%, rgba(124, 77, 203, 0.08), transparent 40%),
+      radial-gradient(circle at 100% 20%, rgba(216, 194, 245, 0.35), transparent 45%);
+    color: var(--color-ink);
+    font-family: var(--font-body);
+    line-height: 1.5;
+    padding-bottom: 4rem;
+  }
+
+  main.app-main {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .app-intro {
+    padding: 1.5rem 0 0;
+  }
+
+  .app-intro h1 {
+    font-family: var(--font-display);
+    font-size: 1.9rem;
+    margin: 0 0 0.4rem;
+    color: var(--color-primary-dark);
+  }
+
+  .app-intro p {
+    margin: 0.35rem 0;
+    color: var(--color-muted);
+    max-width: 62ch;
+  }
+
+  .card {
+    background: var(--color-surface);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+    border: 1px solid var(--color-border);
+    padding: 1.5rem;
+  }
+
+  .dropzone {
+    border: 2px dashed var(--color-accent-light);
+    border-radius: var(--radius-md);
+    padding: 2.5rem 1.5rem;
+    text-align: center;
+    color: var(--color-muted);
+    transition: border-color 0.15s ease, background 0.15s ease;
+  }
+
+  .dropzone.drag-over {
+    border-color: var(--color-primary);
+    background: var(--color-bg);
+  }
+
+  .dropzone p {
+    margin: 0 0 0.9rem;
+  }
+
+  .btn-primary,
+  .btn-secondary {
+    font-family: var(--font-body);
+    font-weight: 600;
+    font-size: 0.95rem;
+    border-radius: 999px;
+    border: none;
+    padding: 0.65rem 1.4rem;
+    cursor: pointer;
+    transition: transform 0.1s ease, box-shadow 0.1s ease, background 0.15s ease;
+  }
+
+  .btn-primary {
+    background: var(--color-primary);
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(124, 77, 203, 0.35);
+  }
+
+  .btn-primary:hover:not(:disabled) { background: var(--color-primary-dark); }
+  .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; box-shadow: none; }
+
+  .btn-secondary {
+    background: var(--color-bg);
+    color: var(--color-primary-dark);
+    border: 1px solid var(--color-accent-light);
+  }
+
+  .btn-secondary:hover { background: #fff; }
+
+  .error-banner {
+    background: var(--color-warn-bg);
+    color: var(--color-warn);
+    border-radius: var(--radius-md);
+    padding: 0.9rem 1.1rem;
+    font-size: 0.92rem;
+  }
+
+  .results[hidden] {
+    display: none;
+  }
+
+  .results {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .preview-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+  }
+
+  @media (max-width: 640px) {
+    .preview-row { grid-template-columns: 1fr; }
+  }
+
+  .preview-box h3 {
+    font-family: var(--font-display);
+    font-size: 1.05rem;
+    margin: 0 0 0.5rem;
+    color: var(--color-ink);
+  }
+
+  .preview-frame {
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border);
+    overflow: hidden;
+    background-image:
+      linear-gradient(45deg, #eee 25%, transparent 25%),
+      linear-gradient(-45deg, #eee 25%, transparent 25%),
+      linear-gradient(45deg, transparent 75%, #eee 75%),
+      linear-gradient(-45deg, transparent 75%, #eee 75%);
+    background-size: 20px 20px;
+    background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .preview-frame img,
+  .preview-frame canvas {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    image-rendering: pixelated;
+  }
+
+  .dims-note {
+    font-size: 0.85rem;
+    color: var(--color-muted);
+    margin: 0.5rem 0 0;
+  }
+
+  .tiled-preview-wrap {
+    display: flex;
+    justify-content: center;
+  }
+
+  .tiled-preview {
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border);
+    image-rendering: pixelated;
+    background-repeat: repeat;
+  }
+
+  .actions-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .helper-note {
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: 1rem 1.2rem;
+    font-size: 0.9rem;
+    color: var(--color-ink);
+  }
+
+  .helper-note strong { color: var(--color-primary-dark); }
+
+  .visually-hidden {
+    position: absolute;
+    width: 1px; height: 1px;
+    padding: 0; margin: -1px;
+    overflow: hidden;
+    clip: rect(0,0,0,0);
+    white-space: nowrap;
+    border: 0;
+  }
+</style>
+</head>
+<body>
+
+<header>
+    <div class="header-content">
+        <a href="/" class="logo-section" aria-label="Victory Sparkle Co. home">
+            <div class="profile-image"><img src="/images/Vlogo.png" alt=""></div>
+            <div class="site-title">Victory Sparkle Co.</div>
+        </a>
+        <nav class="main-nav">
+            <div class="nav-item">
+                <button type="button" class="nav-trigger" aria-expanded="false">Make</button>
+                <div class="nav-dropdown">
+                    <a href="/apps/pinpress/">Pinpress</a>
+                    <a href="/apps/tilemaker/">Seamless Tile Maker</a>
+                    <a href="/resources/">Resources</a>
+                    <a href="https://www.pinterest.com/victorysparkle/website-board/" target="_blank" rel="noopener noreferrer">Pinterest</a>
+                </div>
+            </div>
+            <div class="nav-item">
+                <button type="button" class="nav-trigger" aria-expanded="false">Code</button>
+                <div class="nav-dropdown">
+                    <a href="/#coding-projects">Telegram Bots</a>
+                </div>
+            </div>
+            <div class="nav-item">
+                <button type="button" class="nav-trigger" aria-expanded="false">Enjoy</button>
+                <div class="nav-dropdown">
+                    <span class="nav-placeholder">Coming soon</span>
+                </div>
+            </div>
+            <div class="nav-item">
+                <button type="button" class="nav-trigger" aria-expanded="false">Contact</button>
+                <div class="nav-dropdown">
+                    <a href="/blog/">Blog</a>
+                    <a href="/map/">Travel Map</a>
+                    <a href="/contact/">Contact</a>
+                </div>
+            </div>
+        </nav>
+    </div>
+</header>
+
+<main class="app-main">
+
+  <div class="app-intro">
+    <h1>Seamless Tile Maker</h1>
+    <p>This tool automates the "set up the tile" step of making a seamless pattern: it swaps opposite quadrants (top-left ⇄ bottom-right, top-right ⇄ bottom-left) so the original edges meet in the middle and the outer edges of your image now line up.</p>
+    <p>After downloading, you'll likely still want to <strong>fill the gap in the center</strong> by hand in your art program — the swap pushes your artwork to the edges and leaves the middle to be connected. Best results come from a source image with artwork concentrated near the center and blank margins at the edges.</p>
+  </div>
+
+  <section class="card">
+    <div id="dropzone" class="dropzone">
+      <p>Drag an image here, or</p>
+      <button type="button" id="choose-file-btn" class="btn-secondary">Choose an image</button>
+      <input type="file" id="file-input" accept="image/png,image/jpeg,image/webp" class="visually-hidden">
+      <p class="dims-note" style="margin-top:0.9rem;">PNG, JPEG, or WebP. Processing happens entirely in your browser — nothing is uploaded anywhere.</p>
+    </div>
+    <p id="error-banner" class="error-banner" hidden></p>
+  </section>
+
+  <section id="results" class="results" hidden>
+
+    <div class="preview-row">
+      <div class="preview-box">
+        <h3>Original</h3>
+        <div class="preview-frame">
+          <img id="original-img" alt="Original uploaded image">
+        </div>
+        <p class="dims-note" id="dims-note"></p>
+      </div>
+      <div class="preview-box">
+        <h3>Swapped (seamless tile)</h3>
+        <div class="preview-frame">
+          <canvas id="result-canvas"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 style="font-family: var(--font-display); margin-top:0;">Tiled preview</h3>
+      <p class="dims-note" style="margin-bottom:1rem;">Repeated 3×3 so you can check the edges line up with no visible seams.</p>
+      <div class="tiled-preview-wrap">
+        <div id="tiled-preview" class="tiled-preview"></div>
+      </div>
+    </div>
+
+    <div class="actions-row">
+      <button type="button" id="download-btn" class="btn-primary">Download PNG</button>
+      <button type="button" id="reset-btn" class="btn-secondary">Start over</button>
+    </div>
+
+    <p class="helper-note"><strong>Tip:</strong> the swap only rearranges pixels — it never resizes or blurs your image, and transparency is preserved.</p>
+  </section>
+
+</main>
+
+<script>
+(function () {
+  "use strict";
+
+  var dropzone = document.getElementById("dropzone");
+  var fileInput = document.getElementById("file-input");
+  var chooseBtn = document.getElementById("choose-file-btn");
+  var errorBanner = document.getElementById("error-banner");
+  var resultsSection = document.getElementById("results");
+  var originalImg = document.getElementById("original-img");
+  var resultCanvas = document.getElementById("result-canvas");
+  var dimsNote = document.getElementById("dims-note");
+  var tiledPreview = document.getElementById("tiled-preview");
+  var downloadBtn = document.getElementById("download-btn");
+  var resetBtn = document.getElementById("reset-btn");
+
+  var ACCEPTED_TYPES = ["image/png", "image/jpeg", "image/webp"];
+  var currentObjectUrl = null;
+  var currentDownloadUrl = null;
+
+  function showError(message) {
+    errorBanner.textContent = message;
+    errorBanner.hidden = false;
+  }
+
+  function clearError() {
+    errorBanner.hidden = true;
+    errorBanner.textContent = "";
+  }
+
+  function resetApp() {
+    resultsSection.hidden = true;
+    clearError();
+    fileInput.value = "";
+    if (currentObjectUrl) {
+      URL.revokeObjectURL(currentObjectUrl);
+      currentObjectUrl = null;
+    }
+    if (currentDownloadUrl) {
+      URL.revokeObjectURL(currentDownloadUrl);
+      currentDownloadUrl = null;
+    }
+  }
+
+  // Draws the source image four times onto a W x H canvas, offset so the
+  // copies tile the plane on a W x H lattice. Together the four draws
+  // (clipped to the canvas bounds) cover every output pixel exactly once,
+  // producing a wrapped 50%-offset shift for any W/H, even/odd.
+  function quadrantSwap(img, width, height) {
+    var canvas = document.createElement("canvas");
+    canvas.width = width;
+    canvas.height = height;
+    var ctx = canvas.getContext("2d");
+    ctx.imageSmoothingEnabled = false;
+
+    var mx = Math.floor(width / 2);
+    var my = Math.floor(height / 2);
+    var positions = [
+      [mx, my],
+      [mx - width, my],
+      [mx, my - height],
+      [mx - width, my - height],
+    ];
+
+    for (var i = 0; i < positions.length; i++) {
+      ctx.drawImage(img, positions[i][0], positions[i][1], width, height);
+    }
+
+    return canvas;
+  }
+
+  function buildTiledPreview(canvas, width, height) {
+    var dataUrl = canvas.toDataURL("image/png");
+    var maxTotalWidth = 300;
+    var cellWidth = Math.min(width, maxTotalWidth / 3);
+    var cellHeight = cellWidth * (height / width);
+
+    tiledPreview.style.width = (cellWidth * 3) + "px";
+    tiledPreview.style.height = (cellHeight * 3) + "px";
+    tiledPreview.style.backgroundImage = "url('" + dataUrl + "')";
+    tiledPreview.style.backgroundSize = cellWidth + "px " + cellHeight + "px";
+  }
+
+  function handleImage(img, width, height) {
+    var resultCtx = resultCanvas.getContext("2d");
+    resultCanvas.width = width;
+    resultCanvas.height = height;
+    resultCtx.clearRect(0, 0, width, height);
+
+    var swapped = quadrantSwap(img, width, height);
+    resultCtx.imageSmoothingEnabled = false;
+    resultCtx.drawImage(swapped, 0, 0);
+
+    dimsNote.textContent = width + " × " + height + " px — output is the same size, no resizing.";
+    buildTiledPreview(resultCanvas, width, height);
+
+    if (currentDownloadUrl) {
+      URL.revokeObjectURL(currentDownloadUrl);
+      currentDownloadUrl = null;
+    }
+
+    resultsSection.hidden = false;
+  }
+
+  function processFile(file) {
+    clearError();
+
+    if (!file) return;
+
+    if (ACCEPTED_TYPES.indexOf(file.type) === -1) {
+      showError("Unsupported file type. Please upload a PNG, JPEG, or WebP image.");
+      return;
+    }
+
+    if (currentObjectUrl) {
+      URL.revokeObjectURL(currentObjectUrl);
+    }
+    currentObjectUrl = URL.createObjectURL(file);
+
+    var img = new Image();
+    img.onload = function () {
+      var width = img.naturalWidth;
+      var height = img.naturalHeight;
+
+      if (!width || !height) {
+        showError("This image couldn't be read. Please try a different file.");
+        return;
+      }
+
+      originalImg.src = currentObjectUrl;
+      handleImage(img, width, height);
+    };
+    img.onerror = function () {
+      showError("This image failed to load. Please try a different file.");
+    };
+    img.src = currentObjectUrl;
+  }
+
+  chooseBtn.addEventListener("click", function () {
+    fileInput.click();
+  });
+
+  fileInput.addEventListener("change", function () {
+    if (fileInput.files && fileInput.files[0]) {
+      processFile(fileInput.files[0]);
+    }
+  });
+
+  dropzone.addEventListener("dragover", function (e) {
+    e.preventDefault();
+    dropzone.classList.add("drag-over");
+  });
+
+  dropzone.addEventListener("dragleave", function () {
+    dropzone.classList.remove("drag-over");
+  });
+
+  dropzone.addEventListener("drop", function (e) {
+    e.preventDefault();
+    dropzone.classList.remove("drag-over");
+    var files = e.dataTransfer && e.dataTransfer.files;
+    if (files && files[0]) {
+      processFile(files[0]);
+    }
+  });
+
+  downloadBtn.addEventListener("click", function () {
+    resultCanvas.toBlob(function (blob) {
+      if (!blob) {
+        showError("Couldn't generate the PNG. Please try again.");
+        return;
+      }
+      if (currentDownloadUrl) {
+        URL.revokeObjectURL(currentDownloadUrl);
+      }
+      currentDownloadUrl = URL.createObjectURL(blob);
+
+      var a = document.createElement("a");
+      a.href = currentDownloadUrl;
+      a.download = "seamless-tile.png";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }, "image/png");
+  });
+
+  resetBtn.addEventListener("click", resetApp);
+})();
+</script>
+
+<script src="/js/nav.js" defer></script>
+</body>
+</html>
