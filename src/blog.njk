@@ -3,7 +3,31 @@ layout: base.njk
 title: Blog
 permalink: /blog/
 ---
-<div class="content-section">
+<div class="content-section blog-page">
+  <div id="blog-list-view">
     <h1>Blog</h1>
-    <p>Coming soon! Check back for posts.</p>
+    <p>Updates from Victory Sparkle Co., posted straight from Telegram.</p>
+    <p id="blog-loading" class="blog-status">Loading posts...</p>
+    <p id="blog-empty" class="blog-status" hidden>No posts yet ✨ — check back soon.</p>
+    <p id="blog-error" class="blog-status" hidden>Couldn't load posts right now. Try refreshing.</p>
+    <ul class="blog-list" id="blog-list" hidden></ul>
+  </div>
+
+  <div id="blog-post-view" hidden>
+    <a href="/blog/" class="blog-back-link" id="blog-back-link">&larr; Back to all posts</a>
+    <article class="blog-post" id="blog-post">
+      <h1 id="blog-post-title"></h1>
+      <time class="blog-post-date" id="blog-post-date"></time>
+      <div class="blog-post-body" id="blog-post-body"></div>
+    </article>
+    <p id="blog-post-error" class="blog-status" hidden>That post couldn't be found.</p>
+  </div>
 </div>
+
+<!-- CDN libraries, pinned versions, no build step — same pattern as Pinpress
+     (buttonapp.js loads Konva/jsPDF from jsDelivr this way). The onerror
+     handlers flag a failed load so blog.js can fall back to plain text
+     instead of leaving the page broken. -->
+<script src="https://cdn.jsdelivr.net/npm/marked@18.0.6/lib/marked.umd.js" onerror="window.__libLoadFailed='marked'"></script>
+<script src="https://cdn.jsdelivr.net/npm/dompurify@3.4.12/dist/purify.js" onerror="window.__libLoadFailed='DOMPurify'"></script>
+<script src="/js/blog.js" defer></script>
