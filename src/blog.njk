@@ -1,33 +1,37 @@
 ---
 layout: base.njk
 title: Blog
-permalink: /blog/
+description: "Updates from Victory Sparkle Co., posted straight from Telegram."
+pagination:
+  data: blogpostsForPagination
+  size: 20
+  alias: posts
+permalink: "{% if pagination.pageNumber == 0 %}/blog/{% else %}/blog/page/{{ pagination.pageNumber + 1 }}/{% endif %}"
 ---
 <div class="content-section blog-page">
-  <div id="blog-list-view">
-    <h1>Blog</h1>
-    <p>Updates from Victory Sparkle Co., posted straight from Telegram.</p>
-    <p id="blog-loading" class="blog-status">Loading posts...</p>
-    <p id="blog-empty" class="blog-status" hidden>No posts yet ✨ — check back soon.</p>
-    <p id="blog-error" class="blog-status" hidden>Couldn't load posts right now. Try refreshing.</p>
-    <ul class="blog-list" id="blog-list" hidden></ul>
-  </div>
+  <h1>Blog</h1>
+  <p>Updates from Victory Sparkle Co., posted straight from Telegram.</p>
 
-  <div id="blog-post-view" hidden>
-    <a href="/blog/" class="blog-back-link" id="blog-back-link">&larr; Back to all posts</a>
-    <article class="blog-post" id="blog-post">
-      <h1 id="blog-post-title"></h1>
-      <time class="blog-post-date" id="blog-post-date"></time>
-      <div class="blog-post-body" id="blog-post-body"></div>
+  {% if posts[0].__empty %}
+  <p class="blog-status">No posts yet ✨ — check back soon.</p>
+  {% else %}
+  <div class="blog-list">
+    {% for post in posts %}
+    <article class="blog-list-item">
+      <h2 class="blog-list-title">
+        <a href="{{ post.url }}">{{ post.title or (post.publishedAt | postDate) }}</a>
+      </h2>
+      <time class="blog-list-date" datetime="{{ post.publishedAt | postDateISO }}">{{ post.publishedAt | postDate }}</time>
+      <div class="blog-post-body">{{ post.bodyHtml | safe }}</div>
     </article>
-    <p id="blog-post-error" class="blog-status" hidden>That post couldn't be found.</p>
+    {% endfor %}
   </div>
-</div>
 
-<!-- CDN libraries, pinned versions, no build step — same pattern as Pinpress
-     (buttonapp.js loads Konva/jsPDF from jsDelivr this way). The onerror
-     handlers flag a failed load so blog.js can fall back to plain text
-     instead of leaving the page broken. -->
-<script src="https://cdn.jsdelivr.net/npm/marked@18.0.6/lib/marked.umd.js" onerror="window.__libLoadFailed='marked'"></script>
-<script src="https://cdn.jsdelivr.net/npm/dompurify@3.4.12/dist/purify.js" onerror="window.__libLoadFailed='DOMPurify'"></script>
-<script src="/js/blog.js" defer></script>
+  {% if pagination.href.previous or pagination.href.next %}
+  <nav class="blog-pager">
+    {% if pagination.href.previous %}<a href="{{ pagination.href.previous }}" class="blog-pager-link">&larr; Newer posts</a>{% endif %}
+    {% if pagination.href.next %}<a href="{{ pagination.href.next }}" class="blog-pager-link">Older posts &rarr;</a>{% endif %}
+  </nav>
+  {% endif %}
+  {% endif %}
+</div>

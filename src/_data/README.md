@@ -46,3 +46,10 @@ automatically, including the count of states in each category.
 Same idea, different file: `src/_data/resources.json`. See the comment
 at the top of `src/resources.njk` for the short version, or just copy the
 shape of the existing entry and fill in your own title/url/date/tags.
+
+## How to change the blog's display timezone
+
+`src/_data/site.json`'s `blogTimezone` key controls what timezone blog post
+timestamps are shown in (e.g. `America/New_York`, `America/Los_Angeles`).
+Posts themselves are always stored in UTC — this only changes the `postDate`
+filter's output. Edit the value, commit, and the next build picks it up.

@@ -8,7 +8,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&family=DynaPuff:wght@500&family=Miniver&display=swap" rel="stylesheet">
     <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.png">
+    <link rel="alternate" type="application/rss+xml" title="Victory Sparkle Co. Blog" href="/blog/feed.xml">
     <title>{% if title %}{{ title }} · {% endif %}Victory Sparkle Co.</title>
+    {% if description %}<meta name="description" content="{{ description }}">{% endif %}
     <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>

@@ -1,0 +1,4 @@
+{
+  "_comment": "blogTimezone controls what timezone blog post timestamps are displayed in (an IANA zone name, e.g. 'America/New_York', 'America/Los_Angeles', 'Europe/London'). Posts are always stored in UTC in D1 -- this only changes how they're formatted on the page. Edit it here on GitHub and commit; no code changes needed.",
+  "blogTimezone": "America/New_York"
+}

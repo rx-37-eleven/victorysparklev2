@@ -1,4 +1,10 @@
+const { DateTime } = require("luxon");
+const pluginRss = require("@11ty/eleventy-plugin-rss");
+const site = require("./src/_data/site.json");
+
 module.exports = function (eleventyConfig) {
+  eleventyConfig.addPlugin(pluginRss);
+
   // Copy static assets straight through to the output folder untouched.
   eleventyConfig.addPassthroughCopy("src/css");
   eleventyConfig.addPassthroughCopy("src/images");
@@ -15,6 +21,34 @@ module.exports = function (eleventyConfig) {
       day: "numeric",
     });
   });
+
+  // Blog posts are stored as UTC ISO 8601 strings (e.g.
+  // "2026-07-25T14:03:22Z"). postDate converts to the display timezone from
+  // site.json (default America/New_York) for on-page reading, e.g.
+  // "July 25, 2026 at 10:03 AM". Kept separate from readableDate above --
+  // that one is plain-date-only and the resources page depends on its
+  // current behavior, so it's left untouched rather than merged with this.
+  eleventyConfig.addFilter("postDate", (isoString) => {
+    return DateTime.fromISO(isoString, { zone: "utc" })
+      .setZone(site.blogTimezone || "America/New_York")
+      .toFormat("MMMM d, yyyy 'at' h:mm a");
+  });
+
+  // Raw ISO string for <time datetime="..."> and the RSS feed: always UTC,
+  // no display timezone conversion, so it stays one unambiguous value.
+  eleventyConfig.addFilter("postDateISO", (isoString) => {
+    return DateTime.fromISO(isoString, { zone: "utc" }).toISO();
+  });
+
+  // eleventy-plugin-rss's date filters (dateToRfc822) want a JS Date, and
+  // blogposts.js stores timestamps as ISO strings -- this bridges the two
+  // for src/feed.njk.
+  eleventyConfig.addFilter("toDate", (isoString) => new Date(isoString));
+
+  // Truncates an array to its first n items -- used to cap the RSS feed at
+  // 20 posts without relying on Nunjucks's `slice` filter, which chunks
+  // into batches rather than truncating.
+  eleventyConfig.addFilter("limit", (arr, n) => (arr || []).slice(0, n));
 
   // Self-contained web apps. Everything under src/apps/ is copied verbatim,
   // so each app keeps its own HTML/CSS/JS and never touches the template
