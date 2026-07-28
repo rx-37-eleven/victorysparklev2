@@ -1,145 +1,93 @@
-# Blog setup — post by Telegram message
+# Blog: Telegram → D1 → static HTML
 
-This is a one-time setup. Once it's done, **publishing a post is just sending
-a Telegram message** — no editing files, no redeploying the site. The only
-deploy you need is the one that ships this code (step 7 below); every post
-after that is a database write, not a deploy.
-
-## How it works
+The blog at `/blog/` is a microblog. Posting is done from Telegram, not
+from this repo — this repo only reads the posts back out and renders them.
 
 ```
-   Telegram  ──────▶  POST /api/telegram   (Pages Function)  ──────▶  D1 database  (posts)
-                                                                       ▲
-   Browser   ──────▶  GET /api/posts        (Pages Function)  ────────┘
-                     │  /blog/ renders posts client-side
-                     └─  (marked + DOMPurify from CDN)
+Telegram  ──▶  victory-blog-bot (Worker)  ──▶  D1 database (victory-blog)
+                                                       │
+                                        Pages build ◀──┤  (this repo reads D1
+                                        (this repo)     │   over the REST API
+                                                         at BUILD time)
 ```
 
-- Posts are stored as raw Markdown in a Cloudflare D1 database (table `posts`).
-- `/blog/` fetches from `/api/posts` and renders them in the browser.
-- You publish by texting the bot; it writes straight to D1.
+`victory-blog-bot` is a separate repo — it owns the Telegram webhook, the
+allowlist of who's allowed to post, and all writes to D1. This repo never
+writes to D1 and never talks to Telegram; it only reads published posts at
+build time via `src/_data/blogposts.js`.
 
-## Setup checklist
+## Why build time, not a runtime API call
 
-1. **Create the D1 database** (skip if you already have `victory-blog` — the
-   `wrangler.toml` in this repo already points at a `database_id`, so this
-   is likely already done):
-   ```bash
-   npx wrangler d1 create victory-blog
-   ```
-   Copy the `database_id` it prints into `wrangler.toml` under `[[d1_databases]]`.
+This site is a static Eleventy build on Cloudflare Pages. `blogposts.js`
+fetches D1 once, during the build, and Eleventy renders the results to
+plain static HTML — not a Pages Function querying D1 on every page view.
 
-2. **Apply the schema:**
-   ```bash
-   npx wrangler d1 migrations apply victory-blog --remote
-   ```
-   This creates the `posts` table from `migrations/0001_init.sql`.
+That means:
 
-3. **Confirm the D1 binding.** `wrangler.toml` already binds it as `DB`:
-   ```toml
-   [[d1_databases]]
-   binding = "DB"
-   database_name = "victory-blog"
-   database_id = "..."
-   ```
-   If the Cloudflare dashboard (Pages project → Settings → Bindings) also has
-   a `DB` binding configured, **the dashboard wins** — keep it in one place
-   only to avoid confusion.
+- Posts are real static HTML: fast, good for SEO, no cold starts, no
+  per-request D1 cost.
+- **If the D1 fetch fails, the build fails — on purpose.** `blogposts.js`
+  throws rather than falling back to an empty list, so Cloudflare Pages
+  just keeps serving the last successful deploy instead of publishing a
+  blank blog. A broken `CF_API_TOKEN` should break the build loudly, not
+  quietly ship an empty page.
+- The trade-off: a new Telegram message takes about 60–90 seconds to
+  appear, because a full Pages build has to run first (the bot triggers it
+  automatically via a deploy hook). That delay is intentional, not a bug —
+  don't "fix" it by adding client-side fetching.
 
-4. **Telegram bot.** You already created one with `@BotFather` — keep the
-   bot token handy for step 6.
+The one case that's expected to return an empty list rather than fail the
+build: running `npx @11ty/eleventy --serve` locally with no `.env` at all.
+That's treated as "no credentials configured yet," not a fetch failure —
+see the warning `blogposts.js` logs when that happens.
 
-5. **Find your numeric Telegram user id.** Message `@userinfobot` and it
-   will reply with your id. (Only this id will be allowed to publish.)
+## Required Pages build variables
 
-6. **Set secrets** on the Pages project — dashboard → your Pages project →
-   Settings → Variables and Secrets → add each as a **secret** (not a plain
-   variable), or via CLI:
-   ```bash
-   npx wrangler pages secret put TELEGRAM_BOT_TOKEN
-   npx wrangler pages secret put TELEGRAM_SECRET_TOKEN
-   npx wrangler pages secret put TELEGRAM_ALLOWED_USER_ID
-   ```
-   - `TELEGRAM_BOT_TOKEN` — from BotFather.
-   - `TELEGRAM_SECRET_TOKEN` — any long random string you make up yourself
-     (e.g. `openssl rand -hex 32`). This is separate from the bot token.
-   - `TELEGRAM_ALLOWED_USER_ID` — your numeric id from step 5.
+Cloudflare dashboard → Pages → `victorysparkle` → Settings → Variables and
+secrets → add these as **build** variables, for both Production and Preview:
 
-7. **Deploy once.** Push this branch / merge it, however this project
-   normally deploys to Cloudflare Pages (git push, or
-   `npx wrangler pages deploy _site` after `npm run build`). This ships
-   `/blog/` and the two Functions (`/api/posts`, `/api/telegram`).
-   **This is the only deploy the blog ever needs** — every post after this
-   is just a Telegram message.
-
-8. **Register the webhook** so Telegram knows to call your site:
-   ```bash
-   curl "https://api.telegram.org/bot<TELEGRAM_BOT_TOKEN>/setWebhook" \
-     -d "url=https://victorysparkle.com/api/telegram" \
-     -d "secret_token=<TELEGRAM_SECRET_TOKEN>"
-   ```
-   Use the *same* values you set as secrets in step 6.
-
-9. **Test it.** Message your bot:
-   ```
-   /post My first post
-   Hello world, this is the body of my first post!
-   ```
-   You should get a ✅ reply with a link. Visit `victorysparkle.com/blog/`
-   to see it appear.
-
-10. **Nav link.** Already there — `/blog/` is linked from the header and
-    footer nav (see `src/_includes/base.njk`). Nothing to do here.
-
-## Bot commands
-
-| Command | Effect |
-|---|---|
-| `/post <title>`<br>`<body...>` | Publishes a post. First line = title, rest = Markdown body. |
-| `/draft <title>`<br>`<body...>` | Same, but saved as a draft — never shown on the public site. |
-| `/delete <slug>` | Deletes a post. |
-| `/list` | Replies with the 10 most recent posts and their slugs. |
-| `/help` | Shows this cheat-sheet. |
-| Anything else | Posts nothing — replies with a nudge to use `/post` or `/help`. This is deliberate, so a stray message never goes live. |
-
-Every publish/draft/delete gets a confirmation reply, so you always know it
-worked — and `/delete <slug>` is your fast undo if a post goes out wrong.
-
-## Security
-
-Two gates on the webhook, both required:
-
-1. The request must carry `X-Telegram-Bot-Api-Secret-Token` matching
-   `TELEGRAM_SECRET_TOKEN` (set when you registered the webhook in step 8).
-   This stops random traffic hitting the URL.
-2. The sender's numeric Telegram id must match `TELEGRAM_ALLOWED_USER_ID`.
-   This is the real authorization — only your account can publish.
-
-The read API (`/api/posts`) is public and read-only, and only ever returns
-`status = 'published'` posts — drafts are never exposed, even if someone
-guesses the slug.
-
-None of the three secrets (`TELEGRAM_BOT_TOKEN`, `TELEGRAM_SECRET_TOKEN`,
-`TELEGRAM_ALLOWED_USER_ID`) are committed to git — they live only in the
-Pages project's secrets.
-
-## Changing the defaults
-
-| Decision | Default | To change it |
+| Name | Value | Type |
 |---|---|---|
-| Storage | D1 | — |
-| Publish channel | Telegram only | Email would need a separate Worker (Email Routing can't target a Pages Function) — not built here. |
-| Images in posts | Not supported in v1 (text/Markdown only) | Phase 2: download the Telegram photo via `getFile`, store it in an R2 bucket, reference the R2 URL in the Markdown. |
-| Rendering | Client-side (`marked` + `DOMPurify` from CDN) | — |
-| Post URL | `/blog/?post=<slug>` | — |
+| `CF_ACCOUNT_ID` | Cloudflare account ID | plain |
+| `CF_D1_DATABASE_ID` | the `victory-blog` D1 database's ID | plain |
+| `CF_API_TOKEN` | API token scoped to D1 on this account | **secret/encrypted** |
+| `NODE_VERSION` | `20` | plain |
 
-## Ideas for later (not built)
+A missing or invalid `CF_API_TOKEN` fails the Pages build — that's
+intentional (see above), not a misconfiguration to work around.
 
-- **Images** — see "Changing the defaults" above.
-- **Editing posts** — `/edit <slug>` then send new text.
-- **Tags** — a `tags` column plus a `#tag` convention in messages.
-- **RSS feed** — a small `functions/feed.xml.js` Function reading from D1.
-- **SEO** — posts render client-side, which is fine for humans but not
-  ideal for crawlers. If that starts to matter, a Function could
-  server-render post HTML for bots while humans keep the fast client
-  version.
+For local development, copy these same three D1 values into a gitignored
+`.env` file in the repo root (`CF_ACCOUNT_ID=...`, `CF_D1_DATABASE_ID=...`,
+`CF_API_TOKEN=...`). See the `victory-blog-bot` repo's `SETUP.md` for how to
+create the database and the token in the first place.
+
+## Local development
+
+```bash
+npm install
+cp .env.example .env   # fill in the 3 values; .env is gitignored
+npm run serve
+```
+
+Without a `.env`, the site still builds — `/blog/` just shows "No posts yet"
+instead of throwing, per the local-dev exception described above.
+
+## Layout
+
+```
+src/_data/blogposts.js              fetches + shapes published posts from D1
+src/_data/blogpostsForPagination.js pagination-safe wrapper (see its comment)
+src/_data/site.json                 blogTimezone (display timezone for post dates)
+src/blog.njk                        /blog/ index, paginated, reverse chronological
+src/blogpost.njk + blogpost.11tydata.js   one page per post at /blog/<slug>/
+src/feed.njk                        /blog/feed.xml (RSS 2.0)
+```
+
+## What this repo does NOT do
+
+- **Write posts.** That's `victory-blog-bot` (Telegram webhook → D1).
+- **Serve D1 at runtime.** There's deliberately no `[[d1_databases]]`
+  binding in `wrangler.toml` — see the comment there.
+- **Photos.** The `media` table exists in D1 already, but the upload path
+  (Telegram photo → R2 → `media` row) isn't built yet; see `victory-blog-bot`'s
+  README for status.

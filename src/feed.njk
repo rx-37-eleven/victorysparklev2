@@ -1,0 +1,25 @@
+---
+permalink: /blog/feed.xml
+eleventyExcludeFromCollections: true
+---
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+<channel>
+  <title>Victory Sparkle Co. — Blog</title>
+  <link>https://victorysparkle.com/blog/</link>
+  <atom:link href="https://victorysparkle.com/blog/feed.xml" rel="self" type="application/rss+xml" />
+  <description>Updates from Victory Sparkle Co., posted straight from Telegram.</description>
+  <language>en-us</language>
+  <lastBuildDate>{{ page.date | dateToRfc822 }}</lastBuildDate>
+{%- for post in blogposts | limit(20) %}
+  <item>
+    <title>{{ post.title or (post.publishedAt | postDate) }}</title>
+    <link>https://victorysparkle.com{{ post.url }}</link>
+    <guid isPermaLink="true">https://victorysparkle.com{{ post.url }}</guid>
+    <pubDate>{{ post.publishedAt | toDate | dateToRfc822 }}</pubDate>
+    <description><![CDATA[{{ post.excerpt }}]]></description>
+    <content:encoded><![CDATA[{{ post.bodyHtml | htmlToAbsoluteUrls("https://victorysparkle.com") | safe }}]]></content:encoded>
+  </item>
+{%- endfor %}
+</channel>
+</rss>
