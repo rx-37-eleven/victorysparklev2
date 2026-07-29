@@ -4,6 +4,8 @@
 // plus closing on outside click and Escape.
 document.addEventListener("DOMContentLoaded", function () {
   var items = Array.prototype.slice.call(document.querySelectorAll(".nav-item"));
+  var toggle = document.getElementById("nav-toggle");
+  var mainNav = document.getElementById("main-nav");
   if (!items.length) return;
 
   function closeAll(except) {
@@ -29,7 +31,13 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   document.addEventListener("click", function (e) {
-    if (!e.target.closest(".nav-item")) closeAll();
+    if (e.target.closest(".nav-item")) return;
+    if (e.target.closest(".nav-toggle")) return;
+    closeAll();
+    if (mainNav && mainNav.classList.contains("is-open") && !e.target.closest(".main-nav")) {
+      mainNav.classList.remove("is-open");
+      if (toggle) toggle.setAttribute("aria-expanded", "false");
+    }
   });
 
   document.addEventListener("keydown", function (e) {
@@ -64,4 +72,33 @@ document.addEventListener("DOMContentLoaded", function () {
       if (parent) parent.classList.add("has-current");
     });
   })();
+
+  // --- Mobile hamburger -------------------------------------------------
+  if (toggle && mainNav) {
+    toggle.addEventListener("click", function () {
+      var isOpen = mainNav.classList.toggle("is-open");
+      toggle.setAttribute("aria-expanded", String(isOpen));
+      if (!isOpen) closeAll();
+    });
+
+    // Collapse the whole menu after tapping a real link.
+    mainNav.addEventListener("click", function (e) {
+      if (e.target.tagName !== "A") return;
+      mainNav.classList.remove("is-open");
+      toggle.setAttribute("aria-expanded", "false");
+      closeAll();
+    });
+
+    // Reset state when crossing the breakpoint, so a menu left open on
+    // mobile doesn't leave stale classes behind on desktop.
+    var mq = window.matchMedia("(min-width: 769px)");
+    var onChange = function (e) {
+      if (!e.matches) return;
+      mainNav.classList.remove("is-open");
+      toggle.setAttribute("aria-expanded", "false");
+      closeAll();
+    };
+    if (mq.addEventListener) mq.addEventListener("change", onChange);
+    else mq.addListener(onChange);
+  }
 });

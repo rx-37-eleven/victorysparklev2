@@ -103,6 +103,35 @@ header {
     gap: 10px;
 }
 
+.nav-toggle {
+    display: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 10px;
+    border-radius: 8px;
+}
+
+.nav-toggle-bar {
+    display: block;
+    width: 26px;
+    height: 3px;
+    margin: 5px 0;
+    border-radius: 2px;
+    background: #5a3d7f;
+    transition: transform 0.25s ease, opacity 0.2s ease;
+}
+
+.nav-toggle[aria-expanded="true"] .nav-toggle-bar:nth-child(1) {
+    transform: translateY(8px) rotate(45deg);
+}
+.nav-toggle[aria-expanded="true"] .nav-toggle-bar:nth-child(2) {
+    opacity: 0;
+}
+.nav-toggle[aria-expanded="true"] .nav-toggle-bar:nth-child(3) {
+    transform: translateY(-8px) rotate(-45deg);
+}
+
 .nav-item {
     position: relative;
 }
@@ -393,15 +422,43 @@ p a:hover {
 }
 
 @media (max-width: 768px) {
+    .nav-toggle {
+        display: block;
+    }
+
     .header-content {
-        flex-direction: column;
-        gap: 20px;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        gap: 0;
+    }
+
+    /* Shrink the avatar so the header bar itself isn't 120px tall. */
+    .profile-image,
+    .profile-image img {
+        width: 52px;
+        height: 52px;
+    }
+
+    .profile-image {
+        border-width: 3px;
+    }
+
+    .site-title {
+        font-size: 22px;
     }
 
     .main-nav {
+        display: none;
         flex-direction: column;
         width: 100%;
+        flex-basis: 100%;  /* force onto its own row below logo + toggle */
         gap: 5px;
+        order: 3;
+        padding-top: 10px;
+    }
+
+    .main-nav.is-open {
+        display: flex;
     }
 
     .nav-item {
@@ -410,7 +467,7 @@ p a:hover {
 
     .nav-trigger {
         width: 100%;
-        justify-content: center;
+        justify-content: space-between;
     }
 
     .nav-dropdown {
@@ -424,7 +481,7 @@ p a:hover {
         padding: 0 12px;
         overflow: hidden;
         transition: max-height 0.25s ease, padding 0.25s ease;
-        align-items: center;
+        align-items: stretch;
     }
 
     .nav-item.open .nav-dropdown {
