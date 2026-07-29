@@ -38,7 +38,7 @@ header {
     padding: 0 20px;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    gap: 10px;
     flex-wrap: wrap;
 }
 
@@ -82,10 +82,13 @@ header {
 .main-nav {
     display: flex;
     gap: 10px;
+    order: 1;
+    margin-left: auto;
 }
 
 .nav-toggle {
-    display: none;
+    display: block;
+    order: 2;
     background: none;
     border: none;
     cursor: pointer;
@@ -403,10 +406,6 @@ p a:hover {
 }
 
 @media (max-width: 768px) {
-    .nav-toggle {
-        display: block;
-    }
-
     .header-content {
         flex-wrap: wrap;
         justify-content: space-between;
