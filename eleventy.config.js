@@ -1,5 +1,12 @@
+const path = require("path");
+const fs = require("fs");
 const { DateTime } = require("luxon");
 const pluginRss = require("@11ty/eleventy-plugin-rss");
+// @11ty/eleventy-img v7 is ESM-only; required via CommonJS interop, the
+// callable image-transform function lands on .default rather than being
+// the module export itself.
+const eleventyImg = require("@11ty/eleventy-img");
+const Image = eleventyImg.default;
 const site = require("./src/_data/site.js");
 
 module.exports = function (eleventyConfig) {
@@ -49,6 +56,40 @@ module.exports = function (eleventyConfig) {
   // 20 posts without relying on Nunjucks's `slice` filter, which chunks
   // into batches rather than truncating.
   eleventyConfig.addFilter("limit", (arr, n) => (arr || []).slice(0, n));
+
+  // Responsive image shortcode. `src` is a site-root path like
+  // "/images/resources/foo.png"; the source file is read from src/ and
+  // optimized copies are written to _site/img/.
+  //
+  // If the source file is missing this returns the same purple sparkle
+  // placeholder the resources page already uses, rather than throwing --
+  // a bad filename in resources.json must not break the build.
+  eleventyConfig.addAsyncShortcode(
+    "image",
+    async function (src, alt, sizes = "100vw", className = "") {
+      const inputPath = path.join("src", src);
+
+      if (!src || !fs.existsSync(inputPath)) {
+        console.warn(`[image] missing source, using placeholder: ${src}`);
+        return `<div class="${className} resource-tile-placeholder">✨</div>`;
+      }
+
+      const metadata = await Image(inputPath, {
+        widths: [400, 800, 1200],
+        formats: ["webp", "jpeg"],
+        outputDir: "./_site/img/",
+        urlPath: "/img/",
+      });
+
+      return eleventyImg.generateHTML(metadata, {
+        alt: alt || "",
+        sizes,
+        class: className,
+        loading: "lazy",
+        decoding: "async",
+      });
+    }
+  );
 
   // Self-contained web apps. Everything under src/apps/ is copied verbatim,
   // so each app keeps its own HTML/CSS/JS and never touches the template

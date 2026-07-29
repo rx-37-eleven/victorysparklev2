@@ -623,6 +623,12 @@ p a:hover {
     aspect-ratio: 16 / 10;
 }
 
+.resource-tile-image-wrap picture {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
 .resource-tile-image {
     width: 100%;
     height: 100%;
