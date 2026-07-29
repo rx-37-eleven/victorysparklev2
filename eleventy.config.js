@@ -1,6 +1,6 @@
 const { DateTime } = require("luxon");
 const pluginRss = require("@11ty/eleventy-plugin-rss");
-const site = require("./src/_data/site.json");
+const site = require("./src/_data/site.js");
 
 module.exports = function (eleventyConfig) {
   eleventyConfig.addPlugin(pluginRss);
@@ -24,7 +24,7 @@ module.exports = function (eleventyConfig) {
 
   // Blog posts are stored as UTC ISO 8601 strings (e.g.
   // "2026-07-25T14:03:22Z"). postDate converts to the display timezone from
-  // site.json (default America/New_York) for on-page reading, e.g.
+  // site.js (default America/New_York) for on-page reading, e.g.
   // "July 25, 2026 at 10:03 AM". Kept separate from readableDate above --
   // that one is plain-date-only and the resources page depends on its
   // current behavior, so it's left untouched rather than merged with this.

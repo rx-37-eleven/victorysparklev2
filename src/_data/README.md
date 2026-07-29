@@ -49,7 +49,7 @@ shape of the existing entry and fill in your own title/url/date/tags.
 
 ## How to change the blog's display timezone
 
-`src/_data/site.json`'s `blogTimezone` key controls what timezone blog post
+`src/_data/site.js`'s `blogTimezone` key controls what timezone blog post
 timestamps are shown in (e.g. `America/New_York`, `America/Los_Angeles`).
 Posts themselves are always stored in UTC — this only changes the `postDate`
 filter's output. Edit the value, commit, and the next build picks it up.

@@ -77,7 +77,7 @@ instead of throwing, per the local-dev exception described above.
 ```
 src/_data/blogposts.js              fetches + shapes published posts from D1
 src/_data/blogpostsForPagination.js pagination-safe wrapper (see its comment)
-src/_data/site.json                 blogTimezone (display timezone for post dates)
+src/_data/site.js                    site-wide values incl. blogTimezone (display timezone for post dates)
 src/blog.njk                        /blog/ index, paginated, reverse chronological
 src/blogpost.njk + blogpost.11tydata.js   one page per post at /blog/<slug>/
 src/feed.njk                        /blog/feed.xml (RSS 2.0)
