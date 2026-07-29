@@ -1,3 +1,7 @@
+:root {
+    --font-body: "Comic Neue", sans-serif;
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -9,7 +13,7 @@ html {
 }
 
 body {
-    font-family: "comic Neue";
+    font-family: var(--font-body);
     background: linear-gradient(90deg, rgba(255,255,255,1) 0%, rgba(234,213,245,1) 50%, rgba(255,255,255,1) 100%);
     background-attachment: fixed;
     min-height: 100vh;
@@ -29,7 +33,7 @@ footer {
     z-index: 1000;
     background: #5a3d7f;
     color: #ffffff;
-    font-family: "Comic Neue", sans-serif;
+    font-family: var(--font-body);
     font-weight: 700;
     padding: 12px 20px;
     border-radius: 0 0 10px 10px;
@@ -1110,12 +1114,12 @@ p a:hover {
     --pagefind-ui-tag: #ead5f5;
     --pagefind-ui-border-width: 2px;
     --pagefind-ui-border-radius: 10px;
-    --pagefind-ui-font: "Comic Neue", sans-serif;
+    --pagefind-ui-font: var(--font-body);
 }
 
 .nav-search-link {
     color: #5a3d7f;
-    font-family: "Comic Neue", sans-serif;
+    font-family: var(--font-body);
     font-size: 16px;
     font-weight: 700;
     padding: 10px 15px;
