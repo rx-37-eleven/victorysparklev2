@@ -1,14 +1,25 @@
-cat > src/css/style.css << 'EOF'
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
+html {
+    height: 100%;
+}
+
 body {
     font-family: "comic Neue";
-    background:linear-gradient(90deg,rgba(255, 255, 255, 1) 0%, rgba(234, 213, 245, 1) 50%, rgba(255, 255, 255, 1) 100%);
-    min-height: 175vh;
+    background: linear-gradient(90deg, rgba(255,255,255,1) 0%, rgba(234,213,245,1) 50%, rgba(255,255,255,1) 100%);
+    background-attachment: fixed;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+header,
+footer {
+    flex-shrink: 0;
 }
 
 header {
@@ -160,7 +171,9 @@ header {
 }
 
 main {
+    flex: 1 0 auto;
     max-width: 1200px;
+    width: 100%;
     margin: 40px auto;
     padding: 0 20px;
 }
