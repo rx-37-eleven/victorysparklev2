@@ -1,4 +1,4 @@
-// Header dropdown menus (Make / Code / Enjoy / Contact).
+// Header dropdown menus (Make / Code / Contact).
 // CSS handles hover-to-open on mouse/trackpad; this handles click/tap
 // (touch screens, and mouse users who just click instead of hovering)
 // plus closing on outside click and Escape.

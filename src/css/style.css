@@ -183,8 +183,7 @@ header {
     transform: translateY(0);
 }
 
-.nav-dropdown a,
-.nav-dropdown .nav-placeholder {
+.nav-dropdown a {
     color: #5a3d7f;
     text-decoration: none;
     font-size: 15px;
@@ -198,12 +197,6 @@ header {
 .nav-dropdown a:hover {
     background-color: rgba(122, 92, 173, 0.12);
     color: #3d2456;
-}
-
-.nav-dropdown .nav-placeholder {
-    color: #a89bb8;
-    font-style: italic;
-    cursor: default;
 }
 
 .nav-dropdown a.is-current {
