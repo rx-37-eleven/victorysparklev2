@@ -53,3 +53,24 @@ shape of the existing entry and fill in your own title/url/date/tags.
 timestamps are shown in (e.g. `America/New_York`, `America/Los_Angeles`).
 Posts themselves are always stored in UTC — this only changes the `postDate`
 filter's output. Edit the value, commit, and the next build picks it up.
+
+## How to add an event to the "Where to Find Me" page
+
+Same idea again: `src/_data/events.json` is a plain array you edit through the
+GitHub web UI, no code changes needed.
+
+1. Go to `src/_data/events.json` on GitHub and click the pencil icon.
+2. Add an object to the array with at least:
+   - `"name"` — the event's name.
+   - `"startDate"` — `"YYYY-MM-DD"`.
+   Optionally include `"endDate"` (for multi-day events), `"venue"`, `"city"`,
+   `"url"`, `"booth"`, and `"note"`.
+3. Commit — Cloudflare Pages rebuilds and the event shows up on `/events/`.
+
+You don't need to sort the array or move things around yourself: events are
+split into "Coming up" and "Previously" automatically based on today's date
+at build time (an event stays in "Coming up" through the end of its
+`endDate`, or its `startDate` if there's no `endDate`). Since that check only
+runs when the site builds, an event moves to "Previously" on the next
+Cloudflare Pages build after its date passes, not the instant the date
+ticks over.

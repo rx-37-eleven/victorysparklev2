@@ -1,0 +1,12 @@
+[
+  {
+    "name": "Example Spring Craft Fair",
+    "startDate": "2026-09-12",
+    "endDate": "2026-09-13",
+    "venue": "Example Community Center",
+    "city": "Somewhere, PA",
+    "url": "https://example.com/craft-fair",
+    "booth": "Table 14",
+    "note": "Bringing the full button catalog plus a make-your-own station."
+  }
+]
