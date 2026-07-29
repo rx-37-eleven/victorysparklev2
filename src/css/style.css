@@ -1099,3 +1099,52 @@ p a:hover {
 .events-empty {
     color: #6b5786;
 }
+
+/* ===== SEARCH ===== */
+
+#search {
+    --pagefind-ui-primary: #5a3d7f;
+    --pagefind-ui-text: #6b5786;
+    --pagefind-ui-background: #ffffff;
+    --pagefind-ui-border: rgba(138, 108, 189, 0.3);
+    --pagefind-ui-tag: #ead5f5;
+    --pagefind-ui-border-width: 2px;
+    --pagefind-ui-border-radius: 10px;
+    --pagefind-ui-font: "Comic Neue", sans-serif;
+}
+
+.nav-search-link {
+    color: #5a3d7f;
+    font-family: "Comic Neue", sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    padding: 10px 15px;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+}
+
+.nav-search-link:hover,
+.nav-search-link:focus-visible {
+    background-color: rgba(255, 255, 255, 0.5);
+    color: #3d2456;
+}
+
+.nav-search-link.is-current {
+    background-color: rgba(255, 255, 255, 0.5);
+    color: #3d2456;
+    box-shadow: inset 0 -3px 0 #5a3d7f;
+}
+
+@media (max-width: 768px) {
+    .nav-search-link {
+        width: 100%;
+        justify-content: flex-start;
+    }
+
+    .nav-search-link.is-current {
+        box-shadow: inset 3px 0 0 #5a3d7f;
+    }
+}

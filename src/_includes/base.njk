@@ -37,7 +37,7 @@
 </head>
 <body>
     <a class="skip-link" href="#main-content">Skip to content</a>
-    <header>
+    <header data-pagefind-ignore>
         <div class="header-content">
             <a href="/" class="logo-section" aria-label="Victory Sparkle Co. home">
                 <div class="profile-image"><img src="/images/Vlogo.png" alt=""></div>
@@ -81,15 +81,16 @@
                         <a href="/contact/">Contact</a>
                     </div>
                 </div>
+                <a href="/search/" class="nav-search-link">Search</a>
             </nav>
         </div>
     </header>
 
-    <main id="main-content" tabindex="-1">
+    <main id="main-content" tabindex="-1" data-pagefind-body>
         {{ content | safe }}
     </main>
 
-    <footer>
+    <footer data-pagefind-ignore>
         <div class="footer-content">
             <p>&copy; {{ site.buildYear }} {{ site.name }} All rights reserved.</p>
             <div class="footer-links">
@@ -101,6 +102,7 @@
                 <a href="/blog/">Blog</a>
                 <a href="/events/">Events</a>
                 <a href="/about/">About</a>
+                <a href="/search/">Search</a>
                 <a href="/contact/">Contact</a>
             </div>
             <div><br> <p><em>Semper Desiderari, Princess Sandy</em></p></div>
