@@ -1,6 +1,7 @@
 ---
 layout: base.njk
 title: Cool Web Resources
+description: A running list of neat little tools and sites worth bookmarking, filterable by tag.
 permalink: /resources/
 ---
 {#
@@ -25,14 +26,7 @@ permalink: /resources/
           <a href="{{ resource.url }}" target="_blank" rel="noopener noreferrer" class="resource-tile-link">
             <div class="resource-tile-image-wrap">
               {% if resource.image %}
-              <img
-                src="{{ resource.image }}"
-                alt=""
-                class="resource-tile-image"
-                loading="lazy"
-                onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
-              >
-              <div class="resource-tile-image resource-tile-placeholder" style="display:none">✨</div>
+              {% image resource.image, "", "(max-width: 700px) 100vw, 350px", "resource-tile-image" %}
               {% else %}
               <div class="resource-tile-image resource-tile-placeholder">✨</div>
               {% endif %}

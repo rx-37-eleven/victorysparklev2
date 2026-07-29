@@ -9,18 +9,47 @@
     <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.png">
     <link rel="alternate" type="application/rss+xml" title="Victory Sparkle Co. Blog" href="/blog/feed.xml">
-    <title>{% if title %}{{ title }} · {% endif %}Victory Sparkle Co.</title>
-    {% if description %}<meta name="description" content="{{ description }}">{% endif %}
+    {% set pageTitle = (title + " · " + site.name) if title else site.name %}
+    {% set pageDescription = description if description else site.description %}
+    {% set pageImage = site.url + (ogImage if ogImage else site.defaultOgImage) %}
+    {% set pageUrl = site.url + page.url %}
+
+    <title>{{ pageTitle }}</title>
+    <meta name="description" content="{{ pageDescription }}">
+    <link rel="canonical" href="{{ pageUrl }}">
+
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="{{ site.name }}">
+    <meta property="og:title" content="{{ pageTitle }}">
+    <meta property="og:description" content="{{ pageDescription }}">
+    <meta property="og:url" content="{{ pageUrl }}">
+    <meta property="og:image" content="{{ pageImage }}">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="{{ ogImageAlt if ogImageAlt else site.name }}">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ pageTitle }}">
+    <meta name="twitter:description" content="{{ pageDescription }}">
+    <meta name="twitter:image" content="{{ pageImage }}">
+
     <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
-    <header>
+    <a class="skip-link" href="#main-content">Skip to content</a>
+    <header data-pagefind-ignore>
         <div class="header-content">
             <a href="/" class="logo-section" aria-label="Victory Sparkle Co. home">
                 <div class="profile-image"><img src="/images/Vlogo.png" alt=""></div>
                 <div class="site-title">Victory Sparkle Co.</div>
             </a>
-            <nav class="main-nav">
+            <button type="button" class="nav-toggle" id="nav-toggle"
+                    aria-expanded="false" aria-controls="main-nav" aria-label="Menu">
+                <span class="nav-toggle-bar"></span>
+                <span class="nav-toggle-bar"></span>
+                <span class="nav-toggle-bar"></span>
+            </button>
+            <nav class="main-nav" id="main-nav">
                 <div class="nav-item">
                     <button type="button" class="nav-trigger" aria-expanded="false">Make</button>
                     <div class="nav-dropdown">
@@ -45,22 +74,25 @@
                 <div class="nav-item">
                     <button type="button" class="nav-trigger" aria-expanded="false">Contact</button>
                     <div class="nav-dropdown">
+                        <a href="/events/">Events</a>
+                        <a href="/about/">About</a>
                         <a href="/blog/">Blog</a>
                         <a href="/map/">Travel Map</a>
                         <a href="/contact/">Contact</a>
                     </div>
                 </div>
+                <a href="/search/" class="nav-search-link">Search</a>
             </nav>
         </div>
     </header>
 
-    <main>
+    <main id="main-content" tabindex="-1" data-pagefind-body>
         {{ content | safe }}
     </main>
 
-    <footer>
+    <footer data-pagefind-ignore>
         <div class="footer-content">
-            <p>&copy; 2025 Victory Sparkle Co. All rights reserved.</p>
+            <p>&copy; {{ site.buildYear }} {{ site.name }} All rights reserved.</p>
             <div class="footer-links">
                 <a href="/apps/pinpress/">Pinpress</a>
                 <a href="/apps/tilemaker/">Seamless Tile Maker</a>
@@ -68,6 +100,9 @@
                 <a href="/resources/">Resources</a>
                 <a href="/map/">Travel Map</a>
                 <a href="/blog/">Blog</a>
+                <a href="/events/">Events</a>
+                <a href="/about/">About</a>
+                <a href="/search/">Search</a>
                 <a href="/contact/">Contact</a>
             </div>
             <div><br> <p><em>Semper Desiderari, Princess Sandy</em></p></div>

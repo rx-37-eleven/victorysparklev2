@@ -1,6 +1,7 @@
 ---
 layout: base.njk
 title: Home
+description: Free browser tools for makers — lay out printable photo buttons, generate seamless tiles, and browse a curated list of useful web resources.
 permalink: /
 ---
 <!-- BUTTON MAKER -->
@@ -21,8 +22,6 @@ permalink: /
         <tbody>
             <tr><td>Trash Screamer</td><td>Notifies you on trash day, repeatedly, until you tell it you took the trash out.</td><td>Live</td></tr>
             <tr><td>Price Checker 9000</td><td>Regularly checks the price of an item online and notifies you if the cost increases. </td><td>Live</td></tr>
-            <tr><td></td><td></td><td></td></tr>
-            <tr><td></td><td></td><td></td></tr>
         </tbody>
     </table>
     <p><a href="#">GitHub repo &rarr; (link coming soon)</a></p>

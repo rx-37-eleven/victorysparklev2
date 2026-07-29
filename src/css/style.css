@@ -1,14 +1,52 @@
-cat > src/css/style.css << 'EOF'
+:root {
+    --font-body: "Comic Neue", sans-serif;
+}
+
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
+html {
+    height: 100%;
+}
+
 body {
-    font-family: "comic Neue";
-    background:linear-gradient(90deg,rgba(255, 255, 255, 1) 0%, rgba(234, 213, 245, 1) 50%, rgba(255, 255, 255, 1) 100%);
-    min-height: 175vh;
+    font-family: var(--font-body);
+    background: linear-gradient(90deg, rgba(255,255,255,1) 0%, rgba(234,213,245,1) 50%, rgba(255,255,255,1) 100%);
+    background-attachment: fixed;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+header,
+footer {
+    flex-shrink: 0;
+}
+
+.skip-link {
+    position: absolute;
+    top: -100px;
+    left: 8px;
+    z-index: 1000;
+    background: #5a3d7f;
+    color: #ffffff;
+    font-family: var(--font-body);
+    font-weight: 700;
+    padding: 12px 20px;
+    border-radius: 0 0 10px 10px;
+    text-decoration: none;
+    transition: top 0.15s ease;
+}
+
+.skip-link:focus {
+    top: 0;
+}
+
+#main-content:focus {
+    outline: none;
 }
 
 header {
@@ -67,6 +105,35 @@ header {
 .main-nav {
     display: flex;
     gap: 10px;
+}
+
+.nav-toggle {
+    display: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 10px;
+    border-radius: 8px;
+}
+
+.nav-toggle-bar {
+    display: block;
+    width: 26px;
+    height: 3px;
+    margin: 5px 0;
+    border-radius: 2px;
+    background: #5a3d7f;
+    transition: transform 0.25s ease, opacity 0.2s ease;
+}
+
+.nav-toggle[aria-expanded="true"] .nav-toggle-bar:nth-child(1) {
+    transform: translateY(8px) rotate(45deg);
+}
+.nav-toggle[aria-expanded="true"] .nav-toggle-bar:nth-child(2) {
+    opacity: 0;
+}
+.nav-toggle[aria-expanded="true"] .nav-toggle-bar:nth-child(3) {
+    transform: translateY(-8px) rotate(-45deg);
 }
 
 .nav-item {
@@ -159,8 +226,20 @@ header {
     cursor: default;
 }
 
+.nav-dropdown a.is-current {
+    background-color: rgba(122, 92, 173, 0.18);
+    color: #3d2456;
+}
+
+.nav-item.has-current > .nav-trigger {
+    color: #3d2456;
+    box-shadow: inset 0 -3px 0 #5a3d7f;
+}
+
 main {
+    flex: 1 0 auto;
     max-width: 1200px;
+    width: 100%;
     margin: 40px auto;
     padding: 0 20px;
 }
@@ -194,6 +273,24 @@ p a {
 p a:hover {
         text-decoration: underline;
         color: black;
+}
+
+.notfound-links {
+    color: #6b5786;
+    font-size: 18px;
+    line-height: 1.8;
+    margin: 0 0 20px 24px;
+}
+
+.notfound-links a {
+    color: #5a3d7f;
+    font-weight: 700;
+    text-decoration: underline dotted;
+}
+
+.notfound-links a:hover {
+    color: #000000;
+    text-decoration: underline;
 }
 
 .gallery-section {
@@ -329,15 +426,43 @@ p a:hover {
 }
 
 @media (max-width: 768px) {
+    .nav-toggle {
+        display: block;
+    }
+
     .header-content {
-        flex-direction: column;
-        gap: 20px;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        gap: 0;
+    }
+
+    /* Shrink the avatar so the header bar itself isn't 120px tall. */
+    .profile-image,
+    .profile-image img {
+        width: 52px;
+        height: 52px;
+    }
+
+    .profile-image {
+        border-width: 3px;
+    }
+
+    .site-title {
+        font-size: 22px;
     }
 
     .main-nav {
+        display: none;
         flex-direction: column;
         width: 100%;
+        flex-basis: 100%;  /* force onto its own row below logo + toggle */
         gap: 5px;
+        order: 3;
+        padding-top: 10px;
+    }
+
+    .main-nav.is-open {
+        display: flex;
     }
 
     .nav-item {
@@ -346,7 +471,7 @@ p a:hover {
 
     .nav-trigger {
         width: 100%;
-        justify-content: center;
+        justify-content: space-between;
     }
 
     .nav-dropdown {
@@ -360,12 +485,18 @@ p a:hover {
         padding: 0 12px;
         overflow: hidden;
         transition: max-height 0.25s ease, padding 0.25s ease;
-        align-items: center;
+        align-items: stretch;
     }
 
     .nav-item.open .nav-dropdown {
         max-height: 300px;
         padding: 8px 12px;
+    }
+
+    /* On mobile the dropdowns are an accordion, so the inset underline on the
+       trigger reads oddly against the full-width buttons. Use a left bar. */
+    .nav-item.has-current > .nav-trigger {
+        box-shadow: inset 3px 0 0 #5a3d7f;
     }
 
     .gallery-grid {
@@ -494,6 +625,12 @@ p a:hover {
 .resource-tile-image-wrap {
     width: 100%;
     aspect-ratio: 16 / 10;
+}
+
+.resource-tile-image-wrap picture {
+    display: block;
+    width: 100%;
+    height: 100%;
 }
 
 .resource-tile-image {
@@ -889,4 +1026,129 @@ p a:hover {
 
 .blog-pager-link:hover {
     text-decoration: underline;
+}
+
+/* ===== EVENTS PAGE ===== */
+
+.events-heading {
+    color: #5a3d7f;
+    font-size: 26px;
+    margin: 30px 0 15px;
+}
+
+.events-list {
+    list-style: none;
+    display: grid;
+    gap: 20px;
+    padding: 0;
+    margin: 0;
+}
+
+.event-card {
+    background: #ffffff;
+    border-radius: 15px;
+    padding: 20px 24px;
+    box-shadow: 0 4px 15px rgba(138, 108, 189, 0.2);
+}
+
+.events-list-past .event-card {
+    background: rgba(255, 255, 255, 0.6);
+    box-shadow: none;
+    border: 1px solid rgba(138, 108, 189, 0.2);
+    padding: 14px 20px;
+}
+
+.event-date {
+    color: #8a7aa0;
+    font-size: 14px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.event-date-end {
+    text-transform: none;
+    letter-spacing: 0;
+    font-weight: 400;
+}
+
+.event-name {
+    color: #5a3d7f;
+    font-size: 22px;
+    margin: 6px 0 0;
+}
+
+.event-name a {
+    color: inherit;
+    text-decoration: underline dotted;
+}
+
+.event-name a:hover {
+    color: #000000;
+    text-decoration: underline;
+}
+
+.event-where,
+.event-booth,
+.event-note {
+    color: #6b5786;
+    font-size: 16px;
+    margin-top: 6px;
+}
+
+.event-booth {
+    font-weight: 700;
+}
+
+.events-empty {
+    color: #6b5786;
+}
+
+/* ===== SEARCH ===== */
+
+#search {
+    --pagefind-ui-primary: #5a3d7f;
+    --pagefind-ui-text: #6b5786;
+    --pagefind-ui-background: #ffffff;
+    --pagefind-ui-border: rgba(138, 108, 189, 0.3);
+    --pagefind-ui-tag: #ead5f5;
+    --pagefind-ui-border-width: 2px;
+    --pagefind-ui-border-radius: 10px;
+    --pagefind-ui-font: var(--font-body);
+}
+
+.nav-search-link {
+    color: #5a3d7f;
+    font-family: var(--font-body);
+    font-size: 16px;
+    font-weight: 700;
+    padding: 10px 15px;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+}
+
+.nav-search-link:hover,
+.nav-search-link:focus-visible {
+    background-color: rgba(255, 255, 255, 0.5);
+    color: #3d2456;
+}
+
+.nav-search-link.is-current {
+    background-color: rgba(255, 255, 255, 0.5);
+    color: #3d2456;
+    box-shadow: inset 0 -3px 0 #5a3d7f;
+}
+
+@media (max-width: 768px) {
+    .nav-search-link {
+        width: 100%;
+        justify-content: flex-start;
+    }
+
+    .nav-search-link.is-current {
+        box-shadow: inset 3px 0 0 #5a3d7f;
+    }
 }

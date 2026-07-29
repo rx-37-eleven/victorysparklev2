@@ -5,7 +5,7 @@
 // any post whose title or excerpt contains a literal "<" or "&". Computing
 // in JS means it only ever gets escaped the one time, in the layout.
 const { DateTime } = require("luxon");
-const site = require("./_data/site.json");
+const site = require("./_data/site.js");
 
 function fallbackTitle(publishedAt) {
   return DateTime.fromISO(publishedAt, { zone: "utc" })

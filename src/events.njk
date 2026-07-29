@@ -1,0 +1,65 @@
+---
+layout: base.njk
+title: Events
+description: Craft fairs, markets, and other places you can find Victory Sparkle Co. in person.
+permalink: /events/
+---
+{#
+  HOW TO ADD AN EVENT (no code changes needed):
+  1. Open src/_data/events.json on GitHub and click the pencil icon.
+  2. Add an object with at least "name" and "startDate" (YYYY-MM-DD).
+     Optional: endDate, venue, city, url, booth, note.
+  3. Commit — Cloudflare Pages rebuilds and it appears in the right section.
+#}
+<div class="content-section events-page">
+    <h1>Where to Find Me</h1>
+    <p>Craft fairs, markets, and meetups. Come say hi — I usually have buttons.</p>
+
+    <h2 class="events-heading">Coming up</h2>
+    {% if eventsSorted.upcoming.length %}
+    <ul class="events-list">
+        {% for event in eventsSorted.upcoming %}
+        <li class="event-card">
+            <div class="event-date">
+                <time datetime="{{ event.startDate }}">{{ event.startDate | readableDate }}</time>
+                {% if event.endDate and event.endDate != event.startDate %}
+                <span class="event-date-end">through {{ event.endDate | readableDate }}</span>
+                {% endif %}
+            </div>
+            <h3 class="event-name">
+                {% if event.url %}
+                <a href="{{ event.url }}" target="_blank" rel="noopener noreferrer">{{ event.name }}</a>
+                {% else %}{{ event.name }}{% endif %}
+            </h3>
+            {% if event.venue or event.city %}
+            <p class="event-where">
+                {{ event.venue }}{% if event.venue and event.city %} &middot; {% endif %}{{ event.city }}
+            </p>
+            {% endif %}
+            {% if event.booth %}<p class="event-booth">{{ event.booth }}</p>{% endif %}
+            {% if event.note %}<p class="event-note">{{ event.note }}</p>{% endif %}
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p class="events-empty">
+        Nothing on the calendar right now. <a href="/contact/">Get in touch</a> if you'd
+        like me at your event.
+    </p>
+    {% endif %}
+
+    {% if eventsSorted.past.length %}
+    <h2 class="events-heading">Previously</h2>
+    <ul class="events-list events-list-past">
+        {% for event in eventsSorted.past %}
+        <li class="event-card">
+            <div class="event-date">
+                <time datetime="{{ event.startDate }}">{{ event.startDate | readableDate }}</time>
+            </div>
+            <h3 class="event-name">{{ event.name }}</h3>
+            {% if event.city %}<p class="event-where">{{ event.city }}</p>{% endif %}
+        </li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+</div>

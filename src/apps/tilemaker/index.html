@@ -5,6 +5,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Seamless Tile Maker — Victory Sparkle Co.</title>
 <meta name="description" content="Upload an image and instantly swap its quadrants to set up a seamless repeating tile. Free, client-side, no upload to a server.">
+<link rel="canonical" href="https://victorysparkle.com/apps/tilemaker/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Victory Sparkle Co.">
+<meta property="og:title" content="Seamless Tile Maker · Victory Sparkle Co.">
+<meta property="og:description" content="Upload an image and instantly swap its quadrants to set up a seamless repeating tile. Free, client-side, no upload to a server.">
+<meta property="og:url" content="https://victorysparkle.com/apps/tilemaker/">
+<meta property="og:image" content="https://victorysparkle.com/images/og-default.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
 
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect x='4' y='4' width='26' height='26' fill='%237C4DCB'/%3E%3Crect x='34' y='4' width='26' height='26' fill='%23D8C2F5'/%3E%3Crect x='4' y='34' width='26' height='26' fill='%23D8C2F5'/%3E%3Crect x='34' y='34' width='26' height='26' fill='%237C4DCB'/%3E%3C/svg%3E">
 
@@ -242,14 +252,21 @@
 </style>
 </head>
 <body>
+<a class="skip-link" href="#main-content">Skip to content</a>
 
-<header>
+<header data-pagefind-ignore>
     <div class="header-content">
         <a href="/" class="logo-section" aria-label="Victory Sparkle Co. home">
             <div class="profile-image"><img src="/images/Vlogo.png" alt=""></div>
             <div class="site-title">Victory Sparkle Co.</div>
         </a>
-        <nav class="main-nav">
+        <button type="button" class="nav-toggle" id="nav-toggle"
+                aria-expanded="false" aria-controls="main-nav" aria-label="Menu">
+            <span class="nav-toggle-bar"></span>
+            <span class="nav-toggle-bar"></span>
+            <span class="nav-toggle-bar"></span>
+        </button>
+        <nav class="main-nav" id="main-nav">
             <div class="nav-item">
                 <button type="button" class="nav-trigger" aria-expanded="false">Make</button>
                 <div class="nav-dropdown">
@@ -274,16 +291,19 @@
             <div class="nav-item">
                 <button type="button" class="nav-trigger" aria-expanded="false">Contact</button>
                 <div class="nav-dropdown">
+                    <a href="/events/">Events</a>
+                    <a href="/about/">About</a>
                     <a href="/blog/">Blog</a>
                     <a href="/map/">Travel Map</a>
                     <a href="/contact/">Contact</a>
                 </div>
             </div>
+            <a href="/search/" class="nav-search-link">Search</a>
         </nav>
     </div>
 </header>
 
-<main class="app-main">
+<main id="main-content" tabindex="-1" class="app-main" data-pagefind-body>
 
   <div class="app-intro">
     <h1>Seamless Tile Maker</h1>

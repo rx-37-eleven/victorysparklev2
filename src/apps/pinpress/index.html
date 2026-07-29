@@ -4,7 +4,17 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Pinpress — Button Sheet Maker</title>
-<meta name="description" content="Lay out custom photo buttons and print a ready-to-cut sheet.">
+<meta name="description" content="Pinpress lays out custom photo buttons and prints ready-to-cut sheets, packing everything onto as few pages as possible. Free, runs in your browser.">
+<link rel="canonical" href="https://victorysparkle.com/apps/pinpress/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Victory Sparkle Co.">
+<meta property="og:title" content="Pinpress · Victory Sparkle Co.">
+<meta property="og:description" content="Lay out custom photo buttons and print ready-to-cut sheets. Free, runs in your browser, nothing to install.">
+<meta property="og:url" content="https://victorysparkle.com/apps/pinpress/">
+<meta property="og:image" content="https://victorysparkle.com/images/og-default.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
 
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='28' fill='%237C4DCB'/%3E%3Cpath d='M18 22a18 14 0 0 1 28 0' stroke='%23D8C2F5' stroke-width='5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
 
@@ -18,14 +28,21 @@
 <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
+<a class="skip-link" href="#main-content">Skip to content</a>
 
-<header>
+<header data-pagefind-ignore>
     <div class="header-content">
         <a href="/" class="logo-section" aria-label="Victory Sparkle Co. home">
             <div class="profile-image"><img src="/images/Vlogo.png" alt=""></div>
             <div class="site-title">Victory Sparkle Co.</div>
         </a>
-        <nav class="main-nav">
+        <button type="button" class="nav-toggle" id="nav-toggle"
+                aria-expanded="false" aria-controls="main-nav" aria-label="Menu">
+            <span class="nav-toggle-bar"></span>
+            <span class="nav-toggle-bar"></span>
+            <span class="nav-toggle-bar"></span>
+        </button>
+        <nav class="main-nav" id="main-nav">
             <div class="nav-item">
                 <button type="button" class="nav-trigger" aria-expanded="false">Make</button>
                 <div class="nav-dropdown">
@@ -50,11 +67,14 @@
             <div class="nav-item">
                 <button type="button" class="nav-trigger" aria-expanded="false">Contact</button>
                 <div class="nav-dropdown">
+                    <a href="/events/">Events</a>
+                    <a href="/about/">About</a>
                     <a href="/blog/">Blog</a>
                     <a href="/map/">Travel Map</a>
                     <a href="/contact/">Contact</a>
                 </div>
             </div>
+            <a href="/search/" class="nav-search-link">Search</a>
         </nav>
     </div>
 </header>
@@ -68,7 +88,7 @@
 
 <p id="lib-error-banner" class="lib-error-banner" hidden></p>
 
-<main>
+<main id="main-content" tabindex="-1" data-pagefind-body>
 
   <!-- STEP 1 — Upload photos -->
   <section id="step-photos" class="card step-card">
