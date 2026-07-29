@@ -18,5 +18,8 @@
     "dotenv": "^16.4.5",
     "luxon": "^3.5.0",
     "markdown-it": "^14.1.0"
+  },
+  "devDependencies": {
+    "sharp": "^0.35.3"
   }
 }

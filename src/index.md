@@ -1,6 +1,7 @@
 ---
 layout: base.njk
 title: Home
+description: Free browser tools for makers — lay out printable photo buttons, generate seamless tiles, and browse a curated list of useful web resources.
 permalink: /
 ---
 <!-- BUTTON MAKER -->
