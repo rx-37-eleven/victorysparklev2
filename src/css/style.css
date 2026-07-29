@@ -170,6 +170,16 @@ header {
     cursor: default;
 }
 
+.nav-dropdown a.is-current {
+    background-color: rgba(122, 92, 173, 0.18);
+    color: #3d2456;
+}
+
+.nav-item.has-current > .nav-trigger {
+    color: #3d2456;
+    box-shadow: inset 0 -3px 0 #5a3d7f;
+}
+
 main {
     flex: 1 0 auto;
     max-width: 1200px;
@@ -379,6 +389,12 @@ p a:hover {
     .nav-item.open .nav-dropdown {
         max-height: 300px;
         padding: 8px 12px;
+    }
+
+    /* On mobile the dropdowns are an accordion, so the inset underline on the
+       trigger reads oddly against the full-width buttons. Use a left bar. */
+    .nav-item.has-current > .nav-trigger {
+        box-shadow: inset 3px 0 0 #5a3d7f;
     }
 
     .gallery-grid {
