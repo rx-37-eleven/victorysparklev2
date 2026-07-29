@@ -242,6 +242,24 @@ p a:hover {
         color: black;
 }
 
+.notfound-links {
+    color: #6b5786;
+    font-size: 18px;
+    line-height: 1.8;
+    margin: 0 0 20px 24px;
+}
+
+.notfound-links a {
+    color: #5a3d7f;
+    font-weight: 700;
+    text-decoration: underline dotted;
+}
+
+.notfound-links a:hover {
+    color: #000000;
+    text-decoration: underline;
+}
+
 .gallery-section {
     max-width: 1200px;
     margin: 40px auto 30px;
