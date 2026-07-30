@@ -13,7 +13,7 @@
   function showTooltip(el, x, y) {
     const name = el.getAttribute("data-name");
     const status = el.getAttribute("data-status");
-    const label = titleTextFor(el) || `${name} — ${status}`;
+    const label = el.getAttribute("data-tooltip") || titleTextFor(el) || `${name} — ${status}`;
     tooltip.textContent = label;
     tooltip.hidden = false;
     positionTooltip(x, y);

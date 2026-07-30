@@ -33,6 +33,22 @@ same file — add a new entry with a label and a hex color, then use that
 same key in the `"states"` section. The legend on the page updates itself
 automatically, including the count of states in each category.
 
+**To add the year you were there (shown when you hover/tap the state):**
+
+Instead of a plain status string, use an object with `"status"` and `"year"`:
+
+```
+"TX": { "status": "lived", "year": "2011–2015" },
+"NY": { "status": "visited", "year": "2019" },
+```
+
+The `"year"` value is free-form text, not just a single year — `"2018, 2022"`
+works too. If you leave `"year"` off (or just use the plain
+`"TX": "lived"` form), the hover tooltip shows the state name only, with
+no status label. Both forms — plain string or `{ status, year }` object —
+work everywhere `travelmap.json` is used, so you don't need to convert
+your existing entries.
+
 **A couple of things to know:**
 - If you accidentally type a status that isn't defined in the legend
   (a typo, for example), that state will just fall back to the default
