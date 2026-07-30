@@ -54,8 +54,43 @@ your existing entries.
   (a typo, for example), that state will just fall back to the default
   "Not yet" color instead of breaking the site.
 - Washington D.C. is supported too — use `"DC"`.
-- The three states already in the file (PA, NY, MD) are just examples —
-  feel free to delete them and start fresh, or keep them if they're accurate!
+
+## How to mark a country
+
+Below the US map, `/map/` also has regional maps (Eastern Europe, Western
+Europe, Asia, South America). They work exactly like the states map, just
+in one shared `"countries"` section of the same `travelmap.json` file
+instead of `"states"`:
+
+```
+"countries": {
+  "PL": { "status": "visited", "year": "2023" },
+  "JP": "planned"
+}
+```
+
+- The left side is the country's two-letter code, not the state kind —
+  these are [ISO 3166-1 alpha-2 codes](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2)
+  (PL for Poland, JP for Japan, and so on — the Wikipedia page has the
+  full list).
+- The right side works exactly like states: either a plain status key
+  (`"visited"`) or an object with `"status"` and an optional `"year"`.
+- Any country not listed defaults to "Not yet," same as states.
+- The same `"legend"` categories and colors apply to both states and
+  countries — there's only one legend to edit.
+- You only need to list a country once, in `"countries"` — you don't pick
+  which regional map it shows up on, that's already decided by which
+  region the country belongs to.
+
+**Changing which countries appear on a map (developer-only):** which
+countries are drawn on each regional map, and the map's geography itself,
+comes from `tools/regions.js` and is generated into
+`src/_data/regionMaps.json` by a build script — not something you edit
+through the GitHub web UI. Editing `tools/regions.js` requires running
+`npm run maps` locally afterward to regenerate `regionMaps.json`, then
+committing both files. Marking countries visited/planned/etc. never
+requires this — only adding/removing/re-drawing an entire country's shape
+does.
 
 ## How to add a resource to the Cool Web Resources page
 

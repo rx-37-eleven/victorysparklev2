@@ -59,5 +59,9 @@
     "WV": "visited",
     "WY": "visited",
     "DC": "visited"
+  },
+  "countries": {
+    "PL": { "status": "visited", "year": "2023" },
+    "JP": "planned"
   }
 }
