@@ -1,0 +1,17 @@
+diff --git a/src/_data/resources.json b/src/_data/resources.json
+index 630e54b..f27e1f1 100644
+--- a/src/_data/resources.json
++++ b/src/_data/resources.json
+@@ -5,5 +5,12 @@
+     "dateAdded": "2026-07-13",
+     "tags": ["generator", "patterns", "design"],
+     "note": "Makes seamless gingham patterns you can download and use."
++  },
++  {
++    "title": "STL Splitter",
++    "url": "https://split.actionbox.ca/",
++    "dateAdded": "2026-07-28",
++    "tags": ["3d-printing", "tools", "stl"],
++    "note": "Free, no-signup browser tool that splits large STL/3MF/OBJ files into printable pieces, with optional auto-generated connector pins."
+   }
+ ]

@@ -1,0 +1,101 @@
+From b8c5d1e27871888e41fc4880af124d5c1c6004ac Mon Sep 17 00:00:00 2001
+From: Claude <claude@anthropic.com>
+Date: Wed, 29 Jul 2026 19:36:31 +0000
+Subject: [PATCH] fix(css): add fallback stacks for Comic Neue and Miniver
+
+- Added --font-body / --font-display tokens at top of file, above
+  the * reset, per brief.
+- Replaced font-family on body, .site-title, .nav-trigger, .tag-chip,
+  .clear-filters-btn with the new variables.
+- Removed a stray leftover line 1 ('cat > src/css/style.css << 'EOF'')
+  that wasn't valid CSS and was silently breaking the '* { margin/
+  padding/box-sizing }' reset rule by merging into its selector.
+  Not mentioned in the brief; fixing since it's directly at the top
+  of the section being edited and was clearly unintentional.
+- Discrepancy: found a 6th font-family the brief didn't mention,
+  .blog-list-title { font-family: "DynaPuff", "Comic Neue", sans-serif; }.
+  Kept DynaPuff as the primary (distinct heading font, not part of
+  the Comic Neue/Miniver pair the brief describes) but swapped its
+  bare 'Comic Neue, sans-serif' fallback for var(--font-body) so it
+  gets the same richer fallback chain and stays in sync going forward.
+- Did not touch src/apps/pinpress/buttonstyle.css (separate token
+  system, already has fallbacks) per brief.
+- Verified: npx eleventy build succeeds, grep confirms every
+  font-family in style.css now reads var(--font-body) or
+  var(--font-display) (DynaPuff line uses var(--font-body) for its
+  fallback segment).
+---
+ src/css/style.css | 18 +++++++++++-------
+ 1 file changed, 11 insertions(+), 7 deletions(-)
+
+diff --git a/src/css/style.css b/src/css/style.css
+index 1bde624..dbcb2b9 100644
+--- a/src/css/style.css
++++ b/src/css/style.css
+@@ -1,4 +1,8 @@
+-cat > src/css/style.css << 'EOF'
++:root {
++    --font-body: "Comic Neue", "Segoe UI", system-ui, -apple-system, sans-serif;
++    --font-display: "Miniver", "Brush Script MT", "Segoe Script", cursive;
++}
++
+ * {
+     margin: 0;
+     padding: 0;
+@@ -6,7 +10,7 @@ cat > src/css/style.css << 'EOF'
+ }
+ 
+ body {
+-    font-family: "comic Neue";
++    font-family: var(--font-body);
+     background:linear-gradient(90deg,rgba(255, 255, 255, 1) 0%, rgba(234, 213, 245, 1) 50%, rgba(255, 255, 255, 1) 100%);
+     min-height: 175vh;
+ }
+@@ -61,7 +65,7 @@ header {
+     font-size: 36px;
+     color: #5a3d7f;
+     font-weight: 600;
+-    font-family: "miniver";
++    font-family: var(--font-display);
+ }
+ 
+ .main-nav {
+@@ -78,7 +82,7 @@ header {
+     border: none;
+     cursor: pointer;
+     color: #5a3d7f;
+-    font-family: "Comic Neue", sans-serif;
++    font-family: var(--font-body);
+     font-size: 16px;
+     font-weight: 700;
+     padding: 10px 15px;
+@@ -544,7 +548,7 @@ p a:hover {
+ }
+ 
+ .tag-chip {
+-    font-family: "Comic Neue", sans-serif;
++    font-family: var(--font-body);
+     font-size: 13px;
+     font-weight: 700;
+     color: #5a3d7f;
+@@ -583,7 +587,7 @@ p a:hover {
+ 
+ .clear-filters-btn {
+     width: 100%;
+-    font-family: "Comic Neue", sans-serif;
++    font-family: var(--font-body);
+     font-weight: 700;
+     color: white;
+     background: #5a3d7f;
+@@ -775,7 +779,7 @@ p a:hover {
+     font-size: 24px;
+     font-weight: 700;
+     text-decoration: none;
+-    font-family: "DynaPuff", "Comic Neue", sans-serif;
++    font-family: "DynaPuff", var(--font-body);
+ }
+ 
+ .blog-list-title:hover {
+-- 
+2.43.0
+
