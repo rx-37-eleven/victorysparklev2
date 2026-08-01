@@ -1,0 +1,32 @@
+{#
+  Renders one regional map (Eastern Europe, Western Europe, Asia, South
+  America -- all draw through this one macro). `key` is the regionMaps.json
+  / mapRender.regions key (e.g. "asia"); `region` is regionMaps[key];
+  `places` is mapRender.regions[key], the resolved status/label/color/
+  tooltip for each place in this region.
+
+  regionMaps places always have either `d` (draw a <path>) or `cx`/`cy`/`r`
+  (draw a <circle> -- countries too small to reliably click at this scale,
+  same idea as the DC marker on the US map). Path data, colors, and
+  viewBox all come from src/_data/regionMaps.json + mapRender.js -- do not
+  hand-edit geometry here, edit tools/regions.js and run `npm run maps`.
+#}
+{% macro render(key, region, places) %}
+<svg viewBox="{{ region.viewBox }}" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Map of {{ region.label }} colored by travel status" xmlns="http://www.w3.org/2000/svg" class="travel-map-svg">
+  <defs>
+    <clipPath id="clip-{{ key }}">
+      <rect x="0" y="0" width="900" height="600" />
+    </clipPath>
+  </defs>
+  <g class="map-paths" clip-path="url(#clip-{{ key }})">
+    {% for code, place in region.places %}
+    {% set resolved = places[code] %}
+    {% if place.d %}
+    <path id="{{ key }}-{{ code }}" class="map-path" data-place="{{ code }}" data-status="{{ resolved.status }}" data-name="{{ resolved.name }}" data-tooltip="{{ resolved.tooltip }}" fill="{{ resolved.color }}" stroke="#FFFFFF" stroke-width="1" tabindex="0" d="{{ place.d }}"><title>{{ resolved.tooltip }}</title></path>
+    {% else %}
+    <circle id="{{ key }}-{{ code }}" class="map-path" data-place="{{ code }}" data-status="{{ resolved.status }}" data-name="{{ resolved.name }}" data-tooltip="{{ resolved.tooltip }}" fill="{{ resolved.color }}" stroke="#FFFFFF" stroke-width="1" tabindex="0" cx="{{ place.cx }}" cy="{{ place.cy }}" r="{{ place.r }}"><title>{{ resolved.tooltip }}</title></circle>
+    {% endif %}
+    {% endfor %}
+  </g>
+</svg>
+{% endmacro %}

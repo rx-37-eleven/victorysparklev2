@@ -27,7 +27,7 @@
     "KY": "drove",
     "LA": "visited",
     "MA": "none",
-    "MD": "lived",
+    "MD": { "status": "lived", "year": "2011–2015" },
     "ME": "none",
     "MI": "visited",
     "MN": "none",
@@ -41,7 +41,7 @@
     "NJ": "visited",
     "NM": "visited",
     "NV": "visited",
-    "NY": "visited",
+    "NY": { "status": "visited", "year": "2019" },
     "OH": "none",
     "OK": "visited",
     "OR": "drove",
@@ -59,5 +59,9 @@
     "WV": "visited",
     "WY": "visited",
     "DC": "visited"
+  },
+  "countries": {
+    "PL": { "status": "visited", "year": "2023" },
+    "JP": "planned"
   }
 }

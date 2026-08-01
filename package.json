@@ -7,7 +7,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "eleventy && pagefind --site _site",
     "serve": "eleventy --serve",
-    "build:preview": "npm run build && npx serve _site"
+    "build:preview": "npm run build && npx serve _site",
+    "maps": "node tools/generate-country-paths.js"
   },
   "keywords": [],
   "author": "",
@@ -22,7 +23,11 @@
     "markdown-it": "^14.1.0"
   },
   "devDependencies": {
+    "d3-geo": "^3.1.1",
+    "i18n-iso-countries": "^7.14.0",
     "pagefind": "^1.5.2",
-    "sharp": "^0.35.3"
+    "sharp": "^0.35.3",
+    "topojson-client": "^3.1.0",
+    "world-atlas": "^2.0.2"
   }
 }

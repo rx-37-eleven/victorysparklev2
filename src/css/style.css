@@ -756,17 +756,32 @@ p a:hover {
 
 /* ===== TRAVEL MAP ===== */
 
+.travel-map-section {
+    margin-top: 50px;
+}
+
+.travel-map-section:first-of-type {
+    margin-top: 0;
+}
+
+.travel-map-section h2 {
+    color: #5a3d7f;
+    font-size: 26px;
+    margin-bottom: 10px;
+    font-family: "DynaPuff", "Comic Neue", sans-serif;
+}
+
 .travel-map-wrap {
     max-width: 900px;
     margin: 20px auto;
 }
 
-.travel-map-svg .state-path {
+.travel-map-svg .map-path {
     cursor: pointer;
     transition: stroke-width 0.15s ease, opacity 0.25s ease;
 }
 
-.travel-map-svg .state-path:focus {
+.travel-map-svg .map-path:focus {
     outline: none;
 }
 
@@ -838,6 +853,14 @@ p a:hover {
 }
 
 @media (max-width: 768px) {
+    .travel-map-section {
+        margin-top: 35px;
+    }
+
+    .travel-map-section h2 {
+        font-size: 22px;
+    }
+
     .map-legend {
         gap: 10px;
     }
