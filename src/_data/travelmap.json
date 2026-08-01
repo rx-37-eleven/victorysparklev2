@@ -62,7 +62,7 @@
   },
   "countries": {
     "PL": { "status": "visited", "year": "2023" },
-    "JP": "planned",
+    "JP": "status": "planned",
     "AM": { "status": "visited", "year": "2026" },
     "AZ": { "status": "visited", "year": "2026" },
     "BE": { "status": "visited", "year": "2025" },
@@ -80,13 +80,11 @@
     "MX": { "status": "visited", "year": "2014" },
     "NO": { "status": "visited", "year": "2024" },
     "IE": { "status": "visited", "year": "2014" },
-    
     "SJ": { "status": "visited", "year": "2024" },
     "SE": { "status": "visited", "year": "2024" },
     "CH": { "status": "visited", "year": "2025" },
-    
     "TW": { "status": "visited", "year": "2025" },
     "TR": { "status": "visited", "year": "2026" },
-    "GB": { "status": "visited", "year": "2025" },
+    "GB": { "status": "visited", "year": "2025" }
   }
 }
