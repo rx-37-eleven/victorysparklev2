@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "eleventy && npm --prefix vectorizer run build && pagefind --site _site",
+    "build": "eleventy && npm --prefix vectorizer ci --include=dev && npm --prefix vectorizer run build && pagefind --site _site",
     "serve": "eleventy --serve",
     "build:preview": "npm run build && npx serve _site",
     "maps": "node tools/generate-country-paths.js"
