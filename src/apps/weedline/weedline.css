@@ -1,0 +1,403 @@
+/* =====================================================================
+   WEEDLINE — app-only styles
+   ---------------------------------------------------------------------
+   Everything in this file is scoped under .weedline-app. This site's
+   global stylesheet (/css/style.css) is loaded AFTER this one on the
+   page (see index.html), so any bare-element rule here (body, h1, p...)
+   would lose to the global sheet's — and worse, would fight it. Scope
+   every selector under .weedline-app; never restyle a bare tag.
+
+   Colors, radii and shadows below are the site's own palette (see
+   /css/style.css), just re-declared as --wl- custom properties so this
+   file never collides with another app's tokens (Pinpress defines its
+   own --color-* set with different values under the same names).
+   ===================================================================== */
+
+.weedline-app {
+  --wl-ink: #5a3d7f;
+  --wl-ink-dark: #3d2456;
+  --wl-body: #6b5786;
+  --wl-muted: #8a7aa0;
+  --wl-surface: rgba(255, 255, 255, 0.7);
+  --wl-shadow: 0 4px 15px rgba(138, 108, 189, 0.15);
+  --wl-shadow-lift: 0 6px 20px rgba(138, 108, 189, 0.3);
+  --wl-hairline: rgba(138, 108, 189, 0.2);
+  --wl-radius: 15px;
+  --wl-radius-btn: 10px;
+  --wl-radius-pill: 20px;
+}
+
+.weedline-app .wl-h1 {
+  font-family: "DynaPuff", "Comic Neue", sans-serif;
+  color: var(--wl-ink);
+  margin-bottom: 20px;
+  font-size: 38px;
+}
+
+.weedline-app .wl-h2 {
+  font-family: "Comic Neue", sans-serif;
+  font-weight: 700;
+  color: var(--wl-ink);
+  font-size: 20px;
+  margin-bottom: 12px;
+}
+
+.weedline-app .wl-hint {
+  font-family: "Comic Neue", sans-serif;
+  color: var(--wl-muted);
+  font-size: 14px;
+  margin-top: 10px;
+  line-height: 1.5;
+}
+
+.weedline-app .wl-error {
+  font-family: "Comic Neue", sans-serif;
+  color: var(--wl-ink-dark);
+  background: rgba(255, 255, 255, 0.6);
+  border: 1.5px solid var(--wl-hairline);
+  border-radius: var(--wl-radius-btn);
+  padding: 10px 14px;
+  margin-top: 12px;
+}
+
+.weedline-app .wl-error[hidden] {
+  display: none;
+}
+
+/* --- Panels (tool chrome; prose still uses the site's .content-section) --- */
+
+.weedline-app .wl-panel {
+  background: var(--wl-surface);
+  border-radius: var(--wl-radius);
+  box-shadow: var(--wl-shadow);
+  padding: 24px;
+  margin-bottom: 20px;
+}
+
+.weedline-app .wl-panel[disabled],
+.weedline-app .wl-panel.wl-disabled {
+  opacity: 0.55;
+}
+
+.weedline-app summary.wl-h2 {
+  cursor: pointer;
+  margin-bottom: 0;
+}
+
+.weedline-app details.wl-panel[open] summary.wl-h2 {
+  margin-bottom: 12px;
+}
+
+/* --- Dropzone --- */
+
+.weedline-app .wl-dropzone {
+  border: 2px dashed var(--wl-hairline);
+  border-radius: var(--wl-radius);
+  padding: 32px 20px;
+  text-align: center;
+  transition: border-color 0.2s ease, background 0.2s ease;
+  cursor: pointer;
+}
+
+.weedline-app .wl-dropzone p {
+  color: var(--wl-body);
+  font-size: 16px;
+  margin-bottom: 12px;
+}
+
+.weedline-app .wl-dropzone.wl-drag-over {
+  border-color: var(--wl-ink);
+  background: rgba(138, 108, 189, 0.08);
+}
+
+.weedline-app .wl-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* --- Workspace layout --- */
+
+.weedline-app .wl-workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+
+.weedline-app .wl-preview-panel {
+  position: sticky;
+  top: 20px;
+}
+
+.weedline-app .wl-controls-column {
+  display: flex;
+  flex-direction: column;
+}
+
+/* --- Preview --- */
+
+.weedline-app .wl-preview-frame {
+  position: relative;
+  border-radius: var(--wl-radius);
+  overflow: hidden;
+  background-color: #fff;
+  background-image:
+    linear-gradient(45deg, #eee 25%, transparent 25%),
+    linear-gradient(-45deg, #eee 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #eee 75%),
+    linear-gradient(-45deg, transparent 75%, #eee 75%);
+  background-size: 20px 20px;
+  background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+  border: 1.5px solid var(--wl-hairline);
+}
+
+.weedline-app #wl-canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.weedline-app .wl-empty-message {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 20px;
+  color: var(--wl-muted);
+  font-family: "Comic Neue", sans-serif;
+  font-size: 16px;
+  background: rgba(255, 255, 255, 0.55);
+}
+
+.weedline-app .wl-empty-message[hidden] {
+  display: none;
+}
+
+/* --- Mode toggle (mirrors the site's .tag-chip) --- */
+
+.weedline-app .wl-mode-toggle {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.weedline-app .wl-chip-wrap {
+  position: relative;
+  display: inline-block;
+}
+
+.weedline-app .wl-mode-toggle input[type="radio"] {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.weedline-app .wl-chip {
+  font-family: "Comic Neue", sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--wl-ink);
+  background: transparent;
+  border: 1.5px solid var(--wl-ink);
+  border-radius: var(--wl-radius-pill);
+  padding: 6px 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-block;
+}
+
+.weedline-app .wl-chip:hover {
+  background: rgba(138, 108, 189, 0.15);
+}
+
+.weedline-app input[type="radio"]:checked + .wl-chip {
+  background: var(--wl-ink);
+  color: #fff;
+}
+
+.weedline-app input[type="radio"]:focus-visible + .wl-chip {
+  outline: 3px solid var(--wl-ink);
+  outline-offset: 2px;
+}
+
+.weedline-app input[type="radio"]:disabled + .wl-chip {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* --- Form rows --- */
+
+.weedline-app .wl-slider-row,
+.weedline-app .wl-size-row,
+.weedline-app .wl-field-row {
+  margin-bottom: 18px;
+}
+
+.weedline-app .wl-slider-row:last-child,
+.weedline-app .wl-size-row:last-child,
+.weedline-app .wl-field-row:last-child {
+  margin-bottom: 0;
+}
+
+.weedline-app .wl-slider-row label,
+.weedline-app .wl-size-row label,
+.weedline-app .wl-field-row label {
+  display: block;
+  font-family: "Comic Neue", sans-serif;
+  font-weight: 700;
+  color: var(--wl-body);
+  font-size: 15px;
+  margin-bottom: 8px;
+}
+
+.weedline-app .wl-value {
+  font-weight: 400;
+  color: var(--wl-muted);
+}
+
+.weedline-app input[type="range"] {
+  width: 100%;
+  accent-color: var(--wl-ink);
+}
+
+.weedline-app input[type="range"]:disabled {
+  opacity: 0.5;
+}
+
+.weedline-app .wl-size-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.weedline-app .wl-size-row label:first-child {
+  margin-bottom: 0;
+  flex: 0 0 auto;
+}
+
+.weedline-app input[type="number"],
+.weedline-app select {
+  font-family: "Comic Neue", sans-serif;
+  font-size: 15px;
+  color: var(--wl-ink-dark);
+  border: 1.5px solid var(--wl-hairline);
+  border-radius: var(--wl-radius-btn);
+  padding: 8px 10px;
+  background: #fff;
+}
+
+.weedline-app input[type="number"] {
+  width: 90px;
+}
+
+.weedline-app .wl-field-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.weedline-app .wl-field-row label {
+  margin-bottom: 0;
+  flex: 0 0 auto;
+}
+
+/* --- Buttons (mirror .clear-filters-btn) --- */
+
+.weedline-app .wl-btn-primary {
+  font-family: "Comic Neue", sans-serif;
+  font-weight: 700;
+  color: #fff;
+  background: var(--wl-ink);
+  border: none;
+  border-radius: var(--wl-radius-btn);
+  padding: 10px 16px;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.weedline-app .wl-btn-primary:hover:not(:disabled) {
+  background: var(--wl-ink-dark);
+  transform: translateY(-5px);
+  box-shadow: var(--wl-shadow-lift);
+}
+
+.weedline-app .wl-btn-secondary {
+  font-family: "Comic Neue", sans-serif;
+  font-weight: 700;
+  color: var(--wl-ink);
+  background: transparent;
+  border: 1.5px solid var(--wl-ink);
+  border-radius: var(--wl-radius-btn);
+  padding: 10px 16px;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.weedline-app .wl-btn-secondary:hover:not(:disabled) {
+  background: rgba(138, 108, 189, 0.15);
+  transform: translateY(-5px);
+  box-shadow: var(--wl-shadow-lift);
+}
+
+.weedline-app button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.weedline-app .wl-export-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+/* --- Focus visibility (matches the site's nav focus convention) --- */
+
+.weedline-app button:focus-visible,
+.weedline-app input:focus-visible,
+.weedline-app select:focus-visible,
+.weedline-app [tabindex]:focus-visible {
+  outline: 3px solid var(--wl-ink);
+  outline-offset: 2px;
+}
+
+/* --- Reduced motion --- */
+
+@media (prefers-reduced-motion: reduce) {
+  .weedline-app * {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
+
+/* --- Breakpoint (matches the site's single breakpoint) --- */
+
+@media (max-width: 768px) {
+  .weedline-app .wl-workspace {
+    grid-template-columns: 1fr;
+  }
+
+  .weedline-app .wl-preview-panel {
+    position: static;
+  }
+
+  .weedline-app .wl-export-row {
+    flex-direction: column;
+  }
+
+  .weedline-app .wl-export-row button {
+    width: 100%;
+  }
+}
