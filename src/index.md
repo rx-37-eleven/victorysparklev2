@@ -11,6 +11,13 @@ permalink: /
 </div>
 <!-- END BUTTON MAKER -->
 
+<!-- WEEDLINE -->
+<div id="weedline" class="content-section">
+    <h1>Weedline</h1>
+    <p>Weedline traces a design and draws a weeding boundary around it, so the excess vinyl or HTV comes off in one clean piece instead of bit by bit. Choose a smooth bubble offset or a straight-sided angles boundary, then export a real-size cut line. Runs entirely in your browser. <a href="/apps/weedline/">Open Weedline &rarr;</a></p>
+</div>
+<!-- END WEEDLINE -->
+
 <!-- CODING PROJECTS -->
 <div id="coding-projects" class="content-section">
     <h1>Coding Projects</h1>

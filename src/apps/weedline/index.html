@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Weedline — Weeding Boundary Generator</title>
+<meta name="description" content="Weedline traces your design and draws a weeding boundary around it, so the excess vinyl or HTV comes off in one piece. Free, runs entirely in your browser.">
+<link rel="canonical" href="https://victorysparkle.com/apps/weedline/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Victory Sparkle Co.">
+<meta property="og:title" content="Weedline · Victory Sparkle Co.">
+<meta property="og:description" content="Trace a design and draw a weeding boundary around it, so the excess vinyl or HTV comes off in one piece. Free, runs entirely in your browser.">
+<meta property="og:url" content="https://victorysparkle.com/apps/weedline/">
+<meta property="og:image" content="https://victorysparkle.com/images/og-default.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&family=DynaPuff:wght@500&family=Miniver&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="/apps/weedline/weedline.css">
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<header data-pagefind-ignore>
+    <div class="header-content">
+        <a href="/" class="logo-section" aria-label="Victory Sparkle Co. home">
+            <div class="profile-image"><img src="/images/Vlogo.png" alt=""></div>
+            <div class="site-title">Victory Sparkle Co.</div>
+        </a>
+        <button type="button" class="nav-toggle" id="nav-toggle"
+                aria-expanded="false" aria-controls="main-nav" aria-label="Menu">
+            <span class="nav-toggle-bar"></span>
+            <span class="nav-toggle-bar"></span>
+            <span class="nav-toggle-bar"></span>
+        </button>
+        <nav class="main-nav" id="main-nav">
+            <div class="nav-item">
+                <button type="button" class="nav-trigger" aria-expanded="false">Make</button>
+                <div class="nav-dropdown">
+                    <a href="/apps/pinpress/">Pinpress</a>
+                    <a href="/apps/tilemaker/">Seamless Tile Maker</a>
+                    <a href="/apps/stained-glass-vectorizer/">Stained Glass Vectorizer</a>
+                    <a href="/apps/weedline/">Weedline</a>
+                    <a href="/resources/">Resources</a>
+                    <a href="https://www.pinterest.com/victorysparkle/website-board/" target="_blank" rel="noopener noreferrer">Pinterest</a>
+                </div>
+            </div>
+            <div class="nav-item">
+                <button type="button" class="nav-trigger" aria-expanded="false">Code</button>
+                <div class="nav-dropdown">
+                    <a href="/#coding-projects">Telegram Bots</a>
+                </div>
+            </div>
+            <div class="nav-item">
+                <button type="button" class="nav-trigger" aria-expanded="false">About</button>
+                <div class="nav-dropdown">
+                    <a href="/events/">Events</a>
+                    <a href="/about/">About</a>
+                    <a href="/blog/">Blog</a>
+                    <a href="/map/">Travel Map</a>
+                    <a href="/contact/">Contact</a>
+                </div>
+            </div>
+            <a href="/search/" class="nav-search-link">Search</a>
+        </nav>
+    </div>
+</header>
+
+<main data-pagefind-body>
+<div class="weedline-app" id="weedline-app">
+
+  <!-- INTRO -->
+  <div class="content-section">
+    <h1 class="wl-h1">Weedline</h1>
+    <p>A weeding boundary is an extra cut line drawn around a design so the excess vinyl or HTV peels away in one clean piece instead of bit by bit. Weedline traces your design's outline and draws that boundary for you.</p>
+    <p>Everything happens right here in your browser — your image is never uploaded anywhere.</p>
+  </div>
+
+  <!-- UPLOAD -->
+  <section class="content-section">
+    <div id="wl-dropzone" class="wl-dropzone">
+      <p>Drag a design here, or</p>
+      <button type="button" id="wl-choose-btn" class="wl-btn-primary">Choose a file</button>
+      <input type="file" id="wl-file-input" accept="image/png,image/svg+xml,image/jpeg,image/webp" class="wl-visually-hidden">
+      <p class="wl-hint">PNG, SVG, JPEG, or WEBP. A PNG with transparency works best — Weedline can trace the silhouette directly from the alpha channel.</p>
+    </div>
+    <p id="wl-upload-error" class="wl-error" hidden></p>
+  </section>
+
+  <div id="wl-workspace" class="wl-workspace">
+
+    <!-- PREVIEW -->
+    <section class="wl-panel wl-preview-panel" aria-label="Preview">
+      <div class="wl-preview-frame">
+        <canvas id="wl-canvas" width="600" height="450" aria-label="No design uploaded yet"></canvas>
+        <p id="wl-empty-message" class="wl-empty-message">Add a design above to see its weeding boundary here.</p>
+      </div>
+    </section>
+
+    <!-- CONTROLS -->
+    <div class="wl-controls-column">
+
+      <!-- MODE + SLIDERS -->
+      <section class="wl-panel">
+        <h2 class="wl-h2">Boundary shape</h2>
+
+        <div class="wl-mode-toggle" role="radiogroup" aria-label="Boundary mode">
+          <span class="wl-chip-wrap">
+            <input type="radio" name="wl-mode" id="wl-mode-bubble" value="bubble" checked disabled>
+            <label for="wl-mode-bubble" class="wl-chip">Bubble</label>
+          </span>
+          <span class="wl-chip-wrap">
+            <input type="radio" name="wl-mode" id="wl-mode-angles" value="angles" disabled>
+            <label for="wl-mode-angles" class="wl-chip">Angles</label>
+          </span>
+        </div>
+
+        <div class="wl-slider-row">
+          <label for="wl-distance">Distance <span id="wl-distance-value" class="wl-value">0.25 in</span></label>
+          <input type="range" id="wl-distance" min="0" max="1" step="0.01" value="0.25" disabled>
+        </div>
+
+        <div class="wl-slider-row" id="wl-angles-group" hidden>
+          <label for="wl-angles">Angles <span id="wl-angles-value" class="wl-value">4</span></label>
+          <input type="range" id="wl-angles" min="3" max="24" step="1" value="4" disabled>
+        </div>
+      </section>
+
+      <!-- SIZE -->
+      <section class="wl-panel">
+        <h2 class="wl-h2">Size</h2>
+        <div class="wl-size-row">
+          <label for="wl-design-width">Design width</label>
+          <input type="number" id="wl-design-width" min="0.1" step="0.1" value="4" disabled>
+          <label for="wl-unit" class="wl-visually-hidden">Unit</label>
+          <select id="wl-unit" disabled>
+            <option value="in" selected>in</option>
+            <option value="mm">mm</option>
+          </select>
+        </div>
+        <p class="wl-hint">This sets the real-world scale, so the distance slider above means what it says.</p>
+      </section>
+
+      <!-- ADVANCED -->
+      <details class="wl-panel">
+        <summary class="wl-h2">Advanced</summary>
+
+        <div class="wl-field-row">
+          <label for="wl-background">Background</label>
+          <select id="wl-background" disabled>
+            <option value="auto" selected>Auto</option>
+            <option value="transparent">Transparent</option>
+            <option value="white">White</option>
+            <option value="black">Black</option>
+          </select>
+        </div>
+
+        <div class="wl-slider-row">
+          <label for="wl-threshold">Threshold <span id="wl-threshold-value" class="wl-value">16</span></label>
+          <input type="range" id="wl-threshold" min="1" max="250" step="1" value="16" disabled>
+        </div>
+
+        <div class="wl-slider-row">
+          <label for="wl-specks">Ignore specks smaller than <span id="wl-specks-value" class="wl-value">0.5 mm²</span></label>
+          <input type="range" id="wl-specks" min="0" max="5" step="0.1" value="0.5" disabled>
+        </div>
+      </details>
+
+      <!-- EXPORT -->
+      <section class="wl-panel">
+        <h2 class="wl-h2">Export</h2>
+        <div class="wl-export-row">
+          <button type="button" id="wl-export-boundary" class="wl-btn-primary" disabled>Boundary only (SVG)</button>
+          <button type="button" id="wl-export-both" class="wl-btn-primary" disabled>Boundary + design (SVG)</button>
+          <button type="button" id="wl-export-png" class="wl-btn-secondary" disabled title="Reference only — not a cut file">Preview (PNG)</button>
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+</div>
+</main>
+
+<script src="/apps/weedline/weedline.js" defer></script>
+<script src="/js/nav.js" defer></script>
+</body>
+</html>
