@@ -1,0 +1,48 @@
+/* Design tokens for the Victory Sparkle Co. restyle.
+   Values sourced from "Victory Sparkle new landing page design/Victory Sparkle Home.dc.html".
+   Consumed by src/css/style.css and each src/apps/* app's own stylesheet.
+   Vectorizer (separate Vite build under vectorizer/) duplicates these values
+   into its own :root rather than linking this file, since it builds in isolation. */
+
+:root {
+    /* ---- color ---- */
+    --color-ink: #2f2440;
+    --color-primary: #5c2d91;
+    --color-primary-dark: #45216e;
+    --color-accent-pink: #f2a0c0;
+    --color-accent-pink-dark: #b8407f;
+    --color-accent-teal: #6fc9b4;
+    --color-accent-mint: #c9ece4;
+    --color-surface: #fffdf9;
+    --color-surface-lavender: #efe2fb;
+    --color-surface-pink: #ffdcea;
+    --color-surface-cream: #f7f1e8;
+    --color-shadow: #d9c8f0;
+    --color-bg: #eef0f7;
+    --color-bg-dot: #b9c2e6;
+    --color-text-muted: #6a5f78;
+
+    /* ---- type ---- */
+    --font-body: "Comic Neue", sans-serif;
+    --font-display: "DynaPuff", "Comic Neue", sans-serif;
+    --font-script: "Miniver", cursive;
+
+    /* ---- radii ---- */
+    --radius-lg: 26px;
+    --radius-frame: 22px;
+    --radius-md: 16px;
+    --radius-sm: 14px;
+    --radius-pill: 999px;
+
+    /* ---- hard "sticker" shadow offsets (no blur; pair with a color at point of use) ---- */
+    --shadow-sticker-sm: 3px 3px 0;
+    --shadow-sticker: 6px 6px 0;
+    --shadow-sticker-lg: 10px 10px 0;
+
+    /* ---- borders ---- */
+    --border-width: 3px;
+
+    /* ---- layout ---- */
+    --content-max-width: 1120px;
+    --gutter: 24px;
+}

@@ -7,24 +7,25 @@
    would lose to the global sheet's — and worse, would fight it. Scope
    every selector under .weedline-app; never restyle a bare tag.
 
-   Colors, radii and shadows below are the site's own palette (see
-   /css/style.css), just re-declared as --wl- custom properties so this
-   file never collides with another app's tokens (Pinpress defines its
-   own --color-* set with different values under the same names).
+   Colors, radii and shadows below are aliases onto the site-wide tokens
+   in /css/tokens.css (linked before this file in index.html), re-declared
+   as --wl- custom properties so this file never collides with another
+   app's tokens (Pinpress/Tile Maker define their own --color-* set with
+   different values under the same names).
    ===================================================================== */
 
 .weedline-app {
-  --wl-ink: #5a3d7f;
-  --wl-ink-dark: #3d2456;
-  --wl-body: #6b5786;
-  --wl-muted: #8a7aa0;
-  --wl-surface: rgba(255, 255, 255, 0.7);
-  --wl-shadow: 0 4px 15px rgba(138, 108, 189, 0.15);
-  --wl-shadow-lift: 0 6px 20px rgba(138, 108, 189, 0.3);
-  --wl-hairline: rgba(138, 108, 189, 0.2);
-  --wl-radius: 15px;
-  --wl-radius-btn: 10px;
-  --wl-radius-pill: 20px;
+  --wl-ink: var(--color-primary);
+  --wl-ink-dark: var(--color-primary-dark);
+  --wl-body: var(--color-ink);
+  --wl-muted: var(--color-text-muted);
+  --wl-surface: var(--color-surface);
+  --wl-shadow: var(--shadow-sticker) var(--color-shadow);
+  --wl-shadow-lift: var(--shadow-sticker) var(--color-accent-pink);
+  --wl-hairline: var(--color-shadow);
+  --wl-radius: var(--radius-lg);
+  --wl-radius-btn: var(--radius-sm);
+  --wl-radius-pill: var(--radius-pill);
 }
 
 .weedline-app .wl-h1 {
@@ -68,6 +69,7 @@
 
 .weedline-app .wl-panel {
   background: var(--wl-surface);
+  border: var(--border-width) solid var(--color-ink);
   border-radius: var(--wl-radius);
   box-shadow: var(--wl-shadow);
   padding: 24px;
@@ -91,7 +93,7 @@
 /* --- Dropzone --- */
 
 .weedline-app .wl-dropzone {
-  border: 2px dashed var(--wl-hairline);
+  border: 2px dashed var(--wl-ink);
   border-radius: var(--wl-radius);
   padding: 32px 20px;
   text-align: center;
@@ -321,7 +323,7 @@
   font-weight: 700;
   color: #fff;
   background: var(--wl-ink);
-  border: none;
+  border: 2px solid var(--color-ink);
   border-radius: var(--wl-radius-btn);
   padding: 10px 16px;
   cursor: pointer;

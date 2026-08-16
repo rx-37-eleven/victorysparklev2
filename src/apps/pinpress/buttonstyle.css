@@ -6,28 +6,22 @@
    ===================================================================== */
 
 :root {
-  /* Color */
-  --color-bg:           #F8F4FD;
-  --color-surface:      #FFFFFF;
-  --color-primary:      #7C4DCB;
-  --color-primary-dark: #5A35A0;
-  --color-accent-light: #D8C2F5;
-  --color-ink:          #2E1F47;
-  --color-muted:        #8C7AA8;
+  /* --color-bg, --color-surface, --color-primary, --color-primary-dark,
+     --color-ink, --font-display, --font-body, --radius-md, --radius-lg,
+     and --border-width all come from /css/tokens.css (linked before this
+     file) under the same names, so they're not redeclared here. These are
+     Pinpress-local aliases for shared tokens under different names, plus a
+     couple of functional colors (warning state) with no site-wide
+     equivalent. */
+  --color-accent-light: var(--color-surface-lavender);
+  --color-muted:        var(--color-text-muted);
+  --color-border:       var(--color-shadow);
   --color-warn:         #B5740E;
   --color-warn-bg:      #FBEDD7;
   --color-success:      #3D8F68;
-  --color-border:       #E6DAF7;
 
-  /* Type */
-  --font-display: 'Baloo 2', system-ui, sans-serif;
-  --font-body:    'Work Sans', system-ui, sans-serif;
-
-  /* Layout */
-  --radius-md: 16px;
-  --radius-lg: 24px;
-  --shadow-card: 0 2px 0 rgba(46, 31, 71, 0.04), 0 10px 30px rgba(124, 77, 203, 0.10);
-  --shadow-pop:  0 2px 0 rgba(46, 31, 71, 0.25), 0 6px 16px rgba(124, 77, 203, 0.35);
+  --shadow-card: var(--shadow-sticker) var(--color-shadow);
+  --shadow-pop:  var(--shadow-sticker-sm) var(--color-primary);
 }
 
 * { box-sizing: border-box; }
@@ -149,6 +143,7 @@ main {
    --------------------------------------------------------------------- */
 .card {
   background: var(--color-surface);
+  border: var(--border-width) solid var(--color-ink);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-card);
   padding: 1.75rem;
@@ -191,6 +186,7 @@ main {
   font-size: 1.05rem;
   color: #fff;
   background: radial-gradient(circle at 32% 28%, #B98AE8, var(--color-primary) 55%, var(--color-primary-dark) 100%);
+  border: 2px solid var(--color-ink);
   box-shadow: var(--shadow-pop);
   opacity: 0.45;
 }
@@ -312,27 +308,29 @@ main {
    --------------------------------------------------------------------- */
 .btn-primary, .btn-secondary {
   font-family: var(--font-body);
-  font-weight: 600;
+  font-weight: 700;
   font-size: 0.95rem;
   border-radius: 999px;
   padding: 0.7rem 1.5rem;
-  border: none;
+  border: 2px solid var(--color-ink);
   cursor: pointer;
+  transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
 }
 .btn-primary {
   background: var(--color-primary);
   color: #fff;
   box-shadow: var(--shadow-pop);
 }
-.btn-primary:hover:not(:disabled) { background: var(--color-primary-dark); }
+.btn-primary:hover:not(:disabled) { background: var(--color-primary-dark); transform: translate(1px, 1px); }
 .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; box-shadow: none; }
 .btn-large { padding: 0.9rem 2rem; font-size: 1.05rem; }
 
 .btn-secondary {
   background: var(--color-accent-light);
   color: var(--color-primary-dark);
+  box-shadow: var(--shadow-sticker-sm) var(--color-accent-teal);
 }
-.btn-secondary:hover { background: #c7aaef; }
+.btn-secondary:hover { background: var(--color-surface-pink); transform: translate(1px, 1px); }
 
 .step-actions {
   display: flex;
@@ -351,7 +349,7 @@ button:focus-visible, input:focus-visible {
    Step 1 — upload photos
    --------------------------------------------------------------------- */
 .dropzone {
-  border: 2px dashed var(--color-border);
+  border: 2px dashed var(--color-primary);
   border-radius: var(--radius-md);
   padding: 2rem 1.5rem;
   text-align: center;
@@ -557,12 +555,13 @@ button:focus-visible, input:focus-visible {
 
 .modal {
   background: var(--color-surface);
+  border: var(--border-width) solid var(--color-ink);
   border-radius: var(--radius-lg);
   width: 100%;
   max-width: 460px;
   max-height: 90vh;
   overflow-y: auto;
-  box-shadow: 0 20px 60px rgba(46, 31, 71, 0.35);
+  box-shadow: var(--shadow-sticker-lg) var(--color-shadow);
 }
 
 .modal-header {

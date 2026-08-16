@@ -16,34 +16,30 @@
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect x='4' y='4' width='26' height='26' fill='%237C4DCB'/%3E%3Crect x='34' y='4' width='26' height='26' fill='%23D8C2F5'/%3E%3Crect x='4' y='34' width='26' height='26' fill='%23D8C2F5'/%3E%3Crect x='34' y='34' width='26' height='26' fill='%237C4DCB'/%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect x='4' y='4' width='26' height='26' fill='%235c2d91'/%3E%3Crect x='34' y='4' width='26' height='26' fill='%23efe2fb'/%3E%3Crect x='4' y='34' width='26' height='26' fill='%23efe2fb'/%3E%3Crect x='34' y='34' width='26' height='26' fill='%235c2d91'/%3E%3C/svg%3E">
 
-<!-- Google Fonts: Baloo 2 (display/headings) + Work Sans (body/UI) — same as Pinpress, for a consistent look across apps -->
+<!-- Google Fonts: Comic Neue (body/UI) + DynaPuff (display/headings) + Miniver (site header script) -- same stack as the rest of the site -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-<!-- Comic Neue + Miniver: required by the shared site header/nav (site-title, nav-trigger) in /css/style.css -->
-<link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&family=Miniver&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&family=DynaPuff:wght@400..700&family=Miniver&display=swap" rel="stylesheet">
 
+<link rel="stylesheet" href="/css/tokens.css">
 <link rel="stylesheet" href="/css/style.css">
 
 <style>
   :root {
-    --color-bg:           #F8F4FD;
-    --color-surface:      #FFFFFF;
-    --color-primary:      #7C4DCB;
-    --color-primary-dark: #5A35A0;
-    --color-accent-light: #D8C2F5;
-    --color-ink:          #2E1F47;
-    --color-muted:        #8C7AA8;
+    /* --color-bg, --color-surface, --color-primary, --color-primary-dark,
+       --color-ink, --font-display, --font-body, --radius-md, --radius-lg,
+       and --border-width all come from /css/tokens.css (linked above)
+       under the same names. These are local aliases for shared tokens
+       under different names, plus the warning color (no site-wide
+       equivalent, left as a functional status color). */
+    --color-accent-light: var(--color-surface-lavender);
+    --color-muted:        var(--color-text-muted);
+    --color-border:       var(--color-shadow);
     --color-warn:         #B5740E;
     --color-warn-bg:      #FBEDD7;
-    --color-border:       #E6DAF7;
-    --font-display: 'Baloo 2', system-ui, sans-serif;
-    --font-body:    'Work Sans', system-ui, sans-serif;
-    --radius-md: 16px;
-    --radius-lg: 24px;
-    --shadow-card: 0 2px 0 rgba(46, 31, 71, 0.04), 0 10px 30px rgba(124, 77, 203, 0.10);
+    --shadow-card: var(--shadow-sticker) var(--color-shadow);
   }
 
   * { box-sizing: border-box; }
@@ -96,12 +92,12 @@
     background: var(--color-surface);
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-card);
-    border: 1px solid var(--color-border);
+    border: var(--border-width) solid var(--color-ink);
     padding: 1.5rem;
   }
 
   .dropzone {
-    border: 2px dashed var(--color-accent-light);
+    border: 2px dashed var(--color-primary);
     border-radius: var(--radius-md);
     padding: 2.5rem 1.5rem;
     text-align: center;
@@ -121,10 +117,10 @@
   .btn-primary,
   .btn-secondary {
     font-family: var(--font-body);
-    font-weight: 600;
+    font-weight: 700;
     font-size: 0.95rem;
     border-radius: 999px;
-    border: none;
+    border: 2px solid var(--color-ink);
     padding: 0.65rem 1.4rem;
     cursor: pointer;
     transition: transform 0.1s ease, box-shadow 0.1s ease, background 0.15s ease;
@@ -133,19 +129,19 @@
   .btn-primary {
     background: var(--color-primary);
     color: #fff;
-    box-shadow: 0 4px 12px rgba(124, 77, 203, 0.35);
+    box-shadow: var(--shadow-sticker-sm) var(--color-primary-dark);
   }
 
-  .btn-primary:hover:not(:disabled) { background: var(--color-primary-dark); }
+  .btn-primary:hover:not(:disabled) { background: var(--color-primary-dark); transform: translate(1px, 1px); }
   .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; box-shadow: none; }
 
   .btn-secondary {
-    background: var(--color-bg);
+    background: var(--color-accent-light);
     color: var(--color-primary-dark);
-    border: 1px solid var(--color-accent-light);
+    box-shadow: var(--shadow-sticker-sm) var(--color-accent-teal);
   }
 
-  .btn-secondary:hover { background: #fff; }
+  .btn-secondary:hover { background: var(--color-surface-pink); transform: translate(1px, 1px); }
 
   .error-banner {
     background: var(--color-warn-bg);
@@ -272,6 +268,8 @@
                 <div class="nav-dropdown">
                     <a href="/apps/pinpress/">Pinpress</a>
                     <a href="/apps/tilemaker/">Seamless Tile Maker</a>
+                    <a href="/apps/stained-glass-vectorizer/">Stained Glass Vectorizer</a>
+                    <a href="/apps/weedline/">Weedline</a>
                     <a href="/resources/">Resources</a>
                     <a href="https://www.pinterest.com/victorysparkle/website-board/" target="_blank" rel="noopener noreferrer">Pinterest</a>
                 </div>
@@ -279,7 +277,7 @@
             <div class="nav-item">
                 <button type="button" class="nav-trigger" aria-expanded="false">Code</button>
                 <div class="nav-dropdown">
-                    <a href="/#coding-projects">Telegram Bots</a>
+                    <a href="/code/">Telegram Bots</a>
                 </div>
             </div>
             <div class="nav-item">
@@ -293,6 +291,7 @@
                 </div>
             </div>
             <a href="/search/" class="nav-search-link">Search</a>
+            <a href="https://ko-fi.com/victorysparkle" target="_blank" rel="noopener noreferrer" class="nav-shop-link">Shop</a>
         </nav>
     </div>
 </header>
