@@ -14,17 +14,6 @@
 //   ex-Soviet/ex-Yugoslav states in Eastern Europe, and Greece/Cyprus/Finland
 //   in Western Europe alongside the rest of the EU/EEA/Nordic countries.
 module.exports = {
-  "eastern-europe": {
-    label: "Eastern Europe",
-    bbox: [
-      [12, 39],
-      [42, 61],
-    ],
-    countries: [
-      "AL", "BA", "BG", "BY", "CZ", "EE", "HR", "HU", "LT", "LV", "MD", "ME",
-      "MK", "PL", "RO", "RS", "RU", "SI", "SK", "UA", "XK",
-    ],
-  },
   "western-europe": {
     label: "Western Europe",
     bbox: [
@@ -48,6 +37,17 @@ module.exports = {
       "IN", "IQ", "IR", "JO", "JP", "KG", "KH", "KP", "KR", "KW", "KZ", "LA",
       "LB", "LK", "MM", "MN", "MV", "MY", "NP", "OM", "PH", "PK", "PS", "QA",
       "SA", "SG", "SY", "TH", "TJ", "TL", "TM", "TR", "TW", "UZ", "VN", "YE",
+    ],
+  },
+  "eastern-europe": {
+    label: "Eastern Europe",
+    bbox: [
+      [12, 39],
+      [42, 61],
+    ],
+    countries: [
+      "AL", "BA", "BG", "BY", "CZ", "EE", "HR", "HU", "LT", "LV", "MD", "ME",
+      "MK", "PL", "RO", "RS", "RU", "SI", "SK", "UA", "XK",
     ],
   },
   "south-america": {

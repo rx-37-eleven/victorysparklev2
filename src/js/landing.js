@@ -58,4 +58,49 @@ document.addEventListener("DOMContentLoaded", function () {
       shopTab.classList.add("is-dismissed");
     });
   }
+
+  // --- Pinterest board embed: scale the fixed-width widget to fill the box -
+  // Pinterest's pinit.js replaces the data-pin-do anchor with a fixed
+  // pixel-width iframe (sized via data-pin-board-width in index.njk), which
+  // won't reflow with the page. Instead of hardcoding a width that only
+  // matches one viewport, watch for that iframe to appear and scale it with
+  // a CSS transform to exactly fill .home-pinterest-embed-wrap, re-fitting
+  // on resize.
+  var pinWrap = document.querySelector("[data-pinterest-embed-wrap]");
+  if (pinWrap && window.MutationObserver) {
+    var pinRoot = null;
+    var pinNaturalWidth = 0;
+    var pinNaturalHeight = 0;
+
+    var fitPinterestEmbed = function () {
+      if (!pinRoot || !pinNaturalWidth) return;
+      var scale = pinWrap.clientWidth / pinNaturalWidth;
+      pinRoot.style.transform = "scale(" + scale + ")";
+      pinWrap.style.height = Math.round(pinNaturalHeight * scale) + "px";
+    };
+
+    var pinObserver = new MutationObserver(function () {
+      if (pinRoot) return;
+      var children = pinWrap.children;
+      for (var i = 0; i < children.length; i++) {
+        if (!children[i].hasAttribute("data-pin-do")) {
+          pinRoot = children[i];
+          window.requestAnimationFrame(function () {
+            pinNaturalWidth = pinRoot.offsetWidth;
+            pinNaturalHeight = pinRoot.offsetHeight;
+            fitPinterestEmbed();
+          });
+          pinObserver.disconnect();
+          break;
+        }
+      }
+    });
+    pinObserver.observe(pinWrap, { childList: true, subtree: true });
+
+    var pinResizeTimer;
+    window.addEventListener("resize", function () {
+      clearTimeout(pinResizeTimer);
+      pinResizeTimer = setTimeout(fitPinterestEmbed, 150);
+    });
+  }
 });

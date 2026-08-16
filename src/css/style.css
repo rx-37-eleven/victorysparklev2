@@ -1188,11 +1188,6 @@ p a:hover {
 
 /* ===== HOMEPAGE ===== */
 
-@keyframes twinkle {
-    0%, 100% { opacity: .25; transform: scale(.8) rotate(0deg); }
-    50% { opacity: 1; transform: scale(1.15) rotate(20deg); }
-}
-
 @keyframes driftUp {
     from { transform: translateY(8px); opacity: 0; }
     to { transform: translateY(0); opacity: 1; }
@@ -1238,18 +1233,6 @@ p a:hover {
     position: relative;
     padding: 28px 0 20px;
     overflow: hidden;
-}
-
-.home-hero-sparkles {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-}
-
-.sparkle {
-    position: absolute;
-    -webkit-text-stroke: 1px var(--color-ink);
-    animation: twinkle 3.4s ease-in-out infinite;
 }
 
 .home-hero-title {
@@ -1597,6 +1580,20 @@ p a:hover {
     margin-top: 40px;
 }
 
+/* Pinterest's board widget renders at a fixed pixel width (set via
+   data-pin-board-width in index.njk), so it's scaled with a CSS transform
+   in landing.js to exactly fill this wrap's width instead of overflowing
+   or under-filling it. overflow: hidden clips the widget's unscaled layout
+   box, which the transform shrinks visually but doesn't reflow. */
+.home-pinterest-embed-wrap {
+    width: 100%;
+    overflow: hidden;
+}
+
+.home-pinterest-embed-wrap > :not([data-pin-do]) {
+    transform-origin: top left;
+}
+
 /* --- floating shop tab --- */
 
 .home-shop-tab {
@@ -1698,7 +1695,7 @@ p a:hover {
 }
 
 /* Respect reduced-motion preferences across hover/entrance animations and
-   the homepage's decorative sparkle/carousel/drift effects. */
+   the homepage's decorative carousel/drift effects. */
 @media (prefers-reduced-motion: reduce) {
     *,
     *::before,
