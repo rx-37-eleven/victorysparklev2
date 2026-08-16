@@ -5,20 +5,6 @@ description: Hi, I'm Ryen — welcome to Victory Sparkle Co. Free browser tools 
 permalink: /
 ---
 <section class="home-hero">
-    <div class="home-hero-sparkles" aria-hidden="true">
-        <span class="sparkle" style="left:6%;top:18%;font-size:26px;color:var(--color-accent-pink);animation-delay:0s">&#10022;</span>
-        <span class="sparkle" style="left:88%;top:8%;font-size:20px;color:var(--color-accent-teal);animation-delay:1.1s">&#10022;</span>
-        <span class="sparkle" style="left:72%;top:52%;font-size:30px;color:var(--color-surface-lavender);animation-delay:.5s">&#10022;</span>
-        <span class="sparkle" style="left:44%;top:4%;font-size:16px;color:var(--color-accent-teal);animation-delay:1.8s">&#10022;</span>
-        <span class="sparkle" style="left:94%;top:38%;font-size:22px;color:var(--color-accent-pink);animation-delay:2.4s">&#10022;</span>
-        <span class="sparkle" style="left:22%;top:64%;font-size:18px;color:var(--color-shadow);animation-delay:1.4s">&#10022;</span>
-        <span class="sparkle" style="left:10%;top:4%;font-size:20px;color:var(--color-primary);animation-delay:2s">&#10022;</span>
-        <span class="sparkle" style="left:58%;top:20%;font-size:14px;color:var(--color-accent-pink);animation-delay:1.5s">&#10022;</span>
-        <span class="sparkle" style="left:34%;top:76%;font-size:24px;color:var(--color-accent-teal);animation-delay:.9s">&#10022;</span>
-        <span class="sparkle" style="left:80%;top:70%;font-size:18px;color:var(--color-shadow);animation-delay:2.8s">&#10022;</span>
-        <span class="sparkle" style="left:2%;top:74%;font-size:16px;color:var(--color-surface-lavender);animation-delay:.3s">&#10022;</span>
-        <span class="sparkle" style="left:64%;top:36%;font-size:15px;color:var(--color-primary);animation-delay:3.1s">&#10022;</span>
-    </div>
     <p class="home-kicker">hello, hello</p>
     <h1 class="home-hero-title">Nice to meet you!</h1>
     <p class="home-hero-subtitle">I'm so glad to connect. Please check out my shop &amp; my free resources and tools!</p>
@@ -114,12 +100,17 @@ permalink: /
 
 <section class="content-section home-pinterest" id="pinterest">
     <h2 class="home-h2">Current Inspiration</h2>
-    <!-- Pinterest board embed-->
-    <a data-pin-do="embedBoard"
-       data-pin-board-width="1080"
-       data-pin-scale-height="320"
-       data-pin-scale-width="115"
-       href="https://www.pinterest.com/victorysparkle/website-board/"></a>
+    <!-- Pinterest board embed -- the widget renders at a fixed pixel width
+         (data-pin-board-width below), so home-pinterest-embed-wrap + the JS
+         in landing.js scale it down/up to fill this box's actual width
+         instead of overflowing it or leaving it too narrow. -->
+    <div class="home-pinterest-embed-wrap" data-pinterest-embed-wrap>
+        <a data-pin-do="embedBoard"
+           data-pin-board-width="1080"
+           data-pin-scale-height="320"
+           data-pin-scale-width="115"
+           href="https://www.pinterest.com/victorysparkle/website-board/"></a>
+    </div>
 </section>
 
 <div class="home-shop-tab" id="home-shop-tab">
