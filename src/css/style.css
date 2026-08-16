@@ -1358,6 +1358,15 @@ p a:hover {
     display: block;
 }
 
+/* Higher specificity than the bare .resource-tile-placeholder rule (and
+   order-independent), so the {% image %} shortcode's placeholder fallback
+   still centers its icon here instead of inheriting this block's
+   `display: block`. */
+.home-about-photo.resource-tile-placeholder,
+.home-carousel-photo.resource-tile-placeholder {
+    display: flex;
+}
+
 .home-trait-pills {
     display: flex;
     flex-wrap: wrap;
