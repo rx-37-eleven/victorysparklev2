@@ -9,16 +9,17 @@
   align-items: center;
   gap: 16px;
   padding: 10px 16px;
-  border-bottom: 1px solid var(--border);
+  border-bottom: var(--border-width) solid var(--text);
   background: var(--bg-raised);
   flex: none;
 }
 
 .brand {
+  font-family: var(--display);
   font-weight: 600;
-  font-size: 14px;
+  font-size: 15px;
   letter-spacing: 0.02em;
-  color: var(--text-dim);
+  color: var(--accent);
 }
 
 .topbar-title {
@@ -34,13 +35,16 @@
 }
 
 .btn {
+  font-family: var(--sans);
+  font-weight: 700;
   font-size: 13px;
   padding: 7px 14px;
-  border-radius: 6px;
-  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  border: 2px solid var(--text);
   background: var(--bg-raised);
   color: var(--text);
   cursor: pointer;
+  transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
 }
 
 .btn:disabled {
@@ -50,8 +54,15 @@
 
 .btn-primary {
   background: var(--accent);
-  border-color: var(--accent);
+  border-color: var(--text);
   color: var(--accent-contrast);
+  box-shadow: var(--shadow-sticker-sm);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--accent-dark);
+  transform: translate(1px, 1px);
+  box-shadow: none;
 }
 
 .btn-link {
@@ -95,10 +106,11 @@
 }
 
 .rail-heading {
+  font-family: var(--display);
   font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: var(--text-dim);
+  color: var(--accent);
   margin: 0 0 10px;
   font-weight: 600;
 }
@@ -153,7 +165,7 @@ select {
 }
 
 .error-text {
-  color: var(--accent);
+  color: var(--warn);
   font-size: 13px;
   margin-top: 8px;
 }
@@ -253,8 +265,8 @@ select {
 }
 
 .dropzone {
-  border: 2px dashed var(--border);
-  border-radius: 10px;
+  border: 2px dashed var(--accent);
+  border-radius: var(--radius-md);
   padding: 28px 14px;
   text-align: center;
   cursor: pointer;
@@ -262,7 +274,7 @@ select {
 
 .dropzone.drag-over {
   border-color: var(--accent);
-  background: var(--warn-bg);
+  background: var(--accent-bg);
 }
 
 .dropzone-title {
@@ -315,7 +327,7 @@ select {
 }
 
 .warning-icon {
-  color: var(--accent);
+  color: var(--warn);
 }
 
 .footer {

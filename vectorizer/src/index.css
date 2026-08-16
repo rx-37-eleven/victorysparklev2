@@ -1,28 +1,26 @@
+/* Standalone Vite build (see ../vite.config.ts) -- these values are
+   duplicated from /css/tokens.css rather than linked, since this app
+   builds and ships independently of the Eleventy site. Dark mode is
+   deliberately not supported: the new design has no dark variant. */
 :root {
-  --bg: #f7f6f2;
-  --bg-raised: #ffffff;
-  --text: #2a2a2e;
-  --text-dim: #6b6b73;
-  --border: #dcdad4;
-  --accent: #b5482f;
-  --accent-contrast: #ffffff;
-  --warn-bg: rgba(181, 72, 47, 0.08);
+  --bg: #eef0f7;
+  --bg-raised: #fffdf9;
+  --text: #2f2440;
+  --text-dim: #6a5f78;
+  --border: #d9c8f0;
+  --accent: #5c2d91;
+  --accent-dark: #45216e;
+  --accent-contrast: #fffdf9;
+  --accent-bg: #efe2fb;
+  --warn: #B5740E;
+  --warn-bg: #FBEDD7;
   --mono: ui-monospace, "SF Mono", Consolas, monospace;
-  --sans: -apple-system, "Segoe UI", Roboto, sans-serif;
-  color-scheme: light dark;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #17181c;
-    --bg-raised: #1f2025;
-    --text: #e6e5e2;
-    --text-dim: #9a9a9f;
-    --border: #33343a;
-    --accent: #e0693f;
-    --accent-contrast: #17181c;
-    --warn-bg: rgba(224, 105, 63, 0.12);
-  }
+  --sans: "Comic Neue", sans-serif;
+  --display: "DynaPuff", "Comic Neue", sans-serif;
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --border-width: 3px;
+  --shadow-sticker-sm: 3px 3px 0 var(--border);
 }
 
 * {
