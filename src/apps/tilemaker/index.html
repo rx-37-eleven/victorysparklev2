@@ -541,5 +541,22 @@
 </script>
 
 <script src="/js/nav.js" defer></script>
+
+<!-- Ko-fi floating support widget -->
+<style>
+  @media (max-width: 768px) {
+    .floatingchat-container-wrap,
+    .floatingchat-container-wrap-mobi { display: none !important; }
+  }
+</style>
+<script src="https://storage.ko-fi.com/cdn/scripts/overlay-widget.js"></script>
+<script>
+  kofiWidgetOverlay.draw('victorysparkle', {
+    'type': 'floating-chat',
+    'floating-chat.donateButton.text': 'Tip Me',
+    'floating-chat.donateButton.background-color': '#6fc9b4',
+    'floating-chat.donateButton.text-color': '#2f2440'
+  });
+</script>
 </body>
 </html>
