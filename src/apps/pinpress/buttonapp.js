@@ -34,6 +34,22 @@ const CONFIG = {
   EDGE_MARGIN_MM: 12.7,   // 1/2 inch. Applied only when the "full edge margins"
                           // toggle is ON (for printers that can't do edge-to-edge).
 
+  // --- Registration mark margins (Silhouette Cameo Print & Cut) ---
+  // Blank keep-out bands reserved at the page edges when the registration
+  // margin toggle is ON. Nothing is printed inside these bands, leaving room
+  // for Silhouette Studio to place its own registration marks.
+  // Asymmetric on purpose: in Silhouette Studio the left/top/right insets can
+  // be tightened, but the bottom mark should be left where it is or it risks
+  // falling outside the printer's unprintable border and not printing fully.
+  // STARTING VALUES ONLY — verify against the shaded keep-out zone shown in
+  // your own copy of Silhouette Studio and adjust.
+  REGISTRATION_MARGIN_MM: {
+    top:    12.7,  // 0.5"
+    right:  12.7,  // 0.5"
+    bottom: 25.4,  // 1.0" — largest; do not shrink without testing
+    left:   12.7,  // 0.5"
+  },
+
   // --- Button definitions ---
   // face = visible metal shell size. punch = graphic size incl. bleed (what the
   // image must fill, and what the layout uses). These punch sizes are COMMON
@@ -285,6 +301,7 @@ function cacheDom() {
 
   // Step 4 — print
   dom.edgeMarginToggle = document.getElementById('edge-margin-toggle');
+  dom.regMarginToggle = document.getElementById('reg-margin-toggle');
   dom.generateSummary = document.getElementById('generate-summary');
   dom.generateWarning = document.getElementById('generate-warning');
   dom.backToAlign = document.getElementById('back-to-align');
@@ -917,12 +934,25 @@ function handleEditorCancelOrClose() {
 // STEP 4 — Print
 // =======================================================================
 function getPrintableRect() {
-  const inset = CONFIG.GAP_MM + (dom.edgeMarginToggle.checked ? CONFIG.EDGE_MARGIN_MM : 0);
+  const reg = dom.regMarginToggle.checked ? CONFIG.REGISTRATION_MARGIN_MM : null;
+  const edge = dom.edgeMarginToggle.checked ? CONFIG.EDGE_MARGIN_MM : 0;
+
+  // Both toggles describe "keep out of this band" — take the per-edge max
+  // rather than summing, so having both on doesn't silently double up.
+  const m = {
+    top:    Math.max(reg ? reg.top    : 0, edge),
+    right:  Math.max(reg ? reg.right  : 0, edge),
+    bottom: Math.max(reg ? reg.bottom : 0, edge),
+    left:   Math.max(reg ? reg.left   : 0, edge),
+  };
+
+  // GAP_MM still applies inside whatever margin is in force — it is the
+  // minimum clearance between a bleed ring and anything else.
   return {
-    left: inset,
-    top: inset,
-    width: CONFIG.PAGE.widthMM - 2 * inset,
-    height: CONFIG.PAGE.heightMM - 2 * inset,
+    left:   m.left + CONFIG.GAP_MM,
+    top:    m.top  + CONFIG.GAP_MM,
+    width:  CONFIG.PAGE.widthMM  - m.left - m.right  - 2 * CONFIG.GAP_MM,
+    height: CONFIG.PAGE.heightMM - m.top  - m.bottom - 2 * CONFIG.GAP_MM,
   };
 }
 
@@ -946,7 +976,13 @@ function packInstances(instances, printable) {
 
   const tooBig = boxes.find(b => b.w > printable.width || b.h > printable.height);
   if (tooBig) {
-    throw new Error('One button (plus its gap) is larger than the printable area. Turn off "full edge margins" or check the punch sizes in CONFIG.');
+    const activeToggles = [];
+    if (dom.regMarginToggle.checked) activeToggles.push('"leave room for registration marks"');
+    if (dom.edgeMarginToggle.checked) activeToggles.push('"full edge margins"');
+    const advice = activeToggles.length > 0
+      ? `Turn off ${activeToggles.join(' or ')}, or check`
+      : 'Check';
+    throw new Error(`One button (plus its gap) is larger than the printable area. ${advice} the punch sizes in CONFIG.`);
   }
 
   boxes.sort((a, b) => b.h - a.h); // tallest first — improves row efficiency
@@ -1021,7 +1057,12 @@ function renderGenerateSummary() {
   Object.entries(counts).forEach(([key, n]) => {
     html += `<li>${CONFIG.BUTTON_TYPES[key].label}: <strong>${n}</strong></li>`;
   });
-  html += `<li class="summary-pages">Estimated pages: <strong>${pageCountLabel}</strong></li></ul>`;
+  html += `<li class="summary-pages">Estimated pages: <strong>${pageCountLabel}</strong></li>`;
+  if (dom.regMarginToggle.checked) {
+    const m = CONFIG.REGISTRATION_MARGIN_MM;
+    html += `<li class="toggle-hint">Reserving ${m.top}mm/${m.right}mm/${m.bottom}mm/${m.left}mm (top/right/bottom/left) for registration marks — fewer buttons per page.</li>`;
+  }
+  html += '</ul>';
   dom.generateSummary.innerHTML = html;
 
   // Every group in the photos-first flow always has a photo attached (a
@@ -1124,6 +1165,8 @@ function wireStaticEvents() {
   // Step 4 — print
   dom.backToAlign.addEventListener('click', () => goToStep(3));
   dom.generateBtn.addEventListener('click', generatePDF);
+  dom.edgeMarginToggle.addEventListener('change', renderGenerateSummary);
+  dom.regMarginToggle.addEventListener('change', renderGenerateSummary);
 
   // Editor modal
   dom.editorDone.addEventListener('click', handleEditorDone);
