@@ -74,6 +74,12 @@
   font-weight: 700;
 }
 
+.watermarker-app .wm-error.wm-warning {
+  color: var(--wm-warn);
+  background: var(--wm-warn-bg);
+  border-color: var(--wm-warn);
+}
+
 /* --- Panels --- */
 
 .watermarker-app .wm-panel {
