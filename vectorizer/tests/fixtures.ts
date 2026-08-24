@@ -99,17 +99,6 @@ export interface Pt {
   y: number;
 }
 
-function distToSegment(px: number, py: number, ax: number, ay: number, bx: number, by: number): number {
-  const abx = bx - ax;
-  const aby = by - ay;
-  const abLenSq = abx * abx + aby * aby;
-  let t = abLenSq > 0 ? ((px - ax) * abx + (py - ay) * aby) / abLenSq : 0;
-  t = Math.max(0, Math.min(1, t));
-  const cx = ax + t * abx;
-  const cy = ay + t * aby;
-  return Math.hypot(px - cx, py - cy);
-}
-
 function pointInPolygon(px: number, py: number, poly: Pt[]): boolean {
   let inside = false;
   for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {

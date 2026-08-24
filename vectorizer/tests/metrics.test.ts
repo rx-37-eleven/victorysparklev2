@@ -62,6 +62,29 @@ function ringFitted(chains: Chain[], ring: Ring[]): BezierSeg[] {
   return segs;
 }
 
+function resampleUniformArcLength(pts: Pt[], step: number): { pts: Pt[]; arcLens: number[] } {
+  const out: Pt[] = [pts[0]];
+  const arcLens: number[] = [0];
+  let acc = 0;
+  let target = step;
+  for (let i = 1; i < pts.length; i++) {
+    const a = pts[i - 1];
+    const b = pts[i];
+    const segLen = Math.hypot(b.x - a.x, b.y - a.y);
+    if (segLen < 1e-12) continue;
+    while (acc + segLen >= target) {
+      const t = (target - acc) / segLen;
+      out.push({ x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t });
+      arcLens.push(target);
+      target += step;
+    }
+    acc += segLen;
+  }
+  out.push(pts[pts.length - 1]);
+  arcLens.push(acc);
+  return { pts: out, arcLens };
+}
+
 function pathLengthPx(pts: Pt[]): number {
   let len = 0;
   for (let i = 1; i < pts.length; i++) len += Math.hypot(pts[i].x - pts[i - 1].x, pts[i].y - pts[i - 1].y);
@@ -152,36 +175,46 @@ function computeMetrics(chains: Chain[], pieces: Map<number, Piece>): Metrics {
 
       if (selfIntersects(flat)) selfIntersectingContours++;
 
-      // Turning-angle sign changes, excluding samples within one segment of
-      // a knot boundary (where a real corner may legitimately break sign).
+      // Turning-angle sign changes, excluding samples within one resampled
+      // step of a knot boundary (where a real corner may legitimately break
+      // sign). Resampled at uniform arc length first, per the work order's
+      // own Stage C.1 -- this removes staircase-style aliasing from
+      // honoring individual raw-lattice steps as if they were real
+      // direction changes.
       //
-      // Sampling is uniform-in-parameter-t, not uniform-in-arc-length (the
-      // work order's own Stage C.1 calls out exactly this distinction). A
-      // handful of the pipeline's independently-fit cubic segments have a
-      // microscopic (sub-0.01mm) non-monotonic wobble in their own t-vs-
-      // arc-length mapping -- geometrically invisible at any real cutting
-      // tolerance, but a uniform-t turn-angle sample straddling it reads as
-      // a full 180-degree reversal. MIN_STEP_PX filters those out: a "sign
-      // change" only counts if both of its contributing steps are at least
-      // this long, so it reflects an actual directional reversal of the
-      // curve rather than parameterization noise inside one fitted segment.
-      const MIN_STEP_PX = 0.05 / MM_PER_PX; // 0.05mm
-      const segBoundarySet = new Set<number>();
-      for (let i = 0; i <= fitted.length; i++) segBoundarySet.add(i * SAMPLES_PER_SEG);
+      // What it does NOT remove (confirmed by hand-tracing several flagged
+      // events): a handful of the pipeline's independently-fit cubic
+      // segments have a genuine, if microscopic, non-monotonic wiggle in
+      // their own XY shape -- e.g. one measured case moves forward then
+      // backward by ~0.02px (~0.004mm) within a single ~0.02mm-long step.
+      // That's a property of the curve itself, not an artifact of how it's
+      // sampled, so no resampling scheme removes it; only tighter per-
+      // segment fit conditioning would. At a few microns per event it's
+      // below any real cutting tolerance, which is why this assertion stays
+      // soft rather than driving further pipeline changes -- see PR
+      // description.
+      const RESAMPLE_STEP_PX = 0.05 / MM_PER_PX; // 0.05mm
+      const knotArcLens: number[] = [0];
+      {
+        let acc = 0;
+        for (let i = 1; i < flat.length; i++) {
+          acc += Math.hypot(flat[i].x - flat[i - 1].x, flat[i].y - flat[i - 1].y);
+          if (i % SAMPLES_PER_SEG === 0) knotArcLens.push(acc);
+        }
+      }
+      const uniform = resampleUniformArcLength(flat, RESAMPLE_STEP_PX);
       let prevSign = 0;
-      for (let i = 1; i < flat.length - 1; i++) {
-        const isNearKnot = [...segBoundarySet].some((k) => Math.abs(i - k) <= 1);
-        const v1x = flat[i].x - flat[i - 1].x;
-        const v1y = flat[i].y - flat[i - 1].y;
-        const v2x = flat[i + 1].x - flat[i].x;
-        const v2y = flat[i + 1].y - flat[i].y;
-        const l1 = Math.hypot(v1x, v1y);
+      for (let i = 1; i < uniform.pts.length - 1; i++) {
+        const isNearKnot = knotArcLens.some((k) => Math.abs(uniform.arcLens[i] - k) <= RESAMPLE_STEP_PX);
+        const v1x = uniform.pts[i].x - uniform.pts[i - 1].x;
+        const v1y = uniform.pts[i].y - uniform.pts[i - 1].y;
+        const v2x = uniform.pts[i + 1].x - uniform.pts[i].x;
+        const v2y = uniform.pts[i + 1].y - uniform.pts[i].y;
         const l2 = Math.hypot(v2x, v2y);
-        if (l1 < 1e-9 || l2 < 1e-9) continue;
         const turn = Math.atan2(v1x * v2y - v1y * v2x, v1x * v2x + v1y * v2y);
         if (!isNearKnot) {
           nonCornerLengthPx += l2;
-          const sign = Math.abs(turn) < 1e-3 || l1 < MIN_STEP_PX || l2 < MIN_STEP_PX ? 0 : turn > 0 ? 1 : -1;
+          const sign = Math.abs(turn) < 1e-3 ? 0 : turn > 0 ? 1 : -1;
           if (sign !== 0 && prevSign !== 0 && sign !== prevSign) turnSignChanges++;
           if (sign !== 0) prevSign = sign;
         }
@@ -267,11 +300,36 @@ describe("Task 2 geometry audit (real fixture set, work-order metrics)", () => {
       console.log(`  vertex ${i} (${i % 2 === 0 ? "outer" : "inner"}) at (${v.x.toFixed(1)},${v.y.toFixed(1)}): ${hit ? "preserved" : "MISSED"}`);
     });
     console.log(`  star corners preserved: ${preserved}/${vertices.length}`);
-    // KNOWN GAP (Task 2 audit): 2/10 of this star's most acute outer tips
-    // (~40 degrees, in a tightly-packed pattern) are not detected as
-    // corners even with the pipeline's own cornerSupport sizing for this
-    // image. Soft so the audit table always prints; see PR description.
+    // KNOWN, NARROW GAP (Task 2 audit): 2/10 of this star's most acute
+    // outer tips (~40 degrees -- a needle point, sharper than typical
+    // stained-glass facets) still aren't detected as corners after the
+    // detectCorners non-max-suppression fix below. At a more realistic
+    // corner angle (see the next test) the same fixture hits 10/10 -- this
+    // residual is confined to genuinely extreme acuteness, not a general
+    // regression. Soft so the audit table always prints; see PR
+    // description.
     expect.soft(preserved).toBe(vertices.length);
+  });
+
+  it("moderate sharp corners (5-point star, realistic ~75deg facets) -- fully preserved", () => {
+    // Same fixture, less acute (innerR closer to outerR) -- representative
+    // of an actual stained-glass lead-line facet rather than a needle
+    // point. Confirms the detectCorners fix (below) isn't just papering
+    // over the adversarial case above.
+    const { fixture, vertices } = makeStar(200, 5, 85, 55, 3);
+    const { chains, pieces } = run(fixture);
+    const m = computeMetrics(chains, pieces);
+    reportRow("moderate-corners (star)", m);
+    expect(m.unclosedContours).toBe(0);
+    expect(m.selfIntersectingContours).toBe(0);
+
+    const allKnots: Pt[] = [];
+    for (const chain of chains) {
+      for (const p of flatten(chain.fitted!).filter((_, i) => i % SAMPLES_PER_SEG === 0)) allKnots.push(p);
+    }
+    const preserved = vertices.filter((v) => allKnots.some((k) => Math.hypot(k.x - v.x, k.y - v.y) < 4)).length;
+    console.log(`  star corners preserved: ${preserved}/${vertices.length}`);
+    expect(preserved).toBe(vertices.length);
   });
 
   it("long smooth curve (large circle) -- no spurious corner mid-arc", () => {
@@ -281,12 +339,15 @@ describe("Task 2 geometry audit (real fixture set, work-order metrics)", () => {
     const { signChangesPerMm } = reportRow("smooth-curve (circle)", m);
     expect(m.unclosedContours).toBe(0);
     expect(m.selfIntersectingContours).toBe(0);
-    // KNOWN GAP (Task 2 audit): elevated vs. target, but traced to sub-
-    // 0.02mm-amplitude parameterization wobble between independently-fit
-    // short Bezier segments (uniform-t sampling exaggerates it into a
-    // discrete sign flip) -- not a visible defect at this measured
-    // amplitude. Soft pending a proper arc-length-uniform resample. See PR
-    // description.
+    // KNOWN, LOW-SEVERITY GAP (Task 2 audit): elevated vs. target even
+    // after arc-length-uniform resampling (see computeMetrics) -- traced by
+    // hand-tracing flagged events to a genuine but microscopic (~0.02px /
+    // ~0.004mm) non-monotonic wiggle in a handful of independently-fit
+    // cubic segments' own shape. Not a sampling artifact (resampling
+    // doesn't remove it, confirmed), and not visible at any real cutting
+    // tolerance at this measured amplitude. Left soft rather than chasing
+    // further into Schneider-fit conditioning for a few-micron effect. See
+    // PR description.
     expect.soft(signChangesPerMm).toBeLessThan(0.05);
 
     // No knot on the circular chain should itself be a hard-angle break --
@@ -307,14 +368,17 @@ describe("Task 2 geometry audit (real fixture set, work-order metrics)", () => {
       if ((diff * 180) / Math.PI > 55) hardKnotsMidSpan++;
     }
     console.log(`  hard knots mid-arc on longest circle chain: ${hardKnotsMidSpan}`);
-    // KNOWN GAP (Task 2 audit): 2 knots found, both at locally-flat points
-    // of the raster (top/bottom of the circle, where dy/dx=0 over several
-    // pixels) -- the crack-lattice extraction produces a very short (1-3px)
-    // chain span there, and independently fitting that span produces a
-    // poorly-conditioned tangent handle with a real ~90deg mismatch against
-    // its neighbor. Small in extent (~0.2-0.6mm) but a genuine, real defect,
-    // unlike the sign-change metric above. See PR description.
-    expect.soft(hardKnotsMidSpan).toBe(0);
+    // FIXED (Task 2 audit): this used to find 2 knots, both at locally-flat
+    // points of the raster (top/bottom of the circle, where dy/dx=0 over
+    // several pixels) -- fitChain's near-closed-loop handling split at the
+    // raw index midpoint and smoothed each half independently, so the
+    // split point itself never got smoothed from both sides and ended up
+    // with a genuinely mismatched (~90deg) tangent against its neighbor.
+    // Fixed by smoothing the whole loop before splitting it, and by
+    // splitting at the point farthest from the endpoint chord instead of
+    // the arbitrary index midpoint (see splitNearlyClosedLoop in
+    // curveFit.ts). Hard assertion: this one should stay at 0.
+    expect(hardKnotsMidSpan).toBe(0);
   });
 
   it("very thin stroke (1px lines)", () => {
