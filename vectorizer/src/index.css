@@ -28,8 +28,7 @@
 }
 
 html,
-body,
-#root {
+body {
   height: 100%;
   margin: 0;
 }
@@ -38,6 +37,27 @@ body {
   font-family: var(--sans);
   color: var(--text);
   background: var(--bg);
+  /* The shared site header (index.html) is a normal-flow sibling before
+     #root, not fixed/sticky -- so it needs a share of the viewport height
+     rather than a hardcoded offset. #root gets the rest. */
+  display: flex;
+  flex-direction: column;
+}
+
+#root {
+  flex: 1;
+  min-height: 0;
+}
+
+/* style.css sets the dotted background on `body`, which this app's own
+   background rule above overrides (a dot pattern behind the tool's canvas
+   would fight the UI). That leaves the header's transparent backdrop showing
+   the wrong color where it overlaps -- give the header its own copy of the
+   same pattern instead, from the linked tokens.css custom properties. */
+header {
+  background-color: var(--color-bg);
+  background-image: radial-gradient(var(--color-bg-dot) 1.4px, transparent 1.6px);
+  background-size: 14px 14px;
 }
 
 button {

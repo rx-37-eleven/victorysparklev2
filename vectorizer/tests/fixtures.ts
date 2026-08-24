@@ -94,6 +94,96 @@ export function makeCircleInSquare(size: number, margin: number, radius: number,
   return f;
 }
 
+export interface Pt {
+  x: number;
+  y: number;
+}
+
+function pointInPolygon(px: number, py: number, poly: Pt[]): boolean {
+  let inside = false;
+  for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+    const xi = poly[i].x;
+    const yi = poly[i].y;
+    const xj = poly[j].x;
+    const yj = poly[j].y;
+    if (yi > py !== yj > py && px < ((xj - xi) * (py - yi)) / (yj - yi) + xi) inside = !inside;
+  }
+  return inside;
+}
+
+/**
+ * Mitered offset of a closed polygon's own edge path: each vertex is pushed
+ * along its local bisector by half-width/cos(interior angle/2), the
+ * standard miter-join formula. `sign` is +1 for the outward offset, -1 for
+ * inward; both use the same local bisector direction, since which side is
+ * geometrically "outward" flips at reflex vertices anyway.
+ */
+function miterOffset(vertices: Pt[], halfWidth: number, sign: 1 | -1): Pt[] {
+  const n = vertices.length;
+  return vertices.map((v, i) => {
+    const prev = vertices[(i - 1 + n) % n];
+    const next = vertices[(i + 1) % n];
+    const eIn = normalize2(v.x - prev.x, v.y - prev.y);
+    const eOut = normalize2(next.x - v.x, next.y - v.y);
+    // Right-hand normals of each edge direction (consistent orientation).
+    const nIn = { x: eIn.y, y: -eIn.x };
+    const nOut = { x: eOut.y, y: -eOut.x };
+    let bisector = normalize2(nIn.x + nOut.x, nIn.y + nOut.y);
+    if (bisector.x === 0 && bisector.y === 0) bisector = nIn; // 180-degree edge, fall back
+    const cosHalfAngle = bisector.x * nIn.x + bisector.y * nIn.y;
+    const miterLen = Math.min(halfWidth / Math.max(cosHalfAngle, 0.2), halfWidth * 4); // clamp: avoid runaway spikes on near-reversal vertices
+    return { x: v.x + sign * bisector.x * miterLen, y: v.y + sign * bisector.y * miterLen };
+  });
+}
+
+function normalize2(x: number, y: number): Pt {
+  const l = Math.hypot(x, y);
+  return l < 1e-12 ? { x: 0, y: 0 } : { x: x / l, y: y / l };
+}
+
+/**
+ * Closed polygon outline (e.g. a star) rasterized as a thick stroke with
+ * genuine mitered (sharp) corners -- for sharp-corner tests. Plain
+ * distance-to-nearest-edge-segment rasterization implicitly rounds every
+ * vertex (radius = half line width), which blunts an acute tip enough to
+ * erase it entirely at realistic line widths; this fills between a mitered
+ * outward offset and a mitered inward offset instead, so the corner in the
+ * raster is actually as sharp as the polygon it's meant to represent.
+ */
+export function makePolygon(width: number, height: number, vertices: Pt[], lineWidth: number): Fixture {
+  const f = blank(width, height);
+  const half = lineWidth / 2;
+  const outer = miterOffset(vertices, half, 1);
+  const inner = miterOffset(vertices, half, -1);
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      const px = x + 0.5;
+      const py = y + 0.5;
+      if (pointInPolygon(px, py, outer) && !pointInPolygon(px, py, inner)) f.ink[y * width + x] = 1;
+    }
+  }
+  return f;
+}
+
+/**
+ * An n-pointed star: alternating outer/inner vertices, all genuinely sharp
+ * (unlike a circle, which has no corners at all). Returns the ground-truth
+ * vertex positions alongside the raster so tests can check each one landed
+ * a real corner in the fitted output.
+ */
+export function makeStar(size: number, points: number, outerR: number, innerR: number, lineWidth: number): { fixture: Fixture; vertices: Pt[] } {
+  const cx = size / 2;
+  const cy = size / 2;
+  const vertices: Pt[] = [];
+  const n = points * 2;
+  for (let i = 0; i < n; i++) {
+    const r = i % 2 === 0 ? outerR : innerR;
+    const angle = (Math.PI * 2 * i) / n - Math.PI / 2;
+    vertices.push({ x: cx + r * Math.cos(angle), y: cy + r * Math.sin(angle) });
+  }
+  return { fixture: makePolygon(size, size, vertices, lineWidth), vertices };
+}
+
 /** A single straight diagonal stroke at the given angle (degrees), for EDT isotropy checks. */
 export function makeDiagonal(width: number, height: number, angleDeg: number, lineWidth: number): Fixture {
   const f = blank(width, height);

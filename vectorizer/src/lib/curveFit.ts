@@ -82,29 +82,34 @@ export function detectCorners(pts: Point[], cornerAngleDeg: number, support: num
   // indices" -- e.g. a low-vertex-count polygon (a Clipper2 offset result
   // can have as few as 4 points for a square) can have two genuinely
   // different corners at consecutive indices, far apart in space. Only
-  // merge a run while it stays within `support` px of its start.
+  // treat flagged points within `support` px of each other as one corner.
   const arcLen = new Float64Array(n);
   for (let i = 1; i < n; i++) arcLen[i] = arcLen[i - 1] + len(sub(pts[i], pts[i - 1]));
 
-  let runStart = -1;
-  const closeRun = (end: number) => {
-    let best = runStart;
-    for (let j = runStart + 1; j < end; j++) if (turn[j] > turn[best]) best = j;
-    isCorner[best] = true;
-  };
-  for (let i = 1; i < n; i++) {
-    const above = i < n - 1 && turn[i] > thresholdRad;
-    if (above) {
-      if (runStart === -1) {
-        runStart = i;
-      } else if (arcLen[i] - arcLen[runStart] > k) {
-        closeRun(i);
-        runStart = i;
-      }
-    } else if (runStart !== -1) {
-      closeRun(i);
-      runStart = -1;
+  // Non-max suppression by spatial proximity (arc length), not by
+  // contiguous above-threshold runs. The 8-connected raw lattice near a
+  // genuinely sharp (e.g. ~40deg) corner doesn't cross the threshold once
+  // and drop back down cleanly -- the turn-angle signal there can dip below
+  // threshold and rise again more than once within a couple of pixels
+  // (staircase quantization on a steep direction change), which a
+  // contiguous-run merge treats as several separate corners a few px apart
+  // instead of one. Selecting greedily by turn-angle strength and
+  // suppressing any weaker candidate within `k` px of an already-picked one
+  // is robust to that: it doesn't care whether the signal dipped below
+  // threshold in between, only whether the candidates are close in space.
+  const candidates: number[] = [];
+  for (let i = 1; i < n - 1; i++) if (turn[i] > thresholdRad) candidates.push(i);
+  candidates.sort((a, b) => turn[b] - turn[a]);
+  for (const i of candidates) {
+    if (isCorner[i]) continue;
+    // Each lattice step is >= 1px, so two points more than k apart by index
+    // are also more than k px apart by arc length -- an index window of
+    // +/-k is a safe, cheap superset of the arc-length neighborhood.
+    let tooClose = false;
+    for (let j = Math.max(0, i - k); j <= Math.min(n - 1, i + k) && !tooClose; j++) {
+      tooClose = isCorner[j] && Math.abs(arcLen[i] - arcLen[j]) <= k;
     }
+    if (!tooClose) isCorner[i] = true;
   }
   return isCorner;
 }
@@ -428,6 +433,42 @@ export function fitAllChains(chains: Chain[], params: FitChainParams): void {
   }
 }
 
+/**
+ * Splits a near-360-degree span (see fitChain) into two halves at the point
+ * farthest from the chord through its own endpoints, rather than at the
+ * raw index midpoint. The index midpoint is arbitrary relative to the
+ * actual shape -- for a real closed curve traced from an arbitrary seed
+ * point, it can land the split exactly on a locally-degenerate stretch
+ * (e.g. a lattice-quantized flat run at the top/bottom of a circle), where
+ * the tangent estimate on one or both sides of the new join is poorly
+ * conditioned and the two independently-fit halves end up with a visible
+ * kink there. The farthest-point split is deterministic and geometry-based
+ * instead, and for a genuine loop is usually near-antipodal to the start
+ * anyway, so it keeps the original "at most ~180 degrees per half" intent.
+ */
+function splitNearlyClosedLoop(span: Point[]): [Point[], Point[]] {
+  const a = span[0];
+  const b = span[span.length - 1];
+  const midIdx = Math.floor(span.length / 2);
+  const dir = normalize(sub(b, a));
+  // A truly (not just nearly) closed loop -- e.g. an island piece with a
+  // synthetic seed start/end point -- has a literal zero-length chord, so
+  // there's no direction to measure "farthest" against. The index midpoint
+  // is as good a choice as any in that case.
+  if (dir.x === 0 && dir.y === 0) return [span.slice(0, midIdx + 1), span.slice(midIdx)];
+  let bestIdx = midIdx;
+  let bestDist = -1;
+  for (let i = 1; i < span.length - 1; i++) {
+    const toPoint = sub(span[i], a);
+    const perp = Math.abs(toPoint.x * dir.y - toPoint.y * dir.x);
+    if (perp > bestDist) {
+      bestDist = perp;
+      bestIdx = i;
+    }
+  }
+  return [span.slice(0, bestIdx + 1), span.slice(bestIdx)];
+}
+
 /** Fits one chain's raw lattice polyline into one or more smooth spans of cubic Beziers, split at detected corners. */
 export function fitChain(pts: Point[], params: FitChainParams): BezierSeg[] {
   const isCorner = detectCorners(pts, params.cornerAngleDeg, params.cornerSupport);
@@ -450,13 +491,29 @@ export function fitChain(pts: Point[], params: FitChainParams): BezierSeg[] {
     for (let i = 1; i < span.length; i++) arcLen += len(sub(span[i], span[i - 1]));
     const chordLen = len(sub(span[span.length - 1], span[0]));
     const isNearlyClosedLoop = span.length > 4 && chordLen < arcLen * 0.15;
-    const subSpans = isNearlyClosedLoop
-      ? [span.slice(0, Math.floor(span.length / 2) + 1), span.slice(Math.floor(span.length / 2))]
-      : [span];
-
     const segs: BezierSeg[] = [];
-    for (const sub of subSpans) {
-      const smoothed = preSmoothSpan(sub, params.smoothingSigma);
+    if (isNearlyClosedLoop) {
+      // Smooth the whole loop first, *then* split it -- preSmoothSpan skips
+      // the first/last 2 points of whatever it's handed so true chain
+      // endpoints stay pinned, but splitting first means each half also
+      // treats the artificial split point as a protected boundary and
+      // smooths it from only one side. That leaves the split point itself,
+      // and its immediate neighbors, sitting on the raw (un-smoothed)
+      // lattice position on both sides independently -- fine normally, but
+      // at a spot where the raw lattice is locally noisy (e.g. a
+      // quantized flat run at the top/bottom of a circle), the two
+      // independently-estimated tangents there can end up genuinely
+      // disagreeing. Smoothing across the whole loop before splitting
+      // gives the split point the same noise-averaging its neighbors get,
+      // without needing to move (or lose protection on) the two real
+      // endpoints, which are still the first/last 2 points of the *whole*
+      // span either way.
+      const smoothed = preSmoothSpan(span, params.smoothingSigma);
+      const [subA, subB] = splitNearlyClosedLoop(smoothed);
+      segs.push(...fitCurve(subA, params.maxError));
+      segs.push(...fitCurve(subB, params.maxError));
+    } else {
+      const smoothed = preSmoothSpan(span, params.smoothingSigma);
       segs.push(...fitCurve(smoothed, params.maxError));
     }
     segs[0].p0 = { x: span[0].x, y: span[0].y };
