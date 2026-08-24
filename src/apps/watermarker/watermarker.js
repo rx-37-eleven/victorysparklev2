@@ -385,6 +385,7 @@ const CONFIG = {
     state.items = [];
     state.currentIndex = -1;
     state.selectedStampId = null;
+    if (state.pdfDoc && typeof state.pdfDoc.destroy === "function") state.pdfDoc.destroy();
     state.pdfBytes = null;
     state.pdfDoc = null;
     state.pdfName = null;
