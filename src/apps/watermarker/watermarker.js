@@ -68,6 +68,9 @@ const CONFIG = {
   TILE_MIN_COUNT: 2,
   TILE_MAX_COUNT: 8,
   TILE_DEFAULT_COUNT: 3, // rows == cols == this by default
+
+  // --- Quick-position presets ---
+  PRESET_MARGIN_FRAC: 0.04, // inset from the base edge, so an edge/corner preset doesn't bleed off by default
 };
 
 /* =====================================================================
@@ -1035,6 +1038,101 @@ const CONFIG = {
     dom.clearBtn.disabled = !item || item.stamps.length === 0;
     dom.tileBtn.disabled = !state.watermark.img || !item;
     dom.applyAllBtn.disabled = !item || item.stamps.length === 0 || state.items.length < 2;
+    dom.presetGrid.querySelectorAll(".wm-preset-btn").forEach((btn) => {
+      btn.disabled = !hasSelection;
+    });
+  }
+
+  // -----------------------------------------------------------------
+  // Quick-position presets: move the SELECTED stamp to one of nine
+  // positions, inset from the edge by PRESET_MARGIN_FRAC so an edge or
+  // corner preset doesn't bleed off by default (dragging it further out
+  // is still allowed, per §6's "partial bleed is a legitimate style").
+  // -----------------------------------------------------------------
+  const PRESET_POSITIONS = {
+    "top-left": ["top", "left"],
+    "top-center": ["top", "center"],
+    "top-right": ["top", "right"],
+    "middle-left": ["middle", "left"],
+    center: ["middle", "center"],
+    "middle-right": ["middle", "right"],
+    "bottom-left": ["bottom", "left"],
+    "bottom-center": ["bottom", "center"],
+    "bottom-right": ["bottom", "right"],
+  };
+
+  function applyPreset(presetName) {
+    const stamp = selectedStamp();
+    const item = currentItem();
+    const parts = PRESET_POSITIONS[presetName];
+    if (!stamp || !item || !parts) return;
+    const [vPart, hPart] = parts;
+    const dims = baseDims(item);
+    const margin = CONFIG.PRESET_MARGIN_FRAC;
+    const halfWFrac = stamp.widthFrac / 2;
+    const heightPx = stamp.widthFrac * dims.w * state.watermark.aspect;
+    const halfHFrac = heightPx / 2 / dims.h;
+
+    stamp.cx = hPart === "left" ? clamp(margin + halfWFrac, 0, 1) : hPart === "right" ? clamp(1 - margin - halfWFrac, 0, 1) : 0.5;
+    stamp.cy = vPart === "top" ? clamp(margin + halfHFrac, 0, 1) : vPart === "bottom" ? clamp(1 - margin - halfHFrac, 0, 1) : 0.5;
+
+    applyStampModelToNode(stamp);
+  }
+
+  // -----------------------------------------------------------------
+  // Tile: replaces this page's stamps with an evenly spaced N x N grid,
+  // using the selected stamp (or the first existing one, or a fresh
+  // default) as the template for size/rotation/opacity.
+  // -----------------------------------------------------------------
+  function tileStamps() {
+    const item = currentItem();
+    if (!item || !state.watermark.img) return;
+    const n = clamp(parseInt(dom.tileSpacingSlider.value, 10), CONFIG.TILE_MIN_COUNT, CONFIG.TILE_MAX_COUNT);
+    const template = selectedStamp() || item.stamps[0] || newStampAtCenter();
+
+    const newStamps = [];
+    for (let row = 0; row < n; row++) {
+      for (let col = 0; col < n; col++) {
+        newStamps.push({
+          id: "st" + state.idCounter++,
+          cx: (col + 0.5) / n,
+          cy: (row + 0.5) / n,
+          widthFrac: template.widthFrac,
+          rotationDeg: template.rotationDeg,
+          opacity: template.opacity,
+        });
+      }
+    }
+
+    item.stamps = newStamps;
+    state.selectedStampId = null;
+    rebuildStampNodes(item);
+    editor.stage.batchDraw();
+    updateSelectedControlsUI();
+    updateStampButtonsEnabled();
+    refreshFilmstripBadge(item);
+  }
+
+  // -----------------------------------------------------------------
+  // Apply to all: copies the current item's stamp list onto every other
+  // item, confirming first if that would overwrite existing stamps.
+  // -----------------------------------------------------------------
+  function applyToAll() {
+    const item = currentItem();
+    if (!item || !item.stamps.length) return;
+    const others = state.items.filter((it) => it !== item);
+    if (!others.length) return;
+
+    const hasExisting = others.some((it) => it.stamps.length > 0);
+    if (hasExisting) {
+      const label = state.mode === "pdf" ? "pages" : "images";
+      if (!window.confirm(`Some other ${label} already have stamps. Overwrite them with this one's arrangement?`)) return;
+    }
+
+    others.forEach((it) => {
+      it.stamps = item.stamps.map((s) => Object.assign({}, s, { id: "st" + state.idCounter++ }));
+    });
+    renderFilmstrip();
   }
 
   // -----------------------------------------------------------------
@@ -1116,6 +1214,16 @@ const CONFIG = {
       dom.opacityValue.textContent = dom.opacitySlider.value + "%";
       applyStampModelToNode(stamp);
     });
+
+    dom.presetGrid.addEventListener("click", (e) => {
+      const btn = e.target.closest(".wm-preset-btn");
+      if (btn && !btn.disabled) applyPreset(btn.dataset.preset);
+    });
+    dom.tileSpacingSlider.addEventListener("input", () => {
+      dom.tileSpacingValue.textContent = `${dom.tileSpacingSlider.value}×${dom.tileSpacingSlider.value}`;
+    });
+    dom.tileBtn.addEventListener("click", tileStamps);
+    dom.applyAllBtn.addEventListener("click", applyToAll);
 
     window.addEventListener("resize", debounce(() => {
       const item = currentItem();
