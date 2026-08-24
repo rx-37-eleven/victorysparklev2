@@ -276,7 +276,11 @@ const CONFIG = {
     dom.workspace.hidden = !ready;
     dom.exportImagesPanel.hidden = !(ready && state.mode === "images");
     dom.exportPdfPanel.hidden = !(ready && state.mode === "pdf");
-    if (ready) updateStampButtonsEnabled();
+    if (ready) {
+      updateStampButtonsEnabled();
+      updateExportButtonsEnabled();
+      if (state.mode === "images") updateJpegQualityVisibility();
+    }
   }
 
   // -----------------------------------------------------------------
@@ -1135,6 +1139,160 @@ const CONFIG = {
     renderFilmstrip();
   }
 
+  function updateExportButtonsEnabled() {
+    dom.exportImagesBtn.disabled = state.mode !== "images" || state.items.length === 0;
+    dom.exportPdfBtn.disabled = state.mode !== "pdf" || state.items.length === 0;
+  }
+
+  // -----------------------------------------------------------------
+  // Image export (single file, or a ZIP for 2+). Renders at each
+  // image's NATIVE resolution -- never the preview canvas size -- via
+  // the same stampsToPlacements() the Konva preview uses, just called
+  // with naturalWidth/naturalHeight instead of the on-screen stage size.
+  // -----------------------------------------------------------------
+  function baseFilename(name) {
+    return name.replace(/\.[^.]+$/, "");
+  }
+
+  function downloadBlob(blob, filename) {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
+  function nextFrame() {
+    return new Promise((resolve) => setTimeout(resolve, 0));
+  }
+
+  // "Keep original" maps PNG/WEBP input to PNG output and JPEG input to
+  // JPEG output (§7); the format select can also force PNG or JPEG.
+  function outputMimeFor(item, choice) {
+    if (choice === "png") return "image/png";
+    if (choice === "jpeg") return "image/jpeg";
+    return item.file && item.file.type === "image/jpeg" ? "image/jpeg" : "image/png";
+  }
+
+  function outputExtFor(mime) {
+    return mime === "image/jpeg" ? "jpg" : "png";
+  }
+
+  function willAnyOutputBeJpeg() {
+    const choice = dom.exportFormat.value;
+    if (choice === "jpeg") return true;
+    if (choice === "png") return false;
+    return state.items.some((it) => it.file && it.file.type === "image/jpeg");
+  }
+
+  function updateJpegQualityVisibility() {
+    dom.jpegQualityRow.hidden = !willAnyOutputBeJpeg();
+  }
+
+  function renderItemToCanvas(item, mimeType) {
+    const canvas = document.createElement("canvas");
+    canvas.width = item.naturalWidth;
+    canvas.height = item.naturalHeight;
+    const ctx = canvas.getContext("2d");
+
+    // JPEG has no alpha channel; without a fill, transparent source pixels
+    // would come back black instead of the white a viewer expects.
+    if (mimeType === "image/jpeg") {
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
+    ctx.drawImage(item.source, 0, 0, item.naturalWidth, item.naturalHeight);
+
+    const placements = stampsToPlacements(item.stamps, item.naturalWidth, item.naturalHeight, state.watermark.aspect);
+    placements.forEach((p) => {
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate((p.rotationDeg * Math.PI) / 180);
+      ctx.globalAlpha = p.opacity;
+      ctx.drawImage(state.watermark.img, -p.w / 2, -p.h / 2, p.w, p.h);
+      ctx.restore();
+    });
+    return canvas;
+  }
+
+  function canvasToBlob(canvas, mimeType, quality) {
+    return new Promise((resolve) => canvas.toBlob(resolve, mimeType, quality));
+  }
+
+  function dedupeName(name, usedNames) {
+    if (!usedNames.has(name)) {
+      usedNames.add(name);
+      return name;
+    }
+    const dot = name.lastIndexOf(".");
+    const stem = dot === -1 ? name : name.slice(0, dot);
+    const ext = dot === -1 ? "" : name.slice(dot);
+    let n = 2;
+    let candidate;
+    do {
+      candidate = `${stem}-${n}${ext}`;
+      n++;
+    } while (usedNames.has(candidate));
+    usedNames.add(candidate);
+    return candidate;
+  }
+
+  async function exportImages() {
+    clearError(dom.exportImagesError);
+    const items = state.items;
+    if (!items.length || !state.watermark.img) return;
+
+    dom.exportImagesBtn.disabled = true;
+    dom.exportImagesStatus.hidden = false;
+
+    const choice = dom.exportFormat.value;
+    const quality = clamp(parseInt(dom.jpegQualitySlider.value, 10) / 100, 0.1, 1);
+
+    try {
+      if (items.length === 1) {
+        const item = items[0];
+        dom.exportImagesStatus.textContent = "Rendering…";
+        await nextFrame();
+        const mime = outputMimeFor(item, choice);
+        const canvas = renderItemToCanvas(item, mime);
+        const blob = await canvasToBlob(canvas, mime, mime === "image/jpeg" ? quality : undefined);
+        if (!blob) throw new Error("export-failed");
+        downloadBlob(blob, baseFilename(item.name) + "-watermarked." + outputExtFor(mime));
+        dom.exportImagesStatus.textContent = "Done.";
+      } else {
+        if (typeof window.JSZip === "undefined") {
+          showError(dom.exportImagesError, "JSZip failed to load, so a multi-image ZIP can't be built. Try reloading the page.");
+          return;
+        }
+        const zip = new window.JSZip();
+        const usedNames = new Set();
+        for (let i = 0; i < items.length; i++) {
+          dom.exportImagesStatus.textContent = `Rendering image ${i + 1} of ${items.length}…`;
+          await nextFrame(); // lets the status text repaint and keeps the tab responsive
+          const item = items[i];
+          const mime = outputMimeFor(item, choice);
+          const canvas = renderItemToCanvas(item, mime);
+          const blob = await canvasToBlob(canvas, mime, mime === "image/jpeg" ? quality : undefined);
+          if (!blob) continue;
+          zip.file(dedupeName(baseFilename(item.name) + "-watermarked." + outputExtFor(mime), usedNames), blob);
+        }
+        dom.exportImagesStatus.textContent = "Zipping…";
+        await nextFrame();
+        const zipBlob = await zip.generateAsync({ type: "blob", compression: "STORE" });
+        downloadBlob(zipBlob, CONFIG.ZIP_FILENAME);
+        dom.exportImagesStatus.textContent = `Done — ${items.length} images.`;
+      }
+    } catch (err) {
+      showError(dom.exportImagesError, "Something went wrong while exporting. Please try again.");
+      dom.exportImagesStatus.hidden = true;
+    } finally {
+      dom.exportImagesBtn.disabled = state.items.length === 0;
+    }
+  }
+
   // -----------------------------------------------------------------
   // Keyboard shortcuts on the selected stamp (ignored while typing)
   // -----------------------------------------------------------------
@@ -1224,6 +1382,12 @@ const CONFIG = {
     });
     dom.tileBtn.addEventListener("click", tileStamps);
     dom.applyAllBtn.addEventListener("click", applyToAll);
+
+    dom.exportFormat.addEventListener("change", updateJpegQualityVisibility);
+    dom.jpegQualitySlider.addEventListener("input", () => {
+      dom.jpegQualityValue.textContent = dom.jpegQualitySlider.value + "%";
+    });
+    dom.exportImagesBtn.addEventListener("click", exportImages);
 
     window.addEventListener("resize", debounce(() => {
       const item = currentItem();
