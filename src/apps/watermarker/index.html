@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Watermarker — Batch Watermark Images & PDFs</title>
+<meta name="description" content="Watermarker stamps a logo or signature onto a batch of images or a whole PDF, right in your browser. Drag, resize, rotate, tile — nothing is ever uploaded.">
+<link rel="canonical" href="https://victorysparkle.com/apps/watermarker/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Victory Sparkle Co.">
+<meta property="og:title" content="Watermarker · Victory Sparkle Co.">
+<meta property="og:description" content="Stamp a logo or signature onto a batch of images or a whole PDF, right in your browser. Free, runs entirely in your browser.">
+<meta property="og:url" content="https://victorysparkle.com/apps/watermarker/">
+<meta property="og:image" content="https://victorysparkle.com/images/og-default.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&family=DynaPuff:wght@400..700&family=Miniver&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="/css/tokens.css">
+<link rel="stylesheet" href="/apps/watermarker/watermarker.css">
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<header data-pagefind-ignore>
+    <div class="header-content">
+        <a href="/" class="logo-section" aria-label="Victory Sparkle Co. home">
+            <div class="profile-image"><img src="/images/Vlogo.png" alt=""></div>
+            <div class="site-title">Victory Sparkle Co.</div>
+        </a>
+        <button type="button" class="nav-toggle" id="nav-toggle"
+                aria-expanded="false" aria-controls="main-nav" aria-label="Menu">
+            <span class="nav-toggle-bar"></span>
+            <span class="nav-toggle-bar"></span>
+            <span class="nav-toggle-bar"></span>
+        </button>
+        <nav class="main-nav" id="main-nav">
+            <div class="nav-item">
+                <button type="button" class="nav-trigger" aria-expanded="false">Make</button>
+                <div class="nav-dropdown">
+                    <a href="/apps/pinpress/">Pinpress</a>
+                    <a href="/apps/tilemaker/">Seamless Tile Maker</a>
+                    <a href="/apps/stained-glass-vectorizer/">Stained Glass Vectorizer</a>
+                    <a href="/apps/weedline/">Weedline</a>
+                    <a href="/apps/watermarker/">Watermarker</a>
+                    <a href="/resources/">Resources</a>
+                    <a href="https://www.pinterest.com/victorysparkle/website-board/" target="_blank" rel="noopener noreferrer">Pinterest</a>
+                </div>
+            </div>
+            <div class="nav-item">
+                <button type="button" class="nav-trigger" aria-expanded="false">Code</button>
+                <div class="nav-dropdown">
+                    <a href="/code/">Telegram Bots</a>
+                </div>
+            </div>
+            <div class="nav-item">
+                <button type="button" class="nav-trigger" aria-expanded="false">About</button>
+                <div class="nav-dropdown">
+                    <a href="/events/">Events</a>
+                    <a href="/about/">About</a>
+                    <a href="/blog/">Blog</a>
+                    <a href="/map/">Travel Map</a>
+                    <a href="/contact/">Contact</a>
+                </div>
+            </div>
+            <a href="/search/" class="nav-search-link">Search</a>
+            <a href="https://ko-fi.com/victorysparkle" target="_blank" rel="noopener noreferrer" class="nav-shop-link">Shop</a>
+        </nav>
+    </div>
+</header>
+
+<main data-pagefind-body>
+<div class="watermarker-app" id="watermarker-app">
+
+  <!-- INTRO -->
+  <div class="content-section">
+    <h1 class="wm-h1">Watermarker</h1>
+    <p>A watermark is a logo, signature, or stamp placed over a photo or document to mark it as yours before sharing a preview or proof. Watermarker lets you place one — or a whole grid of them — over a batch of images or every page of a PDF at once.</p>
+    <p>Everything happens right here in your browser — your files are never uploaded anywhere.</p>
+  </div>
+
+  <!-- UPLOAD -->
+  <section class="content-section">
+    <div class="wm-upload-grid">
+      <div>
+        <div id="wm-wm-dropzone" class="wm-dropzone">
+          <p>Drag a transparent PNG here, or</p>
+          <button type="button" id="wm-wm-choose-btn" class="wm-btn-primary">Choose watermark</button>
+          <input type="file" id="wm-wm-file-input" accept="image/png" class="wm-visually-hidden">
+          <p class="wm-hint">A transparent-background PNG works best. This is your logo or signature — it gets stamped onto everything below.</p>
+        </div>
+        <p id="wm-wm-error" class="wm-error" hidden></p>
+      </div>
+      <div>
+        <div id="wm-src-dropzone" class="wm-dropzone">
+          <p>Drag images or a PDF here, or</p>
+          <button type="button" id="wm-src-choose-btn" class="wm-btn-primary">Choose files</button>
+          <input type="file" id="wm-src-file-input" accept="image/png,image/jpeg,image/webp,application/pdf" multiple class="wm-visually-hidden">
+          <p class="wm-hint">Several PNG/JPEG/WEBP images, or one PDF — not both at once.</p>
+        </div>
+        <p id="wm-src-error" class="wm-error" hidden></p>
+      </div>
+    </div>
+    <p id="wm-lib-error-banner" class="wm-error wm-lib-error-banner" hidden></p>
+  </section>
+
+  <!-- WORKSPACE -->
+  <div id="wm-workspace" class="wm-workspace" hidden>
+
+    <!-- PREVIEW -->
+    <section class="wm-panel wm-preview-panel" aria-label="Preview">
+      <div class="wm-preview-frame" id="wm-preview-frame">
+        <div id="wm-stage-container" class="wm-stage-container"></div>
+        <p id="wm-empty-message" class="wm-empty-message" hidden>Add a stamp to get started.</p>
+      </div>
+      <p class="wm-hint wm-preview-hint">Drag to move · drag a corner to resize/rotate · Delete removes the selected stamp.</p>
+    </section>
+
+    <!-- CONTROLS -->
+    <div class="wm-controls-column">
+
+      <!-- FILMSTRIP -->
+      <section class="wm-panel">
+        <h2 class="wm-h2">Pages / images</h2>
+        <div id="wm-filmstrip" class="wm-filmstrip"></div>
+      </section>
+
+      <!-- WATERMARK -->
+      <section class="wm-panel" id="wm-watermark-panel">
+        <h2 class="wm-h2">Watermark</h2>
+        <div class="wm-watermark-row">
+          <div class="wm-watermark-thumb-wrap">
+            <img id="wm-watermark-thumb" class="wm-watermark-thumb" alt="Current watermark">
+          </div>
+          <button type="button" id="wm-watermark-replace-btn" class="wm-btn-secondary">Replace</button>
+        </div>
+
+        <p class="wm-hint" id="wm-no-selection-hint">Select a stamp on the canvas, or add one, to edit it here.</p>
+
+        <div id="wm-selected-controls" class="wm-selected-controls" hidden>
+          <div class="wm-slider-row">
+            <label for="wm-size">Size <span id="wm-size-value" class="wm-value">25%</span></label>
+            <input type="range" id="wm-size" min="1" max="100" step="1" value="25">
+          </div>
+          <div class="wm-slider-row">
+            <label for="wm-rotation">Rotation <span id="wm-rotation-value" class="wm-value">0°</span></label>
+            <input type="range" id="wm-rotation" min="-180" max="180" step="1" value="0">
+          </div>
+          <div class="wm-slider-row">
+            <label for="wm-opacity">Opacity <span id="wm-opacity-value" class="wm-value">100%</span></label>
+            <input type="range" id="wm-opacity" min="5" max="100" step="1" value="100">
+          </div>
+        </div>
+      </section>
+
+      <!-- STAMPS -->
+      <section class="wm-panel">
+        <h2 class="wm-h2">Stamps</h2>
+        <div class="wm-stamp-actions">
+          <button type="button" id="wm-add-stamp-btn" class="wm-btn-primary">Add stamp</button>
+          <button type="button" id="wm-duplicate-btn" class="wm-btn-secondary" disabled title="Ctrl/⌘+D">Duplicate</button>
+          <button type="button" id="wm-delete-btn" class="wm-btn-secondary" disabled title="Delete/Backspace">Delete</button>
+          <button type="button" id="wm-clear-btn" class="wm-btn-secondary" disabled>Clear this page</button>
+        </div>
+
+        <p class="wm-hint">Quick position</p>
+        <div class="wm-preset-grid" id="wm-preset-grid" role="group" aria-label="Quick position presets">
+          <button type="button" class="wm-preset-btn" data-preset="top-left" aria-label="Top left">↖</button>
+          <button type="button" class="wm-preset-btn" data-preset="top-center" aria-label="Top center">↑</button>
+          <button type="button" class="wm-preset-btn" data-preset="top-right" aria-label="Top right">↗</button>
+          <button type="button" class="wm-preset-btn" data-preset="middle-left" aria-label="Middle left">←</button>
+          <button type="button" class="wm-preset-btn" data-preset="center" aria-label="Center">•</button>
+          <button type="button" class="wm-preset-btn" data-preset="middle-right" aria-label="Middle right">→</button>
+          <button type="button" class="wm-preset-btn" data-preset="bottom-left" aria-label="Bottom left">↙</button>
+          <button type="button" class="wm-preset-btn" data-preset="bottom-center" aria-label="Bottom center">↓</button>
+          <button type="button" class="wm-preset-btn" data-preset="bottom-right" aria-label="Bottom right">↘</button>
+        </div>
+
+        <div class="wm-tile-row">
+          <label for="wm-tile-spacing">Tile spacing <span id="wm-tile-spacing-value" class="wm-value">3×3</span></label>
+          <input type="range" id="wm-tile-spacing" min="2" max="8" step="1" value="3">
+          <button type="button" id="wm-tile-btn" class="wm-btn-secondary" disabled>Tile</button>
+        </div>
+      </section>
+
+      <!-- APPLY TO ALL -->
+      <section class="wm-panel">
+        <h2 class="wm-h2">Apply everywhere</h2>
+        <p class="wm-hint">Copy this page's stamps to every other image or page.</p>
+        <button type="button" id="wm-apply-all-btn" class="wm-btn-primary" disabled>Apply to all</button>
+      </section>
+
+      <!-- EXPORT: IMAGES -->
+      <section class="wm-panel" id="wm-export-images-panel" hidden>
+        <h2 class="wm-h2">Export</h2>
+        <div class="wm-field-row">
+          <label for="wm-export-format">Format</label>
+          <select id="wm-export-format">
+            <option value="keep" selected>Keep original</option>
+            <option value="png">PNG</option>
+            <option value="jpeg">JPEG</option>
+          </select>
+        </div>
+        <div class="wm-slider-row" id="wm-jpeg-quality-row" hidden>
+          <label for="wm-jpeg-quality">JPEG quality <span id="wm-jpeg-quality-value" class="wm-value">92%</span></label>
+          <input type="range" id="wm-jpeg-quality" min="10" max="100" step="1" value="92">
+        </div>
+        <button type="button" id="wm-export-images-btn" class="wm-btn-primary" disabled>Download</button>
+        <p id="wm-export-images-status" class="wm-hint wm-export-status" hidden></p>
+        <p id="wm-export-images-error" class="wm-error" hidden></p>
+      </section>
+
+      <!-- EXPORT: PDF -->
+      <section class="wm-panel" id="wm-export-pdf-panel" hidden>
+        <h2 class="wm-h2">Export</h2>
+        <div class="wm-field-row">
+          <label for="wm-pdf-range-mode">Pages</label>
+          <select id="wm-pdf-range-mode">
+            <option value="all" selected>All</option>
+            <option value="current">Current page only</option>
+            <option value="custom">Custom range</option>
+          </select>
+        </div>
+        <div class="wm-field-row" id="wm-pdf-range-custom-row" hidden>
+          <label for="wm-pdf-range-custom" class="wm-visually-hidden">Custom page range</label>
+          <input type="text" id="wm-pdf-range-custom" placeholder="e.g. 1-3,7">
+        </div>
+        <button type="button" id="wm-export-pdf-btn" class="wm-btn-primary" disabled>Download PDF</button>
+        <p id="wm-export-pdf-status" class="wm-hint wm-export-status" hidden></p>
+        <p id="wm-export-pdf-error" class="wm-error" hidden></p>
+      </section>
+
+    </div>
+  </div>
+
+</div>
+</main>
+
+<!-- CDN libraries, pinned versions, no build step. Served from jsDelivr,
+     which mirrors npm packages directly. The onerror attributes let
+     watermarker.js detect and report a failed load instead of failing
+     silently. pdf.js ships as ESM, so it's loaded via a dynamic import()
+     inside a small module script below instead of onerror. -->
+<script src="https://cdn.jsdelivr.net/npm/konva@9.3.6/konva.min.js" onerror="window.__libLoadFailed='Konva'"></script>
+<script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js" onerror="window.__libLoadFailed='pdf-lib'"></script>
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js" onerror="window.__libLoadFailed='JSZip'"></script>
+<script type="module">
+  import("https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/legacy/build/pdf.min.mjs")
+    .then((pdfjsLib) => {
+      pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/legacy/build/pdf.worker.min.mjs";
+      window.__pdfjs = pdfjsLib;
+    })
+    .catch(() => {
+      window.__libLoadFailed = window.__libLoadFailed || "pdf.js";
+    })
+    .finally(() => {
+      window.dispatchEvent(new Event("pdfjs-settled"));
+    });
+</script>
+
+<script src="/apps/watermarker/watermarker.js" defer></script>
+<script src="/js/nav.js" defer></script>
+
+<!-- Ko-fi floating support widget -->
+<style>
+  @media (max-width: 768px) {
+    .floatingchat-container-wrap,
+    .floatingchat-container-wrap-mobi { display: none !important; }
+  }
+</style>
+<script src="https://storage.ko-fi.com/cdn/scripts/overlay-widget.js"></script>
+<script>
+  kofiWidgetOverlay.draw('victorysparkle', {
+    'type': 'floating-chat',
+    'floating-chat.donateButton.text': 'Tip Me',
+    'floating-chat.donateButton.background-color': '#6fc9b4',
+    'floating-chat.donateButton.text-color': '#2f2440'
+  });
+</script>
+</body>
+</html>
