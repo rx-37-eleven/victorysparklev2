@@ -8,10 +8,65 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&family=DynaPuff:wght@400..700&display=swap" rel="stylesheet" />
+
+    <!-- Shared main-site header: same markup/classes as src/_includes/base.njk,
+         styled by the site's own tokens.css/style.css (linked, not duplicated --
+         see src/apps/weedline/index.html for the same pattern). The app's own
+         index.css/App.css load after these via Vite's injected bundle link, so
+         the app's own rules win the cascade for anything they both touch. -->
+    <link rel="stylesheet" href="/css/tokens.css" />
+    <link rel="stylesheet" href="/css/style.css" />
   </head>
   <body>
+    <header data-pagefind-ignore>
+      <div class="header-content">
+        <a href="/" class="logo-section" aria-label="Victory Sparkle Co. home">
+          <div class="profile-image"><img src="/images/Vlogo.png" alt="" /></div>
+          <div class="site-title">Victory Sparkle Co.</div>
+        </a>
+        <button type="button" class="nav-toggle" id="nav-toggle"
+                aria-expanded="false" aria-controls="main-nav" aria-label="Menu">
+          <span class="nav-toggle-bar"></span>
+          <span class="nav-toggle-bar"></span>
+          <span class="nav-toggle-bar"></span>
+        </button>
+        <nav class="main-nav" id="main-nav">
+          <div class="nav-item">
+            <button type="button" class="nav-trigger" aria-expanded="false">Make</button>
+            <div class="nav-dropdown">
+              <a href="/apps/pinpress/">Pinpress</a>
+              <a href="/apps/tilemaker/">Seamless Tile Maker</a>
+              <a href="/apps/stained-glass-vectorizer/">Stained Glass Vectorizer</a>
+              <a href="/apps/weedline/">Weedline</a>
+              <a href="/resources/">Resources</a>
+              <a href="https://www.pinterest.com/victorysparkle/website-board/" target="_blank" rel="noopener noreferrer">Pinterest</a>
+            </div>
+          </div>
+          <div class="nav-item">
+            <button type="button" class="nav-trigger" aria-expanded="false">Code</button>
+            <div class="nav-dropdown">
+              <a href="/code/">Telegram Bots</a>
+            </div>
+          </div>
+          <div class="nav-item">
+            <button type="button" class="nav-trigger" aria-expanded="false">About</button>
+            <div class="nav-dropdown">
+              <a href="/events/">Events</a>
+              <a href="/about/">About</a>
+              <a href="/blog/">Blog</a>
+              <a href="/map/">Travel Map</a>
+              <a href="/contact/">Contact</a>
+            </div>
+          </div>
+          <a href="/search/" class="nav-search-link">Search</a>
+          <a href="https://ko-fi.com/victorysparkle" target="_blank" rel="noopener noreferrer" class="nav-shop-link">Shop</a>
+        </nav>
+      </div>
+    </header>
+
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    <script src="/js/nav.js" defer></script>
 
     <!-- Ko-fi floating support widget -->
     <style>
