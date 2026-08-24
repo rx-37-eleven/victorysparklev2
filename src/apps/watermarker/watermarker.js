@@ -1294,6 +1294,183 @@ const CONFIG = {
   }
 
   // -----------------------------------------------------------------
+  // PDF export (pdf-lib). This is the part that's easy to get subtly
+  // wrong -- see the comment on pdfCenterFromViewerPoint() and
+  // stampPdfPage() for the coordinate-space reasoning.
+  //
+  // The short version: the user places stamps in VIEWER space (what
+  // pdf.js rendered, top-left origin, already rotated per the page's
+  // /Rotate -- see renderPdfPageFull()). pdf-lib draws into UNROTATED
+  // page space with a BOTTOM-LEFT origin, and rotates a drawn image
+  // counter-clockwise about that image's own bottom-left corner, not its
+  // center. So for every stamp: map its viewer-space center into
+  // unrotated-page coordinates (undoing /Rotate), then, because we want
+  // to rotate the stamp about its OWN center but pdf-lib only offers
+  // rotate-about-bottom-left, solve for the bottom-left corner that
+  // makes the rotated box's center land back on that target point.
+  // -----------------------------------------------------------------
+
+  // Parses "1-3,7" style ranges into a Set of 1-based page numbers within
+  // [1, totalPages]. Returns null for unparseable input (caller shows an
+  // error) rather than silently exporting the wrong pages.
+  function parsePageRange(rangeStr, totalPages) {
+    const parts = (rangeStr || "")
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
+    if (!parts.length) return null;
+
+    const set = new Set();
+    for (const part of parts) {
+      const m = part.match(/^(\d+)(?:-(\d+))?$/);
+      if (!m) return null;
+      let start = parseInt(m[1], 10);
+      let end = m[2] ? parseInt(m[2], 10) : start;
+      if (start > end) [start, end] = [end, start];
+      for (let p = start; p <= end; p++) {
+        if (p >= 1 && p <= totalPages) set.add(p);
+      }
+    }
+    return set;
+  }
+
+  // Resolves the page-range control + per-page include/exclude toggles
+  // into the final set of page numbers to stamp. Returns null only for an
+  // unparseable custom range; an empty (but non-null) Set is a valid
+  // "nothing selected" result, handled separately by the caller.
+  function selectedPdfPageNumbers() {
+    const mode = dom.pdfRangeMode.value;
+    const includedNumbers = new Set(state.items.filter((it) => it.included).map((it) => it.pageNumber));
+
+    if (mode === "current") {
+      const item = currentItem();
+      return item && item.included ? new Set([item.pageNumber]) : new Set();
+    }
+    if (mode === "custom") {
+      const parsed = parsePageRange(dom.pdfRangeCustom.value, state.pdfDoc.numPages);
+      if (!parsed) return null;
+      return new Set([...parsed].filter((p) => includedNumbers.has(p)));
+    }
+    return includedNumbers; // "all"
+  }
+
+  // Maps a stamp's viewer-space center (top-left origin, already in the
+  // ROTATED page's on-screen orientation) to the page's UNROTATED content
+  // coordinates (bottom-left origin), undoing /Rotate. Derived by
+  // tracing where the four corners of a page end up under each rotation:
+  // e.g. at rot=90, the viewer's top-left corner is the page's
+  // bottom-left corner, so viewer-Y becomes page-X and viewer-X becomes
+  // page-Y.
+  function pdfCenterFromViewerPoint(cxPt, cyPt, pageWidth, pageHeight, rot) {
+    switch (rot) {
+      case 90:
+        return { X: cyPt, Y: cxPt };
+      case 180:
+        return { X: pageWidth - cxPt, Y: cyPt };
+      case 270:
+        return { X: pageWidth - cyPt, Y: pageHeight - cxPt };
+      default: // 0
+        return { X: cxPt, Y: pageHeight - cyPt };
+    }
+  }
+
+  // Stamps every placement for one item onto one pdf-lib page.
+  function stampPdfPage(page, item, embeddedWatermark, wmAspect) {
+    const { width: pw, height: ph } = page.getSize();
+    const rot = ((page.getRotation().angle % 360) + 360) % 360;
+
+    // Guard against a non-zero CropBox offset relative to the MediaBox --
+    // pdf.js's viewport (and so our viewer-space coordinates) is relative
+    // to the CropBox, while pdf-lib's page.getSize()/drawImage x,y are
+    // relative to the MediaBox's own origin.
+    const media = page.getMediaBox();
+    const crop = page.getCropBox();
+    const offsetX = crop.x - media.x;
+    const offsetY = crop.y - media.y;
+
+    const placements = stampsToPlacements(item.stamps, item.viewportWidth, item.viewportHeight, wmAspect);
+    placements.forEach((p) => {
+      const center = pdfCenterFromViewerPoint(p.x, p.y, pw, ph, rot);
+      const X = center.X + offsetX;
+      const Y = center.Y + offsetY;
+
+      // pdf-lib rotates CCW about the image's own bottom-left corner.
+      // Solve for the bottom-left corner (x,y) such that rotating the
+      // box (whose un-rotated center is (x + w/2, y + h/2)) by theta
+      // about (x,y) lands the center exactly on (X, Y):
+      //   (x, y) = (X, Y) - R(theta) * (w/2, h/2)
+      const thetaDeg = -p.rotationDeg - rot;
+      const thetaRad = (thetaDeg * Math.PI) / 180;
+      const dx = (p.w / 2) * Math.cos(thetaRad) - (p.h / 2) * Math.sin(thetaRad);
+      const dy = (p.w / 2) * Math.sin(thetaRad) + (p.h / 2) * Math.cos(thetaRad);
+
+      page.drawImage(embeddedWatermark, {
+        x: X - dx,
+        y: Y - dy,
+        width: p.w,
+        height: p.h,
+        rotate: PDFLib.degrees(thetaDeg),
+        opacity: p.opacity,
+      });
+    });
+  }
+
+  async function exportPdf() {
+    clearError(dom.exportPdfError);
+    if (!state.pdfBytes || !state.items.length || !state.watermark.file) return;
+
+    const target = selectedPdfPageNumbers();
+    if (!target) {
+      showError(dom.exportPdfError, `Enter a page range like 1-3,7 using pages between 1 and ${state.pdfDoc.numPages}.`);
+      return;
+    }
+    if (!target.size) {
+      showError(dom.exportPdfError, "No pages are selected — check the page range and the include/exclude toggles in the filmstrip.");
+      return;
+    }
+
+    dom.exportPdfBtn.disabled = true;
+    dom.exportPdfStatus.hidden = true;
+    dom.exportPdfStatus.textContent = "Preparing…";
+    dom.exportPdfStatus.hidden = false;
+    await nextFrame();
+
+    try {
+      const doc = await PDFLib.PDFDocument.load(state.pdfBytes, { ignoreEncryption: true });
+      const watermarkBytes = await state.watermark.file.arrayBuffer();
+      const embedded = await doc.embedPng(watermarkBytes); // embedded once, reused on every page
+
+      const targetItems = state.items.filter((it) => target.has(it.pageNumber) && it.stamps.length);
+      for (let i = 0; i < targetItems.length; i++) {
+        const item = targetItems[i];
+        dom.exportPdfStatus.textContent = `Stamping page ${item.pageNumber} (${i + 1} of ${targetItems.length})…`;
+        await nextFrame();
+        const page = doc.getPage(item.pageNumber - 1);
+        stampPdfPage(page, item, embedded, state.watermark.aspect);
+      }
+
+      dom.exportPdfStatus.textContent = "Saving…";
+      await nextFrame();
+      let outBytes;
+      try {
+        outBytes = await doc.save();
+      } catch (saveErr) {
+        showError(dom.exportPdfError, "This PDF is password-protected — remove the password and try again.");
+        dom.exportPdfStatus.hidden = true;
+        return;
+      }
+      const blob = new Blob([outBytes], { type: "application/pdf" });
+      downloadBlob(blob, baseFilename(state.pdfName) + "-watermarked.pdf");
+      dom.exportPdfStatus.textContent = "Done.";
+    } catch (err) {
+      showError(dom.exportPdfError, "Something went wrong while exporting this PDF. Please try again.");
+      dom.exportPdfStatus.hidden = true;
+    } finally {
+      dom.exportPdfBtn.disabled = state.items.length === 0;
+    }
+  }
+
+  // -----------------------------------------------------------------
   // Keyboard shortcuts on the selected stamp (ignored while typing)
   // -----------------------------------------------------------------
   const ARROW_DELTAS = { ArrowUp: [0, -1], ArrowDown: [0, 1], ArrowLeft: [-1, 0], ArrowRight: [1, 0] };
@@ -1388,6 +1565,11 @@ const CONFIG = {
       dom.jpegQualityValue.textContent = dom.jpegQualitySlider.value + "%";
     });
     dom.exportImagesBtn.addEventListener("click", exportImages);
+
+    dom.pdfRangeMode.addEventListener("change", () => {
+      dom.pdfRangeCustomRow.hidden = dom.pdfRangeMode.value !== "custom";
+    });
+    dom.exportPdfBtn.addEventListener("click", exportPdf);
 
     window.addEventListener("resize", debounce(() => {
       const item = currentItem();
