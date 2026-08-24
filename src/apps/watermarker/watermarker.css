@@ -1,0 +1,551 @@
+/* =====================================================================
+   WATERMARKER — app-only styles
+   ---------------------------------------------------------------------
+   Everything in this file is scoped under .watermarker-app. This site's
+   global stylesheet (/css/style.css) is loaded AFTER this one on the
+   page (see index.html), so any bare-element rule here (body, h1, p...)
+   would lose to the global sheet's — and worse, would fight it. Scope
+   every selector under .watermarker-app; never restyle a bare tag.
+
+   Colors, radii and shadows below are aliases onto the site-wide tokens
+   in /css/tokens.css (linked before this file in index.html), re-declared
+   as --wm- custom properties so this file never collides with another
+   app's tokens (Pinpress/Tile Maker define their own --color-* set with
+   different values under the same names).
+   ===================================================================== */
+
+.watermarker-app {
+  --wm-ink: var(--color-primary);
+  --wm-ink-dark: var(--color-primary-dark);
+  --wm-body: var(--color-ink);
+  --wm-muted: var(--color-text-muted);
+  --wm-surface: var(--color-surface);
+  --wm-shadow: var(--shadow-sticker) var(--color-shadow);
+  --wm-shadow-lift: var(--shadow-sticker) var(--color-accent-pink);
+  --wm-hairline: var(--color-shadow);
+  --wm-radius: var(--radius-lg);
+  --wm-radius-btn: var(--radius-sm);
+  --wm-radius-pill: var(--radius-pill);
+  --wm-warn: #b5740e;
+  --wm-warn-bg: #fbedd7;
+  --wm-error: #9a2e2e;
+  --wm-error-bg: #fbe0e0;
+  --wm-error-border: #f0b8b8;
+}
+
+.watermarker-app .wm-h1 {
+  font-family: "DynaPuff", "Comic Neue", sans-serif;
+  color: var(--wm-ink);
+  margin-bottom: 20px;
+  font-size: 38px;
+}
+
+.watermarker-app .wm-h2 {
+  font-family: "Comic Neue", sans-serif;
+  font-weight: 700;
+  color: var(--wm-ink);
+  font-size: 20px;
+  margin-bottom: 12px;
+}
+
+.watermarker-app .wm-hint {
+  font-family: "Comic Neue", sans-serif;
+  color: var(--wm-muted);
+  font-size: 14px;
+  margin-top: 10px;
+  line-height: 1.5;
+}
+
+.watermarker-app .wm-error {
+  font-family: "Comic Neue", sans-serif;
+  color: var(--wm-error);
+  background: var(--wm-error-bg);
+  border: 1.5px solid var(--wm-error-border);
+  border-radius: var(--wm-radius-btn);
+  padding: 10px 14px;
+  margin-top: 12px;
+}
+
+.watermarker-app .wm-error[hidden] {
+  display: none;
+}
+
+.watermarker-app .wm-lib-error-banner {
+  font-weight: 700;
+}
+
+/* --- Panels --- */
+
+.watermarker-app .wm-panel {
+  background: var(--wm-surface);
+  border: var(--border-width) solid var(--color-ink);
+  border-radius: var(--wm-radius);
+  box-shadow: var(--wm-shadow);
+  padding: 24px;
+  margin-bottom: 20px;
+}
+
+/* --- Upload --- */
+
+.watermarker-app .wm-upload-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.watermarker-app .wm-dropzone {
+  border: 2px dashed var(--wm-ink);
+  border-radius: var(--wm-radius);
+  padding: 28px 18px;
+  text-align: center;
+  transition: border-color 0.2s ease, background 0.2s ease;
+  cursor: pointer;
+  height: 100%;
+}
+
+.watermarker-app .wm-dropzone p {
+  color: var(--wm-body);
+  font-size: 16px;
+  margin-bottom: 12px;
+}
+
+.watermarker-app .wm-dropzone.wm-drag-over {
+  border-color: var(--wm-ink);
+  background: rgba(138, 108, 189, 0.08);
+}
+
+.watermarker-app .wm-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* --- Workspace layout --- */
+
+.watermarker-app .wm-workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+
+.watermarker-app .wm-workspace[hidden] {
+  display: none;
+}
+
+.watermarker-app .wm-preview-panel {
+  position: sticky;
+  top: 20px;
+}
+
+.watermarker-app .wm-controls-column {
+  display: flex;
+  flex-direction: column;
+}
+
+/* --- Preview / checkerboard stage --- */
+
+.watermarker-app .wm-preview-frame {
+  position: relative;
+  border-radius: var(--wm-radius);
+  overflow: hidden;
+  min-height: 320px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #fff;
+  background-image:
+    linear-gradient(45deg, #eee 25%, transparent 25%),
+    linear-gradient(-45deg, #eee 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #eee 75%),
+    linear-gradient(-45deg, transparent 75%, #eee 75%);
+  background-size: 20px 20px;
+  background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+  border: 1.5px solid var(--wm-hairline);
+}
+
+.watermarker-app .wm-stage-container {
+  line-height: 0;
+  touch-action: none;
+}
+
+.watermarker-app .wm-stage-container canvas {
+  max-width: 100%;
+  height: auto !important;
+}
+
+.watermarker-app .wm-empty-message {
+  padding: 20px;
+  text-align: center;
+  color: var(--wm-muted);
+  font-family: "Comic Neue", sans-serif;
+  font-size: 16px;
+}
+
+.watermarker-app .wm-preview-hint {
+  text-align: center;
+}
+
+/* --- Filmstrip --- */
+
+.watermarker-app .wm-filmstrip {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 6px;
+}
+
+.watermarker-app .wm-filmstrip-item {
+  position: relative;
+  flex: 0 0 auto;
+  width: 64px;
+  cursor: pointer;
+  border: 2px solid transparent;
+  border-radius: var(--wm-radius-btn);
+  padding: 2px;
+  background: none;
+}
+
+.watermarker-app .wm-filmstrip-item.wm-active {
+  border-color: var(--wm-ink);
+}
+
+.watermarker-app .wm-filmstrip-thumb-wrap {
+  position: relative;
+  width: 60px;
+  height: 60px;
+  border-radius: calc(var(--wm-radius-btn) - 4px);
+  overflow: hidden;
+  background-color: #fff;
+  background-image:
+    linear-gradient(45deg, #eee 25%, transparent 25%),
+    linear-gradient(-45deg, #eee 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #eee 75%),
+    linear-gradient(-45deg, transparent 75%, #eee 75%);
+  background-size: 10px 10px;
+  background-position: 0 0, 0 5px, 5px -5px, -5px 0px;
+  border: 1px solid var(--wm-hairline);
+}
+
+.watermarker-app .wm-filmstrip-thumb-wrap img,
+.watermarker-app .wm-filmstrip-thumb-wrap canvas {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.watermarker-app .wm-filmstrip-badge {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  background: var(--wm-ink);
+  color: #fff;
+  font-family: "Comic Neue", sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+  border-radius: var(--wm-radius-pill);
+  padding: 2px 5px;
+  min-width: 14px;
+  text-align: center;
+}
+
+.watermarker-app .wm-filmstrip-badge[hidden] {
+  display: none;
+}
+
+.watermarker-app .wm-filmstrip-label {
+  display: block;
+  font-family: "Comic Neue", sans-serif;
+  font-size: 10px;
+  color: var(--wm-muted);
+  margin-top: 3px;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.watermarker-app .wm-filmstrip-remove {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  width: 18px;
+  height: 18px;
+  line-height: 16px;
+  border-radius: 50%;
+  background: var(--wm-ink-dark);
+  color: #fff;
+  border: 1.5px solid #fff;
+  font-size: 12px;
+  cursor: pointer;
+  padding: 0;
+}
+
+.watermarker-app .wm-filmstrip-toggle {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  width: 18px;
+  height: 18px;
+  line-height: 15px;
+  border-radius: 50%;
+  background: #fff;
+  color: var(--wm-ink-dark);
+  border: 1.5px solid var(--wm-ink-dark);
+  font-size: 11px;
+  cursor: pointer;
+  padding: 0;
+}
+
+.watermarker-app .wm-filmstrip-item.wm-excluded .wm-filmstrip-thumb-wrap {
+  opacity: 0.35;
+}
+
+/* --- Watermark panel --- */
+
+.watermarker-app .wm-watermark-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 8px;
+}
+
+.watermarker-app .wm-watermark-thumb-wrap {
+  width: 56px;
+  height: 56px;
+  flex: 0 0 auto;
+  border-radius: var(--wm-radius-btn);
+  overflow: hidden;
+  background-color: #fff;
+  background-image:
+    linear-gradient(45deg, #eee 25%, transparent 25%),
+    linear-gradient(-45deg, #eee 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #eee 75%),
+    linear-gradient(-45deg, transparent 75%, #eee 75%);
+  background-size: 10px 10px;
+  background-position: 0 0, 0 5px, 5px -5px, -5px 0px;
+  border: 1px solid var(--wm-hairline);
+}
+
+.watermarker-app .wm-watermark-thumb {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+.watermarker-app .wm-selected-controls[hidden] {
+  display: none;
+}
+
+/* --- Form rows (shared with Weedline's convention) --- */
+
+.watermarker-app .wm-slider-row,
+.watermarker-app .wm-field-row,
+.watermarker-app .wm-tile-row {
+  margin-bottom: 18px;
+}
+
+.watermarker-app .wm-slider-row:last-child,
+.watermarker-app .wm-field-row:last-child,
+.watermarker-app .wm-tile-row:last-child {
+  margin-bottom: 0;
+}
+
+.watermarker-app .wm-slider-row label,
+.watermarker-app .wm-field-row label,
+.watermarker-app .wm-tile-row label {
+  display: block;
+  font-family: "Comic Neue", sans-serif;
+  font-weight: 700;
+  color: var(--wm-body);
+  font-size: 15px;
+  margin-bottom: 8px;
+}
+
+.watermarker-app .wm-value {
+  font-weight: 400;
+  color: var(--wm-muted);
+}
+
+.watermarker-app input[type="range"] {
+  width: 100%;
+  accent-color: var(--wm-ink);
+}
+
+.watermarker-app input[type="range"]:disabled {
+  opacity: 0.5;
+}
+
+.watermarker-app .wm-field-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.watermarker-app .wm-field-row label {
+  margin-bottom: 0;
+  flex: 0 0 auto;
+}
+
+.watermarker-app input[type="number"],
+.watermarker-app input[type="text"],
+.watermarker-app select {
+  font-family: "Comic Neue", sans-serif;
+  font-size: 15px;
+  color: var(--wm-ink-dark);
+  border: 1.5px solid var(--wm-hairline);
+  border-radius: var(--wm-radius-btn);
+  padding: 8px 10px;
+  background: #fff;
+}
+
+.watermarker-app input[type="text"] {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* --- Stamp panel --- */
+
+.watermarker-app .wm-stamp-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.watermarker-app .wm-preset-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  max-width: 160px;
+  margin-top: 8px;
+  margin-bottom: 18px;
+}
+
+.watermarker-app .wm-preset-btn {
+  font-size: 16px;
+  line-height: 1;
+  padding: 10px 0;
+  border: 1.5px solid var(--wm-ink);
+  background: transparent;
+  color: var(--wm-ink);
+  border-radius: var(--wm-radius-btn);
+  cursor: pointer;
+}
+
+.watermarker-app .wm-preset-btn:hover:not(:disabled) {
+  background: rgba(138, 108, 189, 0.15);
+}
+
+.watermarker-app .wm-tile-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.watermarker-app .wm-tile-row label {
+  flex: 1 1 100%;
+  margin-bottom: 8px;
+}
+
+.watermarker-app .wm-tile-row input[type="range"] {
+  flex: 1 1 auto;
+  width: auto;
+}
+
+/* --- Buttons --- */
+
+.watermarker-app .wm-btn-primary {
+  font-family: "Comic Neue", sans-serif;
+  font-weight: 700;
+  color: #fff;
+  background: var(--wm-ink);
+  border: 2px solid var(--color-ink);
+  border-radius: var(--wm-radius-btn);
+  padding: 10px 16px;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.watermarker-app .wm-btn-primary:hover:not(:disabled) {
+  background: var(--wm-ink-dark);
+  transform: translateY(-5px);
+  box-shadow: var(--wm-shadow-lift);
+}
+
+.watermarker-app .wm-btn-secondary {
+  font-family: "Comic Neue", sans-serif;
+  font-weight: 700;
+  color: var(--wm-ink);
+  background: transparent;
+  border: 1.5px solid var(--wm-ink);
+  border-radius: var(--wm-radius-btn);
+  padding: 10px 16px;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.watermarker-app .wm-btn-secondary:hover:not(:disabled) {
+  background: rgba(138, 108, 189, 0.15);
+  transform: translateY(-5px);
+  box-shadow: var(--wm-shadow-lift);
+}
+
+.watermarker-app button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.watermarker-app .wm-export-status {
+  margin-top: 12px;
+}
+
+/* --- Focus visibility --- */
+
+.watermarker-app button:focus-visible,
+.watermarker-app input:focus-visible,
+.watermarker-app select:focus-visible,
+.watermarker-app [tabindex]:focus-visible {
+  outline: 3px solid var(--wm-ink);
+  outline-offset: 2px;
+}
+
+/* --- Reduced motion --- */
+
+@media (prefers-reduced-motion: reduce) {
+  .watermarker-app * {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
+
+/* --- Breakpoint --- */
+
+@media (max-width: 900px) {
+  .watermarker-app .wm-workspace {
+    grid-template-columns: 1fr;
+  }
+
+  .watermarker-app .wm-preview-panel {
+    position: static;
+  }
+
+  .watermarker-app .wm-upload-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .watermarker-app .wm-stamp-actions button,
+  .watermarker-app .wm-watermark-replace-btn {
+    flex: 1 1 auto;
+  }
+}
