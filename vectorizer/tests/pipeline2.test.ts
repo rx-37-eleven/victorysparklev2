@@ -13,7 +13,7 @@ describe("runPipeline", () => {
     const { ink, width, height } = makeGrid(3, 3, 30, 3);
     const cache = new PipelineCache();
     cache.loadSource(inkToGray(ink), width, height, false);
-    const params = { ...DEFAULT_PARAMS, threshold: 128, closeGaps: 0, despeckle: 0, minRegionPx: 0, mmPerPx: 1 };
+    const params = { ...DEFAULT_PARAMS, threshold: 128, closeGaps: 0, despeckle: 0, mmPerPx: 1 };
     const result = runPipeline(cache, params);
     expect(result.pieceCount).toBe(9);
     expect(result.svg.svg).toContain("<svg");
@@ -25,7 +25,7 @@ describe("runPipeline", () => {
     const { ink, width, height } = makeGrid(2, 2, 20, 3);
     const cache = new PipelineCache();
     cache.loadSource(inkToGray(ink), width, height, false);
-    const params = { ...DEFAULT_PARAMS, closeGaps: 0, despeckle: 0, minRegionPx: 0, mmPerPx: 1 };
+    const params = { ...DEFAULT_PARAMS, closeGaps: 0, despeckle: 0, mmPerPx: 1 };
     runPipeline(cache, params);
     const s1ValueBefore = cache.s1.value;
     const s3ValueBefore = cache.s3.value;
@@ -44,13 +44,15 @@ describe("runPipeline", () => {
     expect(t).toBeLessThan(255);
   });
 
-  it("applies a kerf offset without crashing and reports outcomes", () => {
+  it("applies a kerf offset without crashing and emits one path per piece", () => {
     const { ink, width, height } = makeGrid(2, 2, 30, 3, 10);
     const cache = new PipelineCache();
     cache.loadSource(inkToGray(ink), width, height, false);
-    const params = { ...DEFAULT_PARAMS, closeGaps: 0, despeckle: 0, minRegionPx: 0, mmPerPx: 1, offsetMm: 2 };
+    const params = { ...DEFAULT_PARAMS, closeGaps: 0, despeckle: 0, mmPerPx: 1, offsetMm: 2 };
     const result = runPipeline(cache, params);
-    expect(result.offsetOutcomes.size).toBe(result.pieceCount);
+    expect(result.cutPieces.length).toBe(result.pieceCount);
+    expect(result.pieceCount).toBeGreaterThan(0);
+    expect((result.svg.svg.match(/<path/g) ?? []).length).toBe(result.pieceCount);
     expect(result.svg.svg).toContain("<svg");
   });
 });

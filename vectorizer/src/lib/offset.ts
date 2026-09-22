@@ -63,13 +63,17 @@ function ringSegments(chains: Chain[], ring: Ring[]): BezierSeg[] {
   return segs;
 }
 
-/** Flattens a ring's fitted curve to a polygon at high resolution (spec default: max deviation 0.05px). */
-export function flattenRing(chains: Chain[], ring: Ring[], tolerance = 0.05): FlatPoint[] {
-  const segs = ringSegments(chains, ring);
+/** Flattens a run of fitted cubics to a polyline at high resolution (spec default: max deviation 0.05px). */
+export function flattenBezierPath(segs: BezierSeg[], tolerance = 0.05): FlatPoint[] {
   const out: FlatPoint[] = [];
   if (segs.length > 0) out.push(segs[0].p0);
   for (const seg of segs) flattenCubic(seg, tolerance, out);
   return out;
+}
+
+/** Flattens a ring's fitted curve to a polygon at high resolution. */
+export function flattenRing(chains: Chain[], ring: Ring[], tolerance = 0.05): FlatPoint[] {
+  return flattenBezierPath(ringSegments(chains, ring), tolerance);
 }
 
 function toPath64(pts: FlatPoint[]): Path64 {

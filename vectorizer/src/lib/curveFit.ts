@@ -318,10 +318,120 @@ function reparameterize(points: Vec2[], u: number[], seg: BezierSeg): number[] {
   return points.map((p, i) => newtonRaphsonRootFind(seg, p, u[i]));
 }
 
-function computeCenterTangent(points: Vec2[], center: number): Vec2 {
-  const v1 = sub(points[center - 1], points[center]);
-  const v2 = sub(points[center], points[center + 1]);
-  return normalize({ x: (v1.x + v2.x) / 2, y: (v1.y + v2.y) / 2 });
+/**
+ * How far along the span a tangent estimate looks, in pixels of arc length.
+ * Measured as a distance rather than a point count so it behaves the same on
+ * a densely sampled curve and on a sparse one.
+ */
+const TANGENT_WINDOW_PX = 6;
+
+/** Fewest points to use, when the window is shorter than this many samples. */
+const TANGENT_MIN_POINTS = 3;
+
+/**
+ * Principal direction of `points[0..count-1]`, oriented to point from the
+ * first sample towards the last.
+ *
+ * A least-squares (total, not ordinary -- this is the major axis of the
+ * covariance, so it handles vertical runs) direction rather than a weighted
+ * average of steps, because the thing it has to survive is a single outlier
+ * step at the very start. Corner detection marks a corner *at* a lattice
+ * point, and staircase removal leaves one diagonal chamfer step just past
+ * it, so the first step of a span leaving a right-angle corner points 45
+ * degrees away from where the span actually travels. Averaging steps lets
+ * that one step drag the estimate ~20 degrees off; a line fit over the same
+ * window is dominated by the collinear majority and lands within a few
+ * degrees.
+ */
+function principalDirection(points: Vec2[], count: number): Vec2 {
+  let meanX = 0;
+  let meanY = 0;
+  for (let i = 0; i < count; i++) {
+    meanX += points[i].x;
+    meanY += points[i].y;
+  }
+  meanX /= count;
+  meanY /= count;
+
+  let sxx = 0;
+  let sxy = 0;
+  let syy = 0;
+  for (let i = 0; i < count; i++) {
+    const dx = points[i].x - meanX;
+    const dy = points[i].y - meanY;
+    sxx += dx * dx;
+    sxy += dx * dy;
+    syy += dy * dy;
+  }
+
+  const theta = 0.5 * Math.atan2(2 * sxy, sxx - syy);
+  let dir = { x: Math.cos(theta), y: Math.sin(theta) };
+
+  // The major axis is a line, not a ray; point it the way the span travels.
+  const travel = sub(points[count - 1], points[0]);
+  if (dot(dir, travel) < 0) dir = scale(dir, -1);
+  return dir;
+}
+
+/** Number of leading samples of `points` that fit inside the arc-length window. */
+function windowCount(points: Vec2[], windowPx: number): number {
+  let travelled = 0;
+  let count = 1;
+  while (count < points.length) {
+    travelled += len(sub(points[count], points[count - 1]));
+    count++;
+    if (travelled >= windowPx) break;
+  }
+  return Math.max(Math.min(TANGENT_MIN_POINTS, points.length), count);
+}
+
+/**
+ * Direction the curve leaves `points[0]` in.
+ *
+ * Schneider's fit is tangent-*constrained*, so this estimate is not a
+ * nicety: hand it a direction that a single cubic cannot reconcile with the
+ * data and the fit splits, inherits the same bad constraint on the sub-span,
+ * and splits again. A dead-straight run then comes back as dozens of
+ * segments whose control polygons zigzag across the true line -- which not
+ * only looks faceted but makes the curve self-intersect, and offsetting a
+ * self-intersecting path shatters it into slivers.
+ */
+function endpointTangent(points: Vec2[], windowPx = TANGENT_WINDOW_PX): Vec2 {
+  if (points.length < 2) return { x: 0, y: 0 };
+  if (points.length === 2) return normalize(sub(points[1], points[0]));
+  const count = windowCount(points, windowPx);
+  const dir = principalDirection(points, count);
+  if (dir.x === 0 && dir.y === 0) return normalize(sub(points[1], points[0]));
+  return dir;
+}
+
+/** As `endpointTangent`, but for the far end, pointing back into the span. */
+function endTangentReversed(points: Vec2[], windowPx = TANGENT_WINDOW_PX): Vec2 {
+  return endpointTangent([...points].reverse(), windowPx);
+}
+
+/**
+ * Tangent at an internal split point, pointing back into the left half --
+ * the direction convention Schneider's recursion expects. Same estimate as
+ * the endpoints, taken over a window on each side of the split.
+ */
+function computeCenterTangent(points: Vec2[], center: number, windowPx = TANGENT_WINDOW_PX): Vec2 {
+  const before = points.slice(0, center + 1).reverse();
+  const after = points.slice(center);
+
+  const dirBack = before.length >= 2 ? endpointTangent(before, windowPx) : { x: 0, y: 0 };
+  const dirForward = after.length >= 2 ? endpointTangent(after, windowPx) : { x: 0, y: 0 };
+
+  // dirBack already points backwards along the curve; dirForward points
+  // forwards, so flip it before averaging the two into one direction.
+  const combined = { x: dirBack.x - dirForward.x, y: dirBack.y - dirForward.y };
+  const tangent = normalize(combined);
+  if (tangent.x === 0 && tangent.y === 0) {
+    const v1 = sub(points[center - 1], points[center]);
+    const v2 = sub(points[center], points[center + 1]);
+    return normalize({ x: (v1.x + v2.x) / 2, y: (v1.y + v2.y) / 2 });
+  }
+  return tangent;
 }
 
 const MAX_RECURSION_DEPTH = 32;
@@ -360,10 +470,23 @@ function fitCubic(points: Vec2[], tHat1: Vec2, tHat2: Vec2, maxErrorSq: number, 
 
   if (depth >= MAX_RECURSION_DEPTH || splitPoint <= 0 || splitPoint >= n - 1) return [seg];
 
+  // `computeCenterTangent` points *backwards* along the curve, which is the
+  // sense `generateBezier` wants for a span's far end (it places p2 as
+  // `last + tHat2 * alpha`). So the left half takes it as given and the
+  // right half, which needs a forward direction for its own start, takes the
+  // negation -- the order Schneider's original has.
+  //
+  // These were the other way round, which left both halves constrained to
+  // tangents pointing back the way they came. That is invisible as long as
+  // the fit never subdivides, and catastrophic as soon as it does: each half
+  // fits badly, splits again with the same inverted constraint, and the
+  // recursion runs away. A perfect circle came out as two segments at a
+  // loose tolerance and over a hundred as soon as the tolerance was tight
+  // enough to require one split.
   const centerTangent = computeCenterTangent(points, splitPoint);
   const centerTangentReversed = scale(centerTangent, -1);
-  const left = fitCubic(points.slice(0, splitPoint + 1), tHat1, centerTangentReversed, maxErrorSq, depth + 1);
-  const right = fitCubic(points.slice(splitPoint), centerTangent, tHat2, maxErrorSq, depth + 1);
+  const left = fitCubic(points.slice(0, splitPoint + 1), tHat1, centerTangent, maxErrorSq, depth + 1);
+  const right = fitCubic(points.slice(splitPoint), centerTangentReversed, tHat2, maxErrorSq, depth + 1);
   return [...left, ...right];
 }
 
@@ -372,8 +495,8 @@ export function fitCurve(points: Vec2[], maxError: number): BezierSeg[] {
   if (points.length === 2) {
     return fitCubic(points, normalize(sub(points[1], points[0])), normalize(sub(points[0], points[1])), maxError * maxError, 0);
   }
-  const tHat1 = normalize(sub(points[1], points[0]));
-  const tHat2 = normalize(sub(points[points.length - 2], points[points.length - 1]));
+  const tHat1 = endpointTangent(points);
+  const tHat2 = endTangentReversed(points);
   return fitCubic(points, tHat1, tHat2, maxError * maxError, 0);
 }
 

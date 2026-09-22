@@ -37,8 +37,7 @@ function Slider({
 
 export function ControlRail({ params, setParams, loaded, onNewFile }: Props) {
   const [widthIn, setWidthIn] = useState<string>("");
-  const offsetPreset =
-    params.offsetMm === 0 ? "none" : params.offsetMm === 0.4 ? "foil" : params.offsetMm === 1.2 ? "came" : "custom";
+  const offsetPreset = params.offsetMm === 0.4 ? "foil" : params.offsetMm === 1.2 ? "came" : "custom";
 
   const applyWidthIn = (value: string) => {
     setWidthIn(value);
@@ -101,6 +100,39 @@ export function ControlRail({ params, setParams, loaded, onNewFile }: Props) {
       </div>
 
       <div className="rail-section">
+        <h2 className="rail-heading">Centreline</h2>
+        <Slider
+          label="Trim dead ends"
+          value={params.pruneSpurMm}
+          min={0}
+          max={10}
+          step={0.1}
+          onChange={(v) => setParams((p) => ({ ...p, pruneSpurMm: v }))}
+          format={(v) => (v === 0 ? "keep all" : `${v.toFixed(1)}mm`)}
+        />
+        <p className="hint-text">
+          Branches shorter than this are dropped. Low values clear up thinning whiskers at junctions; raise it to
+          also remove lines that genuinely stop in open space.
+        </p>
+        <label className="control-row">
+          <span className="control-label">Dead end shape</span>
+          <select value={params.endCap} onChange={(e) => setParams((p) => ({ ...p, endCap: e.target.value as PipelineParams["endCap"] }))}>
+            <option value="round">Rounded</option>
+            <option value="square">Square (extended)</option>
+            <option value="butt">Flat</option>
+          </select>
+        </label>
+        <label className="control-row control-row-checkbox">
+          <input
+            type="checkbox"
+            checked={params.subpixelRefine}
+            onChange={(e) => setParams((p) => ({ ...p, subpixelRefine: e.target.checked }))}
+          />
+          Sub-pixel re-centring
+        </label>
+      </div>
+
+      <div className="rail-section">
         <h2 className="rail-heading">Curves</h2>
         <Slider
           label="Smoothing"
@@ -143,20 +175,49 @@ export function ControlRail({ params, setParams, loaded, onNewFile }: Props) {
             disabled={params.mmPerPx === null}
             onChange={(e) => {
               const v = e.target.value;
-              const mm = v === "none" ? 0 : v === "foil" ? 0.4 : v === "came" ? 1.2 : params.offsetMm;
+              const mm = v === "foil" ? 0.4 : v === "came" ? 1.2 : params.offsetMm;
               setParams((p) => ({ ...p, offsetMm: mm }));
             }}
           >
-            <option value="none">None (0.00mm)</option>
-            <option value="foil">Copper foil (0.4mm/side)</option>
-            <option value="came">Lead came (1.2mm/side)</option>
+            <option value="foil">Copper foil (0.4mm each side)</option>
+            <option value="came">Lead came (1.2mm each side)</option>
             <option value="custom">Custom</option>
           </select>
         </label>
         {offsetPreset === "custom" && (
-          <Slider label="Offset" value={params.offsetMm} min={0} max={5} step={0.1} onChange={(v) => setParams((p) => ({ ...p, offsetMm: v }))} format={(v) => `${v.toFixed(1)}mm`} />
+          <Slider
+            label="Offset"
+            value={params.offsetMm}
+            min={0.05}
+            max={5}
+            step={0.05}
+            onChange={(v) => setParams((p) => ({ ...p, offsetMm: v }))}
+            format={(v) => `${v.toFixed(2)}mm`}
+          />
         )}
-        {params.mmPerPx === null && <p className="hint-text">Set a physical width to enable the kerf offset.</p>}
+        <p className="hint-text">
+          Each cut line sits {params.offsetMm.toFixed(2)}mm from the centre of the drawn line, so neighbouring
+          pieces are {(params.offsetMm * 2).toFixed(2)}mm apart. That gap is held at whatever finished width you
+          set above -- it does not scale with the panel.
+        </p>
+        <Slider
+          label="Miter limit"
+          value={params.miterLimit}
+          min={1}
+          max={8}
+          step={0.5}
+          onChange={(v) => setParams((p) => ({ ...p, miterLimit: v }))}
+          format={(v) => `${v.toFixed(1)}x`}
+        />
+        <p className="hint-text">
+          Corners extend to the point where the two cut lines meet. Past this multiple of the offset the point is
+          cut off square instead, so an acute junction cannot throw a long spike into the next piece.
+        </p>
+        {params.mmPerPx === null && (
+          <p className="hint-text">
+            Set a finished width to work in millimetres. Until then the offset is measured in pixels.
+          </p>
+        )}
       </div>
     </div>
   );
