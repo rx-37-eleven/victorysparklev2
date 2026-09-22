@@ -7,13 +7,21 @@
     <title>Stained Glass Vectorizer</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&family=DynaPuff:wght@400..700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&family=DynaPuff:wght@400..700&family=Miniver&display=swap" rel="stylesheet" />
 
     <!-- Shared main-site header: same markup/classes as src/_includes/base.njk,
          styled by the site's own tokens.css/style.css (linked, not duplicated --
          see src/apps/weedline/index.html for the same pattern). The app's own
          index.css/App.css load after these via Vite's injected bundle link, so
-         the app's own rules win the cascade for anything they both touch. -->
+         the app's own rules win the cascade for anything they both touch.
+
+         This is a copy, so it drifts: the Watermarker entry was added to the
+         site nav and to every other app page but not to this one, and the
+         Miniver webfont that .site-title depends on was never linked here, so
+         the site title rendered in the browser's generic cursive. Both are
+         fixed, and tests/siteHeader.test.ts now fails if this header and
+         base.njk's diverge again. Keep the font link in step with base.njk's
+         too -- the header's styling depends on it. -->
     <link rel="stylesheet" href="/css/tokens.css" />
     <link rel="stylesheet" href="/css/style.css" />
   </head>
@@ -38,6 +46,7 @@
               <a href="/apps/tilemaker/">Seamless Tile Maker</a>
               <a href="/apps/stained-glass-vectorizer/">Stained Glass Vectorizer</a>
               <a href="/apps/weedline/">Weedline</a>
+              <a href="/apps/watermarker/">Watermarker</a>
               <a href="/resources/">Resources</a>
               <a href="https://www.pinterest.com/victorysparkle/website-board/" target="_blank" rel="noopener noreferrer">Pinterest</a>
             </div>
