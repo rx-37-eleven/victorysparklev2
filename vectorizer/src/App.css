@@ -229,12 +229,17 @@ select {
   cursor: grabbing;
 }
 
+/* Anchored top-left; CanvasView computes the translate that centres and
+   fits the image. This used to sit at 50%/50% and try to pull itself back
+   with `margin-top: calc(-1 * var(--half-h))`, but nothing ever defined
+   --half-h and there was no margin-left at all, so the image's top-left
+   corner landed in the dead centre of the viewport and everything above and
+   left of it was off-screen until you dragged. */
 .canvas-transform-layer {
   transform-origin: 0 0;
   position: absolute;
-  top: 50%;
-  left: 50%;
-  margin-top: calc(-1 * var(--half-h, 0px));
+  top: 0;
+  left: 0;
 }
 
 .canvas-transform-layer canvas {

@@ -18,6 +18,24 @@ export function CanvasView({ loaded, result, view, selectedLabel, onSelectLabel 
   const width = loaded?.width ?? 0;
   const height = loaded?.height ?? 0;
 
+  // Frame a newly loaded image: scale it to fit the viewport (never magnifying
+  // past 1:1) and centre it. Without this the transform starts at scale 1 /
+  // offset 0, which on any image bigger than the viewport shows an arbitrary
+  // corner -- and now that areas with no piece are drawn transparent rather
+  // than filled, that corner can be completely blank.
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container || !width || !height) return;
+    const { clientWidth, clientHeight } = container;
+    if (!clientWidth || !clientHeight) return;
+    const scale = Math.min(1, Math.min(clientWidth / width, clientHeight / height) * 0.92);
+    setTransform({
+      scale,
+      x: (clientWidth - width * scale) / 2,
+      y: (clientHeight - height * scale) / 2,
+    });
+  }, [loaded, width, height]);
+
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas || !loaded) return;

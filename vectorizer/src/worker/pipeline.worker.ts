@@ -90,12 +90,16 @@ function labelsToColorRgba(labels: Int32Array, width: number, height: number, co
       out[o + 1] = color[1];
       out[o + 2] = color[2];
       out[o + 3] = 255;
-    } else {
-      out[o] = 20;
-      out[o + 1] = 20;
-      out[o + 2] = 24;
-      out[o + 3] = 255;
     }
+    // Anything with no piece -- the came gap between two pieces, and
+    // whatever falls outside the panel -- is left transparent so the
+    // canvas's checkerboard shows through. It used to be filled near-black,
+    // which was fine when every pixel belonged to some region: the pieces
+    // came from a watershed that labelled the whole image. Now they come
+    // from offset geometry, so "no piece" covers the gaps and the margin
+    // around the artwork, and filling that black turned the preview into a
+    // black rectangle for any drawing that doesn't reach the page edges.
+    
   }
   return out;
 }
