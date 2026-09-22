@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { patternFileStem, patternNameFromFile } from "./lib/filename";
 import "./App.css";
 import type { PipelineParams } from "./lib/pipeline";
 import { DEFAULT_PARAMS } from "./lib/pipeline";
@@ -34,7 +35,6 @@ let requestCounter = 0;
 
 export default function App() {
   const workerRef = useRef<Worker | null>(null);
-  const [file, setFile] = useState<File | null>(null);
   const [loaded, setLoaded] = useState<LoadedInfo | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -43,6 +43,7 @@ export default function App() {
   const [result, setResult] = useState<RunResult | null>(null);
   const [computing, setComputing] = useState(false);
   const [selectedLabel, setSelectedLabel] = useState<number | null>(null);
+  const [patternName, setPatternName] = useState("");
 
   const inFlightRef = useRef<{ requestId: number; view: ViewMode } | null>(null);
   const pendingRef = useRef<{ params: PipelineParams; view: ViewMode } | null>(null);
@@ -118,7 +119,6 @@ export default function App() {
   }, [params, view, loaded]);
 
   const handleFile = useCallback((f: File) => {
-    setFile(f);
     setError(null);
     setLoading(true);
     setResult(null);
@@ -126,20 +126,29 @@ export default function App() {
     if (!worker) return;
     const requestId = ++requestCounter;
     worker.postMessage({ type: "load", requestId, blob: f });
+    // Seed the name from the file, minus its extension -- "roses.png" is a
+    // better starting point than "Untitled pattern", and it is still only a
+    // default the artist can type over.
+    setPatternName(patternNameFromFile(f.name));
   }, []);
 
   const attentionCount = result?.warnings.length ?? 0;
 
-  const exportSvg = useCallback(() => {
-    if (!result?.svg) return;
-    const blob = new Blob([result.svg], { type: "image/svg+xml" });
+  const fileStem = useMemo(() => patternFileStem(patternName), [patternName]);
+
+  const download = useCallback((blob: Blob, filename: string) => {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = "pattern.svg";
+    a.download = filename;
     a.click();
     URL.revokeObjectURL(url);
-  }, [result]);
+  }, []);
+
+  const exportSvg = useCallback(() => {
+    if (!result?.svg) return;
+    download(new Blob([result.svg], { type: "image/svg+xml" }), `${fileStem}.svg`);
+  }, [result, fileStem, download]);
 
   const exportPng = useCallback(() => {
     if (!result?.svg) return;
@@ -156,17 +165,12 @@ export default function App() {
       ctx.drawImage(img, 0, 0);
       canvas.toBlob((blob) => {
         if (!blob) return;
-        const pngUrl = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = pngUrl;
-        a.download = "pattern-preview.png";
-        a.click();
-        URL.revokeObjectURL(pngUrl);
+        download(blob, `${fileStem}-preview.png`);
       }, "image/png");
       URL.revokeObjectURL(url);
     };
     img.src = url;
-  }, [result]);
+  }, [result, fileStem, download]);
 
   const statusText = useMemo(() => {
     if (!loaded) return "";
@@ -182,7 +186,19 @@ export default function App() {
     <div className="app">
       <header className="topbar">
         <div className="brand">Stained Glass Vectorizer</div>
-        <div className="topbar-title">{file?.name ?? "Untitled pattern"}</div>
+        <input
+          className="topbar-title"
+          value={patternName}
+          onChange={(e) => setPatternName(e.target.value)}
+          placeholder="Untitled pattern"
+          aria-label="Pattern name"
+          title="Name this pattern -- it becomes the exported file's name"
+          spellCheck={false}
+          disabled={!loaded}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === "Escape") e.currentTarget.blur();
+          }}
+        />
         <div className="topbar-actions">
           <button className="btn" disabled={!result?.svg} onClick={exportPng}>
             PNG preview

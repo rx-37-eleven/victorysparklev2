@@ -125,31 +125,34 @@ function handleRun(msg: RunMessage): void {
     const warningsPlain = result.warnings.map((w) => ({ ...w }));
     const pieceStats = Array.from(result.svg.pieces);
 
-    if (msg.view === "bw") {
-      const rgba = inkToRgba(result.ink);
-      ctx.postMessage(
-        { type: "result", requestId: msg.requestId, view: "bw", width: result.width, height: result.height, rgba, warnings: warningsPlain, pieceStats, pieceCount: result.pieceCount },
-        { transfer: [rgba.buffer] },
-      );
-    } else if (msg.view === "pieces") {
-      const rgba = labelsToColorRgba(result.labels, result.width, result.height, result.pieceColors);
-      ctx.postMessage(
-        { type: "result", requestId: msg.requestId, view: "pieces", width: result.width, height: result.height, rgba, warnings: warningsPlain, pieceStats, pieceCount: result.pieceCount },
-        { transfer: [rgba.buffer] },
-      );
+    // The SVG rides along with every view, not just the cut-lines one. The
+    // export buttons are enabled by its presence, and the default view is
+    // "pieces", so leaving it out meant the buttons sat disabled until you
+    // happened to click through to "Cut lines" -- with nothing on screen
+    // saying that was the reason. The pipeline builds the SVG on every run
+    // regardless, and the bitmap views already post a multi-megabyte pixel
+    // buffer, so carrying a few hundred kilobytes of markup alongside it
+    // costs nothing worth having.
+    const common = {
+      type: "result" as const,
+      requestId: msg.requestId,
+      width: result.width,
+      height: result.height,
+      svg: result.svg.svg,
+      warnings: warningsPlain,
+      pieceStats,
+      pieceCount: result.pieceCount,
+    };
+
+    if (msg.view === "bw" || msg.view === "pieces") {
+      const rgba =
+        msg.view === "bw"
+          ? inkToRgba(result.ink)
+          : labelsToColorRgba(result.labels, result.width, result.height, result.pieceColors);
+      ctx.postMessage({ ...common, view: msg.view, rgba }, { transfer: [rgba.buffer] });
     } else {
-      // "cutlines" and "source" both just need the SVG + warnings; "source" view is drawn from the cached original bitmap on the main thread.
-      ctx.postMessage({
-        type: "result",
-        requestId: msg.requestId,
-        view: msg.view,
-        width: result.width,
-        height: result.height,
-        svg: result.svg.svg,
-        warnings: warningsPlain,
-        pieceStats,
-        pieceCount: result.pieceCount,
-      });
+      // "source" is drawn from the cached original bitmap on the main thread.
+      ctx.postMessage({ ...common, view: msg.view });
     }
   } catch (err) {
     ctx.postMessage({ type: "error", requestId: msg.requestId, message: String(err) });
