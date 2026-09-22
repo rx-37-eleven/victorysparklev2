@@ -103,6 +103,11 @@ export function buildCenterlineGraph(skeleton: Uint8Array, width: number, height
   // into several, so an 8-connected cluster becomes one node.
   const nodeOf = new Int32Array(size).fill(-1);
   const nodes: (CenterlineNode | null)[] = [];
+  // The pixels making up each node's cluster, kept from the flood fill below.
+  // Re-deriving them by scanning the image per node instead would make edge
+  // tracing O(nodes x pixels), which is unnoticeable on a drawing with a
+  // handful of junctions and ruinous on a real panel with hundreds.
+  const clusterPixels: number[][] = [];
   const queue: number[] = [];
 
   for (let seed = 0; seed < size; seed++) {
@@ -134,7 +139,8 @@ export function buildCenterlineGraph(skeleton: Uint8Array, width: number, height
       sx += p.x;
       sy += p.y;
     }
-    nodes.push({ id, x: sx / cluster.length, y: sy / cluster.length, edges: [], terminal: false, });
+    nodes.push({ id, x: sx / cluster.length, y: sy / cluster.length, edges: [], terminal: false });
+    clusterPixels.push(cluster);
     // A cluster is a line end only if the whole cluster has a single outward
     // arm; that is recomputed from the finished edge lists below.
   }
@@ -187,10 +193,7 @@ export function buildCenterlineGraph(skeleton: Uint8Array, width: number, height
 
   const traceScratch: number[] = new Array(8);
   for (let nodeId = 0; nodeId < nodes.length; nodeId++) {
-    // Re-derive the cluster's pixels lazily rather than storing them: cheap
-    // enough, and it keeps the node record small.
-    for (let index = 0; index < size; index++) {
-      if (nodeOf[index] !== nodeId) continue;
+    for (const index of clusterPixels[nodeId]) {
       // Snapshot rather than iterating the shared buffer: addEdge/walk below
       // both re-enter the neighbour lookup.
       const neighbours = traceScratch.slice(0, neighbourIndices(index, traceScratch));
@@ -225,6 +228,7 @@ export function buildCenterlineGraph(skeleton: Uint8Array, width: number, height
     const id = nodes.length;
     const p = pixelCentre(index, width);
     nodes.push({ id, x: p.x, y: p.y, edges: [], terminal: false });
+    clusterPixels.push([index]);
     nodeOf[index] = id;
 
     const count = neighbourIndices(index, traceScratch);
