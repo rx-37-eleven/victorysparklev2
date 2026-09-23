@@ -1574,6 +1574,25 @@ p a:hover {
     opacity: .75;
 }
 
+/* --- need help / tailoring --- */
+
+.home-help {
+    padding: 34px;
+    margin: 40px 0;
+    transform: rotate(.3deg);
+}
+
+.home-help-subtitle {
+    font-size: 18px;
+    line-height: 1.5;
+    max-width: 640px;
+    margin: 14px 0 0;
+}
+
+.home-help-pills {
+    margin-bottom: 28px;
+}
+
 /* --- pinterest section --- */
 
 .home-pinterest {
@@ -1666,6 +1685,11 @@ p a:hover {
 
     .home-features {
         grid-template-columns: 1fr;
+    }
+
+    .home-help {
+        padding: 24px;
+        transform: none;
     }
 
     .home-carousel-btn {
