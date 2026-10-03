@@ -49,11 +49,14 @@ const CONFIG = {
     downloadPanel: $("gb-download-panel"), download: $("gb-download"), exportStatus: $("gb-export-status"), exportLinks: $("gb-export-links"),
     showDots: $("gb-show-dots"), zoomIn: $("gb-zoom-in"), zoomOut: $("gb-zoom-out"), zoomFit: $("gb-zoom-fit"),
     viewport: $("gb-viewport"), stage: $("gb-stage"), canvas: $("gb-canvas"), overlay: $("gb-overlay"), legend: $("gb-legend"),
+    minAngle: $("gb-min-angle"), minAngleValue: $("gb-min-angle-value"),
     spotsPanel: $("gb-spots-panel"), spotsTitle: $("gb-spots-title"), spotsNote: $("gb-spots-note"), spots: $("gb-spots"),
   };
 
   const state = {
     src: null,         // { img, w, h, name }
+    minAngle: 0,
+    dismissed: new Set(),
     result: null,      // { spots, size: {w,h} inches, bits: [bit] }
     worker: null,
     busy: false,
@@ -106,7 +109,7 @@ const CONFIG = {
       const v = parseFloat(el.value);
       if (v > 0) el.value = round(v * k);
     }
-    if (state.result) showSpots(); // re-render lengths in the new unit
+    if (state.result) refreshSpots(); // re-render lengths in the new unit
     refreshControls();
   }
   function sizeChanged() {
@@ -212,6 +215,7 @@ const CONFIG = {
   const view = { k: 1, x: 0, y: 0, fitW: 0, fitH: 0 };
   const pointers = new Map();
   let gesture = null;
+  let tap = null;
 
   function layoutStage() {
     const vw = els.viewport.clientWidth, vh = els.viewport.clientHeight;
@@ -259,6 +263,7 @@ const CONFIG = {
   els.viewport.addEventListener("pointerdown", (e) => {
     els.viewport.setPointerCapture(e.pointerId);
     pointers.set(e.pointerId, pointerPos(e));
+    tap = pointers.size === 1 ? { id: e.pointerId, pos: pointerPos(e) } : null;
     startGesture();
     els.viewport.classList.add("gb-panning");
   });
@@ -283,6 +288,11 @@ const CONFIG = {
     clampView(); applyView();
   });
   function endPointer(e) {
+    if (tap && e.type === "pointerup" && tap.id === e.pointerId) {
+      const [x, y] = pointerPos(e);
+      if (Math.hypot(x - tap.pos[0], y - tap.pos[1]) < 6) handleTap(x, y);
+    }
+    tap = null;
     pointers.delete(e.pointerId);
     startGesture();
     if (!pointers.size) els.viewport.classList.remove("gb-panning");
@@ -382,43 +392,60 @@ const CONFIG = {
   }
   const bitFor = (inches) => CONFIG.BITS.find((b) => b.inches === inches);
 
+  const shownSpots = () => state.result.spots.filter((s) => s.angle >= state.minAngle);
+  const activeSpots = () => shownSpots().filter((s) => !state.dismissed.has(s.n));
+
   function showResult() {
-    const { spots, size } = state.result;
+    const { size } = state.result;
+    state.dismissed = new Set();
     els.overlay.setAttribute("viewBox", `0 0 ${size.w} ${size.h}`);
+    els.showDots.disabled = false;
+    renderLegend();
+    refreshSpots();
+    els.downloadPanel.hidden = false;
+    layoutStage();
+    fitView();
+    els.viewport.scrollIntoView({ block: "nearest", behavior: "smooth" });
+  }
+
+  function toggleSpot(s) {
+    if (state.dismissed.has(s.n)) state.dismissed.delete(s.n); else state.dismissed.add(s.n);
+    refreshSpots();
+  }
+
+  // Redraws dots, the list and the status line from state. Cheap, so the
+  // slider and toggles call it on every change.
+  function refreshSpots() {
+    const shown = shownSpots(), active = activeSpots(), total = state.result.spots.length;
     const dots = svgEl("g", { id: "gb-dots" });
-    for (const s of spots) {
-      const bit = bitFor(s.bit);
-      dots.append(svgEl("circle", { cx: s.cx, cy: s.cy, r: s.bit / 2, fill: bit.color, "fill-opacity": CONFIG.DOT_ALPHA, "data-n": s.n }));
+    for (const s of shown) {
+      if (state.dismissed.has(s.n)) {
+        dots.append(svgEl("circle", { cx: s.cx, cy: s.cy, r: s.bit / 2, class: "gb-off-dot" }));
+        continue;
+      }
+      dots.append(svgEl("circle", { cx: s.cx, cy: s.cy, r: s.bit / 2, fill: bitFor(s.bit).color, "fill-opacity": CONFIG.DOT_ALPHA }));
     }
-    for (const s of spots) {
+    for (const s of active) {
       const t = svgEl("text", { x: s.cx, y: s.cy, class: "gb-num", "font-size": Math.min(0.35, s.bit * 0.45), "dominant-baseline": "central" });
       t.textContent = s.n;
       dots.append(t);
     }
     els.overlay.replaceChildren(dots);
     dots.style.display = els.showDots.checked ? "" : "none";
-    els.showDots.disabled = false;
-    renderLegend();
-    showSpots();
-    els.downloadPanel.hidden = false;
-    setStatus(spots.length
-      ? `Found ${spots.length} spot${spots.length === 1 ? "" : "s"} too tight for your bits.`
-      : "No inside curves are too tight for the bits you selected.");
-    layoutStage();
-    fitView();
-    els.viewport.scrollIntoView({ block: "nearest", behavior: "smooth" });
-  }
 
-  function showSpots() {
-    const { spots, bits } = state.result;
     els.spotsPanel.hidden = false;
-    els.spotsTitle.textContent = spots.length ? `Flagged spots (${spots.length})` : "Flagged spots";
-    els.spotsNote.textContent = spots.length
-      ? "Each dot is the size of the bit closest to that curve's measured diameter. Tap a spot to zoom to it."
-      : "Nothing to flag. If you expected something, check the finished size and that the pattern's outer border is drawn.";
-    els.spots.replaceChildren(...spots.map((s) => {
-      const bit = bitFor(s.bit);
+    els.spotsTitle.textContent = shown.length ? `Flagged spots (${active.length})` : "Flagged spots";
+    els.spotsNote.textContent = shown.length
+      ? "Each dot is the size of the bit closest to that curve's measured diameter. Uncheck a spot (or tap its dot) to dismiss it; dismissed dots are left out of downloads. Tap a spot's name to zoom to it."
+      : total ? "Every spot is hidden by the bend slider." : "Nothing to flag. If you expected something, check the finished size and that the pattern's outer border is drawn.";
+    els.spots.replaceChildren(...shown.map((s) => {
+      const bit = bitFor(s.bit), off = state.dismissed.has(s.n);
       const li = document.createElement("li");
+      li.className = off ? "gb-off" : "";
+      const cb = document.createElement("input");
+      cb.type = "checkbox"; cb.className = "gb-spot-toggle"; cb.checked = !off;
+      cb.setAttribute("aria-label", `Include spot ${s.n}`);
+      cb.addEventListener("change", () => toggleSpot(s));
       const btn = document.createElement("button");
       btn.type = "button";
       const sw = document.createElement("span");
@@ -426,12 +453,30 @@ const CONFIG = {
       const n = document.createElement("span");
       n.className = "gb-spot-n"; n.textContent = "#" + s.n;
       const txt = document.createElement("span");
-      txt.textContent = `${bit.label} bit · curve diameter ${fmtLen(s.diameter)}`;
+      txt.textContent = `${bit.label} bit · curve diameter ${fmtLen(s.diameter)} · bend ${Math.round(s.angle)}°`;
       btn.append(sw, n, txt);
       btn.addEventListener("click", () => focusSpot(s));
-      li.append(btn);
+      li.append(cb, btn);
       return li;
     }));
+
+    const hidden = total - shown.length, dismissed = shown.length - active.length;
+    const extra = [hidden ? `${hidden} hidden by the bend slider` : "", dismissed ? `${dismissed} dismissed` : ""].filter(Boolean).join(", ");
+    setStatus(!total ? "No inside curves are too tight for the bits you selected."
+      : `${active.length} spot${active.length === 1 ? "" : "s"} flagged${extra ? " (" + extra + ")" : ""}.`);
+  }
+
+  // Tap on the preview: toggle the nearest visible dot under the finger.
+  function handleTap(px, py) {
+    if (!state.result || !view.fitW) return;
+    const { size } = state.result;
+    const ix = (px - view.x) / (view.fitW * view.k) * size.w, iy = (py - view.y) / (view.fitH * view.k) * size.h;
+    let best = null, bestD = Infinity;
+    for (const s of shownSpots()) {
+      const d = Math.hypot(ix - s.cx, iy - s.cy);
+      if (d <= s.bit / 2 && d < bestD) { best = s; bestD = d; }
+    }
+    if (best) toggleSpot(best);
   }
 
   function focusSpot(s) {
@@ -494,7 +539,7 @@ const CONFIG = {
     drawPattern(pattern.getContext("2d"), W, H);
     const dots = makeCanvas(W, H); // transparent background
     const dctx = dots.getContext("2d");
-    for (const s of state.result.spots) {
+    for (const s of activeSpots()) {
       dctx.fillStyle = hexToRgba(bitFor(s.bit).color, CONFIG.DOT_ALPHA);
       dctx.beginPath();
       dctx.arc(s.cx * (W / size.w), s.cy * (H / size.h), s.bit / 2 * (W / size.w), 0, Math.PI * 2);
@@ -631,6 +676,11 @@ const CONFIG = {
   els.unit.addEventListener("change", onUnitChange);
   els.lock.addEventListener("change", () => { if (els.lock.checked && els.width.value) onWidthInput(); else refreshControls(); });
   els.run.addEventListener("click", runAnalysis);
+  els.minAngle.addEventListener("input", () => {
+    state.minAngle = +els.minAngle.value;
+    els.minAngleValue.textContent = state.minAngle + "°";
+    if (state.result) refreshSpots();
+  });
   els.download.addEventListener("click", doDownload);
   els.showDots.addEventListener("change", () => {
     const g = $("gb-dots");

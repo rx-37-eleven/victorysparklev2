@@ -134,7 +134,7 @@
         <button type="button" id="gb-download" class="gb-btn-primary">Download</button>
         <p class="gb-status" id="gb-export-status" role="status" aria-live="polite"></p>
         <div id="gb-export-links" class="gb-export-links"></div>
-        <p class="gb-hint">Exports are 300 DPI at your entered size. If your device can't hold an image that big, we'll use the highest DPI that works and tell you. Spot numbers appear on screen only.</p>
+        <p class="gb-hint">Exports are 300 DPI at your entered size. If your device can't hold an image that big, we'll use the highest DPI that works and tell you. Dismissed dots are left out, and spot numbers appear on screen only.</p>
       </section>
     </div>
 
@@ -161,6 +161,11 @@
       <section class="gb-panel" id="gb-spots-panel" hidden>
         <h2 class="gb-h2" id="gb-spots-title">Flagged spots</h2>
         <p class="gb-hint gb-hint-top" id="gb-spots-note"></p>
+        <div class="gb-slider-row">
+          <label for="gb-min-angle">Ignore bends gentler than <span id="gb-min-angle-value" class="gb-value">0°</span></label>
+          <input type="range" id="gb-min-angle" min="0" max="360" step="1" value="0">
+          <p class="gb-hint">A bend is how far the curve turns in total: a full hole is 360°, a half circle 180°, a quarter circle 90°. Raise this to hide slight kinks that don't need a bit.</p>
+        </div>
         <ol class="gb-spots" id="gb-spots"></ol>
       </section>
     </div>
