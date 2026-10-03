@@ -1,0 +1,235 @@
+/* =====================================================================
+   GRINDER BIT CHECKER — app-only styles
+   ---------------------------------------------------------------------
+   Same rules as the other apps: everything is scoped under .bitcheck-app
+   because /css/style.css loads after this file, and colors, radii and
+   shadows are aliases onto /css/tokens.css.
+   ===================================================================== */
+
+.bitcheck-app {
+  --gb-ink: var(--color-primary);
+  --gb-ink-dark: var(--color-primary-dark);
+  --gb-body: var(--color-ink);
+  --gb-muted: var(--color-text-muted);
+  --gb-surface: var(--color-surface);
+  --gb-shadow: var(--shadow-sticker) var(--color-shadow);
+  --gb-shadow-lift: var(--shadow-sticker) var(--color-accent-pink);
+  --gb-hairline: var(--color-shadow);
+  --gb-radius: var(--radius-lg);
+  --gb-radius-btn: var(--radius-sm);
+  --gb-radius-pill: var(--radius-pill);
+}
+
+.bitcheck-app [hidden] { display: none !important; }
+
+.bitcheck-app .gb-h1 {
+  font-family: "DynaPuff", "Comic Neue", sans-serif;
+  color: var(--gb-ink);
+  margin-bottom: 20px;
+  font-size: 38px;
+}
+
+.bitcheck-app .gb-h2 {
+  font-family: "Comic Neue", sans-serif;
+  font-weight: 700;
+  color: var(--gb-ink);
+  font-size: 20px;
+  margin-bottom: 12px;
+}
+
+.bitcheck-app .gb-hint {
+  font-family: "Comic Neue", sans-serif;
+  color: var(--gb-muted);
+  font-size: 14px;
+  margin-top: 10px;
+  line-height: 1.5;
+}
+.bitcheck-app .gb-hint-top { margin-top: 0; margin-bottom: 14px; }
+
+.bitcheck-app .gb-error {
+  font-family: "Comic Neue", sans-serif;
+  color: var(--gb-ink-dark);
+  background: rgba(255, 255, 255, 0.6);
+  border: 1.5px solid var(--gb-hairline);
+  border-radius: var(--gb-radius-btn);
+  padding: 10px 14px;
+  margin-top: 12px;
+}
+
+.bitcheck-app .gb-status {
+  font-family: "Comic Neue", sans-serif;
+  color: var(--gb-body);
+  font-size: 15px;
+  margin-top: 12px;
+  line-height: 1.5;
+}
+.bitcheck-app .gb-status:empty { display: none; }
+
+.bitcheck-app .gb-panel {
+  background: var(--gb-surface);
+  border: var(--border-width) solid var(--color-ink);
+  border-radius: var(--gb-radius);
+  box-shadow: var(--gb-shadow);
+  padding: 24px;
+  margin-bottom: 20px;
+}
+
+.bitcheck-app .gb-visually-hidden {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+}
+
+/* --- Dropzone --- */
+.bitcheck-app .gb-dropzone {
+  border: 2px dashed var(--gb-ink);
+  border-radius: var(--gb-radius);
+  padding: 32px 20px;
+  text-align: center;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+.bitcheck-app .gb-dropzone p { color: var(--gb-body); font-size: 16px; margin-bottom: 12px; }
+.bitcheck-app .gb-dropzone p.gb-hint { color: var(--gb-muted); font-size: 14px; margin: 10px auto 0; max-width: 560px; }
+.bitcheck-app .gb-dropzone.gb-drag-over { background: rgba(138, 108, 189, 0.08); }
+
+/* --- Layout --- */
+.bitcheck-app .gb-workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 340px) minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+.bitcheck-app .gb-result-column { min-width: 0; }
+
+/* --- Form --- */
+.bitcheck-app .gb-size-grid {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: "Comic Neue", sans-serif;
+}
+.bitcheck-app .gb-size-grid label { font-weight: 700; color: var(--gb-body); font-size: 15px; }
+.bitcheck-app .gb-size-grid select { grid-column: 3; grid-row: 1 / span 2; align-self: center; }
+
+.bitcheck-app input[type="number"],
+.bitcheck-app select {
+  font-family: "Comic Neue", sans-serif;
+  font-size: 16px; /* 16px stops iOS zooming the page on focus */
+  color: var(--gb-ink-dark);
+  border: 1.5px solid var(--gb-hairline);
+  border-radius: var(--gb-radius-btn);
+  padding: 8px 10px;
+  background: #fff;
+  min-width: 0;
+}
+
+.bitcheck-app .gb-check {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: "Comic Neue", sans-serif;
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--gb-body);
+  min-height: 36px;
+  cursor: pointer;
+}
+.bitcheck-app .gb-check input { width: 20px; height: 20px; accent-color: var(--gb-ink); flex: 0 0 auto; }
+.bitcheck-app .gb-value { font-weight: 400; color: var(--gb-muted); }
+
+.bitcheck-app .gb-bits { display: flex; flex-direction: column; gap: 4px; margin-bottom: 16px; }
+.bitcheck-app .gb-swatch {
+  display: inline-block; width: 18px; height: 18px; border-radius: 50%;
+  border: 1.5px solid var(--color-ink); flex: 0 0 auto;
+}
+.bitcheck-app .gb-formats { display: flex; flex-direction: column; gap: 4px; margin-bottom: 16px; }
+.bitcheck-app .gb-export-links { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+.bitcheck-app .gb-export-links a { font-family: "Comic Neue", sans-serif; font-weight: 700; color: var(--gb-ink); }
+
+/* --- Buttons --- */
+.bitcheck-app .gb-btn-primary {
+  font-family: "Comic Neue", sans-serif; font-weight: 700; font-size: 16px;
+  color: #fff; background: var(--gb-ink);
+  border: 2px solid var(--color-ink); border-radius: var(--gb-radius-btn);
+  padding: 10px 16px; min-height: 44px; cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+.bitcheck-app .gb-btn-primary:hover:not(:disabled) {
+  background: var(--gb-ink-dark); transform: translateY(-5px); box-shadow: var(--gb-shadow-lift);
+}
+.bitcheck-app .gb-btn-secondary {
+  font-family: "Comic Neue", sans-serif; font-weight: 700; font-size: 16px;
+  color: var(--gb-ink); background: transparent;
+  border: 1.5px solid var(--gb-ink); border-radius: var(--gb-radius-btn);
+  padding: 8px 14px; min-height: 40px; cursor: pointer;
+}
+.bitcheck-app .gb-btn-secondary:hover:not(:disabled) { background: rgba(138, 108, 189, 0.15); }
+.bitcheck-app .gb-btn-small { min-width: 44px; padding: 6px 10px; }
+.bitcheck-app button:disabled { opacity: 0.5; cursor: not-allowed; }
+.bitcheck-app .gb-run { width: 100%; }
+
+/* --- Preview --- */
+.bitcheck-app .gb-toolbar {
+  display: flex; justify-content: space-between; align-items: center;
+  gap: 12px; flex-wrap: wrap; margin-bottom: 12px;
+}
+.bitcheck-app .gb-zoom { display: flex; gap: 8px; }
+.bitcheck-app .gb-viewport {
+  position: relative;
+  overflow: hidden;
+  height: min(70vh, 640px);
+  min-height: 280px;
+  border-radius: var(--gb-radius-btn);
+  border: 1.5px solid var(--gb-hairline);
+  background: #e9e6ee;
+  touch-action: none; /* we handle pinch and pan ourselves */
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.bitcheck-app .gb-viewport.gb-panning { cursor: grabbing; }
+.bitcheck-app .gb-stage { position: absolute; left: 0; top: 0; transform-origin: 0 0; will-change: transform; }
+.bitcheck-app .gb-stage canvas { display: block; width: 100%; height: 100%; background: #fff; }
+.bitcheck-app .gb-overlay { position: absolute; left: 0; top: 0; width: 100%; height: 100%; pointer-events: none; }
+.bitcheck-app .gb-overlay .gb-num {
+  font-family: "Comic Neue", sans-serif; font-weight: 700; text-anchor: middle;
+  fill: #000; stroke: #fff; stroke-width: 0.012; paint-order: stroke; stroke-linejoin: round;
+}
+.bitcheck-app .gb-overlay .gb-ring { fill: none; stroke: #000; stroke-width: 0.012; stroke-dasharray: 0.04 0.03; }
+
+.bitcheck-app .gb-legend {
+  list-style: none; display: flex; flex-wrap: wrap; gap: 8px 18px;
+  margin: 14px 0 0; padding: 0;
+  font-family: "Comic Neue", sans-serif; font-weight: 700; color: var(--gb-body);
+}
+.bitcheck-app .gb-legend li { display: flex; align-items: center; gap: 8px; }
+
+/* --- Spot list --- */
+.bitcheck-app .gb-spots { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.bitcheck-app .gb-spots li button {
+  width: 100%; display: flex; align-items: center; gap: 12px; text-align: left;
+  font-family: "Comic Neue", sans-serif; font-size: 16px; color: var(--gb-body);
+  background: #fff; border: 1.5px solid var(--gb-hairline); border-radius: var(--gb-radius-btn);
+  padding: 8px 12px; min-height: 44px; cursor: pointer;
+}
+.bitcheck-app .gb-spots li button:hover { border-color: var(--gb-ink); }
+.bitcheck-app .gb-spots .gb-spot-n { font-weight: 700; color: var(--gb-ink); min-width: 2.2em; }
+
+/* --- Focus / motion --- */
+.bitcheck-app button:focus-visible,
+.bitcheck-app input:focus-visible,
+.bitcheck-app select:focus-visible { outline: 3px solid var(--gb-ink); outline-offset: 2px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .bitcheck-app * { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+}
+
+@media (max-width: 900px) {
+  .bitcheck-app .gb-workspace { grid-template-columns: 1fr; }
+  .bitcheck-app .gb-viewport { height: min(62vh, 560px); }
+}
+@media (max-width: 768px) {
+  .bitcheck-app .gb-h1 { font-size: 30px; }
+  .bitcheck-app .gb-panel { padding: 18px; }
+}

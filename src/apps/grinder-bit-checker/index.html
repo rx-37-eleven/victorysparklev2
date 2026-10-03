@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Grinder Bit Checker — Find Curves Too Tight for Your Bits</title>
+<meta name="description" content="Upload a stained glass pattern and see which inside curves are too tight for your grinder bits. Download the result as a layered PSD or PNG pair. Free, runs entirely in your browser.">
+<link rel="canonical" href="https://victorysparkle.com/apps/grinder-bit-checker/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Victory Sparkle Co.">
+<meta property="og:title" content="Grinder Bit Checker · Victory Sparkle Co.">
+<meta property="og:description" content="See which curves in your stained glass pattern are too tight for your grinder bits. Free, runs entirely in your browser.">
+<meta property="og:url" content="https://victorysparkle.com/apps/grinder-bit-checker/">
+<meta property="og:image" content="https://victorysparkle.com/images/og-default.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&family=DynaPuff:wght@400..700&family=Miniver&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="/css/tokens.css">
+<link rel="stylesheet" href="/apps/grinder-bit-checker/bitcheck.css">
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<header data-pagefind-ignore>
+    <div class="header-content">
+        <a href="/" class="logo-section" aria-label="Victory Sparkle Co. home">
+            <div class="profile-image"><img src="/images/Vlogo.png" alt=""></div>
+            <div class="site-title">Victory Sparkle Co.</div>
+        </a>
+        <button type="button" class="nav-toggle" id="nav-toggle"
+                aria-expanded="false" aria-controls="main-nav" aria-label="Menu">
+            <span class="nav-toggle-bar"></span>
+            <span class="nav-toggle-bar"></span>
+            <span class="nav-toggle-bar"></span>
+        </button>
+        <nav class="main-nav" id="main-nav">
+            <div class="nav-item">
+                <button type="button" class="nav-trigger" aria-expanded="false">Make</button>
+                <div class="nav-dropdown">
+                    <a href="/apps/pinpress/">Pinpress</a>
+                    <a href="/apps/tilemaker/">Seamless Tile Maker</a>
+                    <a href="/apps/stained-glass-vectorizer/">Stained Glass Vectorizer</a>
+                    <a href="/apps/weedline/">Weedline</a>
+                    <a href="/apps/watermarker/">Watermarker</a>
+                    <a href="/apps/grinder-bit-checker/">Grinder Bit Checker</a>
+                    <a href="/resources/">Resources</a>
+                    <a href="https://www.pinterest.com/victorysparkle/website-board/" target="_blank" rel="noopener noreferrer">Pinterest</a>
+                </div>
+            </div>
+            <div class="nav-item">
+                <button type="button" class="nav-trigger" aria-expanded="false">Code</button>
+                <div class="nav-dropdown">
+                    <a href="/code/">Telegram Bots</a>
+                </div>
+            </div>
+            <div class="nav-item">
+                <button type="button" class="nav-trigger" aria-expanded="false">About</button>
+                <div class="nav-dropdown">
+                    <a href="/events/">Events</a>
+                    <a href="/about/">About</a>
+                    <a href="/blog/">Blog</a>
+                    <a href="/map/">Travel Map</a>
+                    <a href="/contact/">Contact</a>
+                </div>
+            </div>
+            <a href="/search/" class="nav-search-link">Search</a>
+            <a href="https://ko-fi.com/victorysparkle" target="_blank" rel="noopener noreferrer" class="nav-shop-link">Shop</a>
+        </nav>
+    </div>
+</header>
+
+<main data-pagefind-body>
+<div class="bitcheck-app" id="bitcheck-app">
+
+  <!-- INTRO -->
+  <div class="content-section">
+    <h1 class="gb-h1">Grinder Bit Checker</h1>
+    <p>A grinder bit can't shape an inside curve tighter than the bit itself. Upload your pattern, tell the checker how big the finished piece will be and which bits you own, and it drops a colored dot on every inside curve that's too tight, sized to the bit that comes closest.</p>
+    <p>Everything happens right here in your browser — your pattern is never uploaded anywhere.</p>
+  </div>
+
+  <!-- UPLOAD -->
+  <section class="content-section">
+    <div id="gb-dropzone" class="gb-dropzone">
+      <p>Drag a pattern here, or</p>
+      <button type="button" id="gb-choose-btn" class="gb-btn-primary">Choose a file</button>
+      <input type="file" id="gb-file-input" accept="image/png,image/jpeg,image/svg+xml,.svg" class="gb-visually-hidden">
+      <p class="gb-hint">PNG, JPEG or SVG. Works best with a clean digital pattern: fairly thick black lines on a light background, with the pattern's outer border drawn in.</p>
+    </div>
+    <p id="gb-upload-error" class="gb-error" hidden></p>
+  </section>
+
+  <div id="gb-workspace" class="gb-workspace" hidden>
+
+    <!-- SETTINGS -->
+    <div class="gb-settings-column">
+
+      <section class="gb-panel">
+        <h2 class="gb-h2">1. Finished size</h2>
+        <p class="gb-hint gb-hint-top">The whole image, edge to edge, including any blank margin.</p>
+        <div class="gb-size-grid">
+          <label for="gb-width">Width</label>
+          <input type="number" id="gb-width" min="0.1" step="any" inputmode="decimal">
+          <label for="gb-height">Height</label>
+          <input type="number" id="gb-height" min="0.1" step="any" inputmode="decimal">
+          <label for="gb-unit" class="gb-visually-hidden">Unit</label>
+          <select id="gb-unit"><option value="in" selected>inches</option><option value="cm">cm</option></select>
+        </div>
+        <label class="gb-check"><input type="checkbox" id="gb-lock" checked> Lock aspect ratio</label>
+        <p class="gb-hint" id="gb-stretch-note" hidden>Aspect ratio is unlocked: the pattern will be stretched to fit these dimensions, and curves are measured after stretching.</p>
+      </section>
+
+      <section class="gb-panel">
+        <h2 class="gb-h2">2. Your grinder bits</h2>
+        <p class="gb-hint gb-hint-top">Pick every bit you have. Select at least one.</p>
+        <div class="gb-bits" id="gb-bits" role="group" aria-label="Grinder bits"></div>
+        <button type="button" id="gb-run" class="gb-btn-primary gb-run" disabled>Check my pattern</button>
+        <p class="gb-status" id="gb-status" role="status" aria-live="polite"></p>
+      </section>
+
+      <section class="gb-panel" id="gb-download-panel" hidden>
+        <h2 class="gb-h2">3. Download</h2>
+        <div class="gb-formats" role="radiogroup" aria-label="Download format">
+          <label class="gb-check"><input type="radio" name="gb-format" value="psd" checked> Layered PSD <span class="gb-value">(one file, two layers)</span></label>
+          <label class="gb-check"><input type="radio" name="gb-format" value="png"> Two PNGs <span class="gb-value">(pattern + dots)</span></label>
+        </div>
+        <button type="button" id="gb-download" class="gb-btn-primary">Download</button>
+        <p class="gb-status" id="gb-export-status" role="status" aria-live="polite"></p>
+        <div id="gb-export-links" class="gb-export-links"></div>
+        <p class="gb-hint">Exports are 300 DPI at your entered size. If your device can't hold an image that big, we'll use the highest DPI that works and tell you. Spot numbers appear on screen only.</p>
+      </section>
+    </div>
+
+    <!-- RESULT -->
+    <div class="gb-result-column">
+      <section class="gb-panel gb-preview-panel" aria-label="Preview">
+        <div class="gb-toolbar">
+          <label class="gb-check"><input type="checkbox" id="gb-show-dots" checked disabled> Show dots</label>
+          <div class="gb-zoom">
+            <button type="button" id="gb-zoom-out" class="gb-btn-secondary gb-btn-small" aria-label="Zoom out">−</button>
+            <button type="button" id="gb-zoom-fit" class="gb-btn-secondary gb-btn-small">Fit</button>
+            <button type="button" id="gb-zoom-in" class="gb-btn-secondary gb-btn-small" aria-label="Zoom in">+</button>
+          </div>
+        </div>
+        <div class="gb-viewport" id="gb-viewport" aria-label="Pattern preview. Pinch or use the zoom buttons to zoom, drag to pan.">
+          <div class="gb-stage" id="gb-stage">
+            <canvas id="gb-canvas" width="600" height="450"></canvas>
+            <svg id="gb-overlay" class="gb-overlay" aria-hidden="true"></svg>
+          </div>
+        </div>
+        <ul class="gb-legend" id="gb-legend" aria-label="Legend"></ul>
+      </section>
+
+      <section class="gb-panel" id="gb-spots-panel" hidden>
+        <h2 class="gb-h2" id="gb-spots-title">Flagged spots</h2>
+        <p class="gb-hint gb-hint-top" id="gb-spots-note"></p>
+        <ol class="gb-spots" id="gb-spots"></ol>
+      </section>
+    </div>
+  </div>
+
+</div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/ag-psd@31.0.2/dist/bundle.js" onerror="window.__libLoadFailed='ag-psd'"></script>
+<script src="/apps/grinder-bit-checker/bitcheck.js" defer></script>
+<script src="/js/nav.js" defer></script>
+
+<!-- Ko-fi floating support widget -->
+<style>
+  @media (max-width: 768px) {
+    .floatingchat-container-wrap,
+    .floatingchat-container-wrap-mobi { display: none !important; }
+  }
+</style>
+<script src="https://storage.ko-fi.com/cdn/scripts/overlay-widget.js"></script>
+<script>
+  kofiWidgetOverlay.draw('victorysparkle', {
+    'type': 'floating-chat',
+    'floating-chat.donateButton.text': 'Tip Me',
+    'floating-chat.donateButton.background-color': '#6fc9b4',
+    'floating-chat.donateButton.text-color': '#2f2440'
+  });
+</script>
+</body>
+</html>
