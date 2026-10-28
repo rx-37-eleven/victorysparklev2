@@ -1,0 +1,230 @@
+/* =====================================================================
+   RHINESTONE FILL CREATOR — app-only styles
+   ---------------------------------------------------------------------
+   Same rules as the other apps: everything is scoped under .rhinestone-app
+   because /css/style.css loads after this file, and colors, radii and
+   shadows are aliases onto /css/tokens.css.
+   ===================================================================== */
+
+.rhinestone-app {
+  --rf-ink: var(--color-primary);
+  --rf-ink-dark: var(--color-primary-dark);
+  --rf-body: var(--color-ink);
+  --rf-muted: var(--color-text-muted);
+  --rf-surface: var(--color-surface);
+  --rf-shadow: var(--shadow-sticker) var(--color-shadow);
+  --rf-shadow-lift: var(--shadow-sticker) var(--color-accent-pink);
+  --rf-hairline: var(--color-shadow);
+  --rf-radius: var(--radius-lg);
+  --rf-radius-btn: var(--radius-sm);
+  --rf-radius-pill: var(--radius-pill);
+}
+
+.rhinestone-app [hidden] { display: none !important; }
+
+.rhinestone-app .rf-h1 {
+  font-family: "DynaPuff", "Comic Neue", sans-serif;
+  color: var(--rf-ink);
+  margin-bottom: 20px;
+  font-size: 38px;
+}
+
+.rhinestone-app .rf-h2 {
+  font-family: "Comic Neue", sans-serif;
+  font-weight: 700;
+  color: var(--rf-ink);
+  font-size: 20px;
+  margin-bottom: 12px;
+}
+
+.rhinestone-app .rf-hint {
+  font-family: "Comic Neue", sans-serif;
+  color: var(--rf-muted);
+  font-size: 14px;
+  margin-top: 10px;
+  line-height: 1.5;
+}
+.rhinestone-app .rf-hint-top { margin-top: 0; margin-bottom: 14px; }
+
+.rhinestone-app .rf-error {
+  font-family: "Comic Neue", sans-serif;
+  color: var(--rf-ink-dark);
+  background: rgba(255, 255, 255, 0.6);
+  border: 1.5px solid var(--rf-hairline);
+  border-radius: var(--rf-radius-btn);
+  padding: 10px 14px;
+  margin-top: 12px;
+}
+
+.rhinestone-app .rf-status {
+  font-family: "Comic Neue", sans-serif;
+  color: var(--rf-body);
+  font-size: 15px;
+  margin-top: 12px;
+  line-height: 1.5;
+}
+.rhinestone-app .rf-status:empty { display: none; }
+
+.rhinestone-app .rf-panel {
+  background: var(--rf-surface);
+  border: var(--border-width) solid var(--color-ink);
+  border-radius: var(--rf-radius);
+  box-shadow: var(--rf-shadow);
+  padding: 24px;
+  margin-bottom: 20px;
+}
+
+.rhinestone-app .rf-visually-hidden {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+}
+
+/* --- Layout --- */
+.rhinestone-app .rf-workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 340px) minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+.rhinestone-app .rf-canvas-column { min-width: 0; position: sticky; top: 12px; }
+
+/* --- Form --- */
+.rhinestone-app .rf-field-grid {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 14px;
+  font-family: "Comic Neue", sans-serif;
+}
+.rhinestone-app .rf-field-grid label { font-weight: 700; color: var(--rf-body); font-size: 15px; }
+.rhinestone-app .rf-unit { color: var(--rf-muted); font-size: 15px; }
+.rhinestone-app .rf-optional { font-weight: 400; color: var(--rf-muted); font-size: 15px; }
+
+.rhinestone-app input[type="number"],
+.rhinestone-app select {
+  font-family: "Comic Neue", sans-serif;
+  font-size: 16px; /* 16px stops iOS zooming the page on focus */
+  color: var(--rf-ink-dark);
+  border: 1.5px solid var(--rf-hairline);
+  border-radius: var(--rf-radius-btn);
+  padding: 8px 10px;
+  background: #fff;
+  min-width: 0;
+}
+
+.rhinestone-app .rf-check {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: "Comic Neue", sans-serif;
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--rf-body);
+  min-height: 36px;
+  cursor: pointer;
+}
+.rhinestone-app .rf-check input { width: 20px; height: 20px; accent-color: var(--rf-ink); flex: 0 0 auto; }
+.rhinestone-app .rf-value { font-weight: 400; color: var(--rf-muted); }
+
+.rhinestone-app .rf-radios { display: flex; flex-direction: column; gap: 2px; margin-bottom: 12px; }
+.rhinestone-app .rf-range-label {
+  display: flex; justify-content: space-between; gap: 8px;
+  font-family: "Comic Neue", sans-serif; font-weight: 700; font-size: 15px;
+  color: var(--rf-body); margin: 12px 0 6px;
+}
+.rhinestone-app input[type="range"] { width: 100%; accent-color: var(--rf-ink); }
+.rhinestone-app .rf-btn-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.rhinestone-app .rf-panel .rf-btn-secondary:not(.rf-btn-small) { width: 100%; }
+.rhinestone-app #rf-active-size { width: 100%; }
+
+.rhinestone-app .rf-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+.rhinestone-app .rf-chip {
+  font-family: "Comic Neue", sans-serif; font-weight: 700; font-size: 14px; line-height: 1.15;
+  color: var(--rf-body); background: #fff; text-align: center;
+  border: 1.5px solid var(--rf-hairline); border-radius: var(--rf-radius-btn);
+  padding: 6px 8px; min-width: 56px; min-height: 44px; cursor: pointer;
+}
+.rhinestone-app .rf-chip small { display: block; font-weight: 400; color: var(--rf-muted); font-size: 12px; }
+.rhinestone-app .rf-chip[aria-pressed="true"] { background: var(--rf-ink); border-color: var(--color-ink); color: #fff; }
+.rhinestone-app .rf-chip[aria-pressed="true"] small { color: rgba(255, 255, 255, 0.85); }
+
+.rhinestone-app .rf-swatches { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+.rhinestone-app .rf-swatch {
+  width: 40px; height: 40px; border-radius: 50%; cursor: pointer; padding: 0;
+  border: 1.5px solid var(--color-ink); position: relative;
+}
+.rhinestone-app .rf-swatch[aria-pressed="true"] { box-shadow: 0 0 0 3px #fff, 0 0 0 6px var(--rf-ink); }
+.rhinestone-app .rf-swatch[data-active="true"]::after {
+  content: ""; position: absolute; left: 50%; top: 50%; width: 10px; height: 10px; margin: -5px 0 0 -5px;
+  border-radius: 50%; background: #fff; border: 2px solid var(--color-ink);
+}
+.rhinestone-app .rf-custom-color { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; font-family: "Comic Neue", sans-serif; font-weight: 700; color: var(--rf-body); }
+.rhinestone-app .rf-custom-color input[type="color"] { width: 44px; height: 40px; padding: 2px; border: 1.5px solid var(--rf-hairline); border-radius: var(--rf-radius-btn); background: #fff; }
+
+.rhinestone-app .rf-export-links { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+.rhinestone-app .rf-export-links a { font-family: "Comic Neue", sans-serif; font-weight: 700; color: var(--rf-ink); }
+
+/* --- Buttons --- */
+.rhinestone-app .rf-btn-primary {
+  font-family: "Comic Neue", sans-serif; font-weight: 700; font-size: 16px;
+  color: #fff; background: var(--rf-ink);
+  border: 2px solid var(--color-ink); border-radius: var(--rf-radius-btn);
+  padding: 10px 16px; min-height: 44px; cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+.rhinestone-app .rf-btn-primary:hover:not(:disabled) {
+  background: var(--rf-ink-dark); transform: translateY(-5px); box-shadow: var(--rf-shadow-lift);
+}
+.rhinestone-app .rf-btn-secondary {
+  font-family: "Comic Neue", sans-serif; font-weight: 700; font-size: 16px;
+  color: var(--rf-ink); background: transparent;
+  border: 1.5px solid var(--rf-ink); border-radius: var(--rf-radius-btn);
+  padding: 8px 14px; min-height: 40px; cursor: pointer;
+}
+.rhinestone-app .rf-btn-secondary:hover:not(:disabled) { background: rgba(138, 108, 189, 0.15); }
+.rhinestone-app .rf-btn-small { min-width: 44px; padding: 6px 10px; }
+.rhinestone-app button:disabled { opacity: 0.5; cursor: not-allowed; }
+.rhinestone-app .rf-run { width: 100%; }
+
+/* --- Canvas --- */
+.rhinestone-app .rf-toolbar {
+  display: flex; justify-content: space-between; align-items: center;
+  gap: 10px 16px; flex-wrap: wrap; margin-bottom: 12px;
+}
+.rhinestone-app .rf-tools { display: flex; gap: 8px; flex-wrap: wrap; }
+.rhinestone-app .rf-tool[aria-pressed="true"] { background: var(--rf-ink); color: #fff; border-color: var(--color-ink); }
+.rhinestone-app .rf-viewport {
+  overflow: auto;
+  height: min(72vh, 720px);
+  min-height: 280px;
+  border-radius: var(--rf-radius-btn);
+  border: 1.5px solid var(--rf-hairline);
+  background: #e9e6ee;
+}
+.rhinestone-app .rf-stage { position: relative; margin: 12px; width: max-content; }
+.rhinestone-app .rf-stage canvas { display: block; background: #fff; box-shadow: 0 2px 10px rgba(47, 36, 64, 0.25); }
+.rhinestone-app .rf-stage canvas.rf-ghost { position: absolute; left: 0; top: 0; background: transparent; box-shadow: none; touch-action: pan-x pan-y pinch-zoom; }
+.rhinestone-app .rf-stage[data-tool="image"] .rf-ghost { touch-action: none; }
+.rhinestone-app .rf-stage[data-tool="place"] .rf-ghost { cursor: crosshair; }
+.rhinestone-app .rf-stage[data-tool="delete"] .rf-ghost { cursor: not-allowed; }
+.rhinestone-app .rf-stage[data-tool="image"] .rf-ghost { cursor: grab; }
+
+/* --- Focus / motion --- */
+.rhinestone-app button:focus-visible,
+.rhinestone-app input:focus-visible,
+.rhinestone-app select:focus-visible { outline: 3px solid var(--rf-ink); outline-offset: 2px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .rhinestone-app * { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+}
+
+@media (max-width: 900px) {
+  .rhinestone-app .rf-workspace { grid-template-columns: 1fr; }
+  .rhinestone-app .rf-canvas-column { position: static; order: -1; }
+  .rhinestone-app .rf-viewport { height: min(62vh, 560px); }
+}
+@media (max-width: 768px) {
+  .rhinestone-app .rf-h1 { font-size: 30px; }
+  .rhinestone-app .rf-panel { padding: 18px; }
+}
