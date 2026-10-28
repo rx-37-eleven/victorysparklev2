@@ -22,6 +22,7 @@
     kit: { 10: true },
     activeSS: 10, // size for hand-placed stones
     fillSS: 10, // size for the generated fill
+    offsetRows: false, // grid: shift every other row by half a step
     altSS: 0, // second fill size for checkerboard alternation (0 = none)
     colors: [PALETTE[0].hex], // selected, in selection order
     activeColor: PALETTE[0].hex,
@@ -143,7 +144,7 @@
     var a = core.ssMm(state.fillSS);
     if (!state.altSS) return a;
     var b = core.ssMm(state.altSS);
-    return state.fillMode === "grid" ? (a + b) / 2 : Math.max(a, b);
+    return state.fillMode === "grid" && !state.offsetRows ? (a + b) / 2 : Math.max(a, b);
   }
   function onFillSizeChanged() {
     buildSizeUI();
@@ -170,7 +171,7 @@
       return;
     }
     var pts = state.fillMode === "grid"
-      ? core.gridFill(state.area.w, state.area.h, s, r)
+      ? core.gridFill(state.area.w, state.area.h, s, r, state.offsetRows)
       : core.radialFill(state.area.w, state.area.h, s, r);
     state.fill = pts.map(function (p, i) { return { x: p.x, y: p.y, ss: state.altSS && p.parity ? state.altSS : state.fillSS, color: colorFor(i) }; });
   }
@@ -386,6 +387,7 @@
     var c = counts();
     var parts = Object.keys(c.by).map(Number).sort(function (a, b) { return a - b; }).map(function (ss) { return "SS" + ss + " × " + c.by[ss]; });
     setStatus(fillWarn || (c.total ? c.total + " stone" + (c.total === 1 ? "" : "s") + " — " + parts.join(", ") : "No stones yet. Choose a fill, or click the canvas to place stones."));
+    $("rf-offset").disabled = state.fillMode !== "grid";
     $("rf-bake").disabled = !state.fill.length;
     $("rf-undo").disabled = !state.undo.length;
     $("rf-clear").disabled = !state.manual.length;
@@ -558,6 +560,10 @@
     });
     $("rf-fill-size").addEventListener("change", function (e) {
       state.fillSS = parseInt(e.target.value, 10);
+      onFillSizeChanged();
+    });
+    $("rf-offset").addEventListener("change", function (e) {
+      state.offsetRows = e.target.checked;
       onFillSizeChanged();
     });
     $("rf-alt-size").addEventListener("change", function (e) {

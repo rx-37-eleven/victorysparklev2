@@ -23,19 +23,32 @@
   }
   function mmToIn(mm) { return mm / MM_PER_IN; }
 
-  /* Centres of a square grid of stones, centred in the area. Each point carries
+  /* Centres of a grid of stones, centred in the area. Each point carries
      a checkerboard `parity` (0/1) for alternating sizes. Each stone
-     (radius r) lies fully inside the area; spacing is centre to centre. */
-  function gridFill(width, height, spacing, radius) {
+     (radius r) lies fully inside the area; spacing is centre to centre.
+     With `offset`, every other row shifts half a step sideways and rows pull
+     closer (spacing * sqrt(3)/2), so each stone's six neighbours sit exactly
+     `spacing` away (honeycomb) instead of stacking in vertical columns. */
+  function gridFill(width, height, spacing, radius, offset) {
     var out = [];
     var usableW = width - 2 * radius, usableH = height - 2 * radius;
     if (usableW < 0 || usableH < 0 || spacing <= 0) return out;
+    var pitch = offset ? spacing * Math.sqrt(3) / 2 : spacing;
     var cols = Math.floor(usableW / spacing + 1e-9) + 1;
-    var rows = Math.floor(usableH / spacing + 1e-9) + 1;
-    var x0 = radius + (usableW - (cols - 1) * spacing) / 2;
-    var y0 = radius + (usableH - (rows - 1) * spacing) / 2;
-    for (var j = 0; j < rows; j++)
-      for (var i = 0; i < cols; i++) out.push({ x: x0 + i * spacing, y: y0 + j * spacing, parity: (i + j) & 1 });
+    var rows = Math.floor(usableH / pitch + 1e-9) + 1;
+    var extent = (cols - 1) * spacing;
+    // The shifted rows need half a step of extra width; if it isn't there they
+    // simply hold one stone fewer.
+    var shiftFits = offset && usableW - extent >= spacing / 2 - 1e-9;
+    var span = extent + (shiftFits ? spacing / 2 : 0);
+    var x0 = radius + (usableW - span) / 2;
+    var y0 = radius + (usableH - (rows - 1) * pitch) / 2;
+    for (var j = 0; j < rows; j++) {
+      var shifted = offset && j % 2 === 1;
+      var n = shifted && !shiftFits ? cols - 1 : cols;
+      var xs = x0 + (shifted ? spacing / 2 : 0);
+      for (var i = 0; i < n; i++) out.push({ x: xs + i * spacing, y: y0 + j * pitch, parity: (i + j) & 1 });
+    }
     return out;
   }
 
