@@ -39,7 +39,7 @@ test("radial fill keeps spacing, stays inside, starts at the centre", () => {
   assert.ok(pts.length > 100);
   assert.ok(insideArea(pts, w, h, r));
   assert.ok(minDistance(pts) >= s - 1e-9, `min ${minDistance(pts)} < ${s}`);
-  assert.deepStrictEqual(pts[0], { x: 2, y: 1.5 });
+  assert.deepStrictEqual([pts[0].x, pts[0].y], [2, 1.5]);
 });
 
 test("fills return nothing when the stone cannot fit", () => {
@@ -71,4 +71,13 @@ test("zip is readable by unzip", (t) => {
   catch (e) { if (e.code === "ENOENT") return t.skip("unzip not installed"); throw e; }
   assert.strictEqual(out, "<svg>22</svg>\n");
   execFileSync("unzip", ["-tq", file]);
+});
+
+test("grid parity alternates along rows and flips on every row", () => {
+  const pts = core.gridFill(2, 2, 0.25, 0.05);
+  const byRow = {};
+  pts.forEach((p) => { (byRow[p.y.toFixed(6)] = byRow[p.y.toFixed(6)] || []).push(p); });
+  const rows = Object.keys(byRow).sort((a, b) => a - b).map((k) => byRow[k].sort((a, b) => a.x - b.x));
+  rows.forEach((row, j) => row.forEach((p, i) => assert.strictEqual(p.parity, (i + j) & 1)));
+  assert.notStrictEqual(rows[0][0].parity, rows[1][0].parity);
 });

@@ -159,9 +159,12 @@
         </div>
         <label class="rf-range-label" for="rf-fill-size">Fill stone size</label>
         <select id="rf-fill-size"></select>
+        <label class="rf-range-label" for="rf-alt-size">Alternate with</label>
+        <select id="rf-alt-size"></select>
+        <p class="rf-hint">Pick a second size to alternate stone by stone, switching on every row like a checkerboard.</p>
         <label class="rf-range-label" for="rf-spacing">Spacing, center to center <span class="rf-value" id="rf-spacing-val"></span></label>
         <input type="range" id="rf-spacing" min="1" max="30" step="0.05" value="3.2">
-        <p class="rf-hint">Fills the whole working area with the fill size and the active color (or all selected colors if rotating). It ignores the backing image.</p>
+        <p class="rf-hint">Fills the whole working area with the fill size(s) and the active color (or all selected colors if rotating). It ignores the backing image.</p>
         <button type="button" id="rf-bake" class="rf-btn-secondary" disabled>Convert fill to editable stones</button>
       </section>
 

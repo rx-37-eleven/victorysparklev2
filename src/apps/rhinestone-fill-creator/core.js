@@ -23,7 +23,8 @@
   }
   function mmToIn(mm) { return mm / MM_PER_IN; }
 
-  /* Centres of a square grid of stones, centred in the area. Each stone
+  /* Centres of a square grid of stones, centred in the area. Each point carries
+     a checkerboard `parity` (0/1) for alternating sizes. Each stone
      (radius r) lies fully inside the area; spacing is centre to centre. */
   function gridFill(width, height, spacing, radius) {
     var out = [];
@@ -34,7 +35,7 @@
     var x0 = radius + (usableW - (cols - 1) * spacing) / 2;
     var y0 = radius + (usableH - (rows - 1) * spacing) / 2;
     for (var j = 0; j < rows; j++)
-      for (var i = 0; i < cols; i++) out.push({ x: x0 + i * spacing, y: y0 + j * spacing });
+      for (var i = 0; i < cols; i++) out.push({ x: x0 + i * spacing, y: y0 + j * spacing, parity: (i + j) & 1 });
     return out;
   }
 
@@ -50,7 +51,7 @@
       return x >= radius - 1e-9 && x <= width - radius + 1e-9 &&
              y >= radius - 1e-9 && y <= height - radius + 1e-9;
     }
-    out.push({ x: cx, y: cy });
+    out.push({ x: cx, y: cy, parity: 0 });
     for (var k = 1; k * spacing <= maxR + spacing; k++) {
       var R = k * spacing;
       var n = Math.floor(Math.PI / Math.asin(Math.min(1, spacing / (2 * R))) + 1e-9);
@@ -58,7 +59,7 @@
       for (var i = 0; i < n; i++) {
         var a = offset + (i / n) * 2 * Math.PI;
         var x = cx + R * Math.cos(a), y = cy + R * Math.sin(a);
-        if (inside(x, y)) out.push({ x: x, y: y });
+        if (inside(x, y)) out.push({ x: x, y: y, parity: (i + k) & 1 });
       }
     }
     return out;

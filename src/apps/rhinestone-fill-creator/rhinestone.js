@@ -22,6 +22,7 @@
     kit: { 10: true },
     activeSS: 10, // size for hand-placed stones
     fillSS: 10, // size for the generated fill
+    altSS: 0, // second fill size for checkerboard alternation (0 = none)
     colors: [PALETTE[0].hex], // selected, in selection order
     activeColor: PALETTE[0].hex,
     cycle: false,
@@ -104,7 +105,6 @@
           state.activeSS = s.ss;
         }
         if (!state.kit[state.activeSS]) state.activeSS = kitSizes()[0];
-        buildSizeUI();
         onFillSizeChanged();
         drawGhost(null);
       });
@@ -113,10 +113,20 @@
     if (!state.kit[state.fillSS]) state.fillSS = kitSizes()[0];
     fillSizeOptions($("rf-active-size"), state.activeSS);
     fillSizeOptions($("rf-fill-size"), state.fillSS);
+    if (!state.kit[state.altSS] || state.altSS === state.fillSS) state.altSS = 0;
+    fillSizeOptions($("rf-alt-size"), state.altSS, state.fillSS);
   }
-  function fillSizeOptions(sel, current) {
+  function fillSizeOptions(sel, current, skip) {
     sel.innerHTML = "";
+    if (skip) {
+      var none = document.createElement("option");
+      none.value = 0;
+      none.textContent = "None (single size)";
+      none.selected = !current;
+      sel.appendChild(none);
+    }
     kitSizes().forEach(function (ss) {
+      if (ss === skip) return;
       var o = document.createElement("option");
       o.value = ss;
       o.textContent = "SS" + ss + " (" + core.ssMm(ss) + " mm)";
@@ -127,8 +137,17 @@
   function kitSizes() {
     return Object.keys(state.kit).map(Number).sort(function (a, b) { return a - b; });
   }
+  // Smallest spacing at which stones can't overlap. A checkerboard grid only
+  // ever puts unlike sizes side by side, so it can sit tighter than rings can.
+  function minSpacingMM() {
+    var a = core.ssMm(state.fillSS);
+    if (!state.altSS) return a;
+    var b = core.ssMm(state.altSS);
+    return state.fillMode === "grid" ? (a + b) / 2 : Math.max(a, b);
+  }
   function onFillSizeChanged() {
-    var d = core.ssMm(state.fillSS);
+    buildSizeUI();
+    var d = minSpacingMM();
     $("rf-spacing").min = d;
     if (state.spacingMM < d) state.spacingMM = d;
     $("rf-spacing").value = state.spacingMM;
@@ -145,7 +164,7 @@
     fillWarn = "";
     state.fill = [];
     if (state.fillMode === "none") return;
-    var s = core.mmToIn(state.spacingMM), r = radiusIn(state.fillSS);
+    var s = core.mmToIn(state.spacingMM), r = Math.max(radiusIn(state.fillSS), state.altSS ? radiusIn(state.altSS) : 0);
     if (core.estimateFillCount(state.area.w, state.area.h, s) > 120000) {
       fillWarn = "That would be too many stones to draw. Increase the spacing or shrink the area.";
       return;
@@ -153,7 +172,7 @@
     var pts = state.fillMode === "grid"
       ? core.gridFill(state.area.w, state.area.h, s, r)
       : core.radialFill(state.area.w, state.area.h, s, r);
-    state.fill = pts.map(function (p, i) { return { x: p.x, y: p.y, ss: state.fillSS, color: colorFor(i) }; });
+    state.fill = pts.map(function (p, i) { return { x: p.x, y: p.y, ss: state.altSS && p.parity ? state.altSS : state.fillSS, color: colorFor(i) }; });
   }
   var raf = 0;
   function refill() {
@@ -498,7 +517,7 @@
   function init() {
     buildSizeUI();
     buildColorUI();
-    $("rf-spacing").min = core.ssMm(state.fillSS);
+    $("rf-spacing").min = minSpacingMM();
     state.spacingMM = Math.ceil(core.ssMm(state.fillSS) * 1.15 * 20) / 20;
     $("rf-spacing").value = state.spacingMM;
     updateSpacingLabel();
@@ -541,6 +560,10 @@
       state.fillSS = parseInt(e.target.value, 10);
       onFillSizeChanged();
     });
+    $("rf-alt-size").addEventListener("change", function (e) {
+      state.altSS = parseInt(e.target.value, 10);
+      onFillSizeChanged();
+    });
     $("rf-add-color").addEventListener("click", function () {
       var hex = $("rf-custom-color").value.toLowerCase();
       if (state.colors.indexOf(hex) < 0) state.colors.push(hex);
@@ -551,7 +574,7 @@
     $("rf-cycle").addEventListener("change", function (e) { state.cycle = e.target.checked; refill(); });
 
     document.querySelectorAll('input[name="rf-fill"]').forEach(function (r) {
-      r.addEventListener("change", function () { state.fillMode = r.value; refill(); });
+      r.addEventListener("change", function () { state.fillMode = r.value; onFillSizeChanged(); });
     });
     $("rf-spacing").addEventListener("input", function (e) {
       state.spacingMM = parseFloat(e.target.value);
