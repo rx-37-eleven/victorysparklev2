@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rhinestone Fill Creator — Plan Stone Layouts and Export True-Size SVG</title>
+<meta name="description" content="Fill a working area with rhinestones in a grid or radial pattern, place stones by hand, and export true-size SVG files by stone size. Free, runs entirely in your browser.">
+<link rel="canonical" href="https://victorysparkle.com/apps/rhinestone-fill-creator/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Victory Sparkle Co.">
+<meta property="og:title" content="Rhinestone Fill Creator · Victory Sparkle Co.">
+<meta property="og:description" content="Plan rhinestone layouts and export true-size SVG files. Free, runs entirely in your browser.">
+<meta property="og:url" content="https://victorysparkle.com/apps/rhinestone-fill-creator/">
+<meta property="og:image" content="https://victorysparkle.com/images/og-default.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&family=DynaPuff:wght@400..700&family=Miniver&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="/css/tokens.css">
+<link rel="stylesheet" href="/apps/rhinestone-fill-creator/rhinestone.css">
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<header data-pagefind-ignore>
+    <div class="header-content">
+        <a href="/" class="logo-section" aria-label="Victory Sparkle Co. home">
+            <div class="profile-image"><img src="/images/Vlogo.png" alt=""></div>
+            <div class="site-title">Victory Sparkle Co.</div>
+        </a>
+        <button type="button" class="nav-toggle" id="nav-toggle"
+                aria-expanded="false" aria-controls="main-nav" aria-label="Menu">
+            <span class="nav-toggle-bar"></span>
+            <span class="nav-toggle-bar"></span>
+            <span class="nav-toggle-bar"></span>
+        </button>
+        <nav class="main-nav" id="main-nav">
+            <div class="nav-item">
+                <button type="button" class="nav-trigger" aria-expanded="false">Make</button>
+                <div class="nav-dropdown">
+                    <a href="/apps/pinpress/">Pinpress</a>
+                    <a href="/apps/tilemaker/">Seamless Tile Maker</a>
+                    <a href="/apps/stained-glass-vectorizer/">Stained Glass Vectorizer</a>
+                    <a href="/apps/weedline/">Weedline</a>
+                    <a href="/apps/watermarker/">Watermarker</a>
+                    <a href="/apps/grinder-bit-checker/">Grinder Bit Checker</a>
+                    <a href="/apps/rhinestone-fill-creator/">Rhinestone Fill Creator</a>
+                    <a href="/resources/">Resources</a>
+                    <a href="https://www.pinterest.com/victorysparkle/website-board/" target="_blank" rel="noopener noreferrer">Pinterest</a>
+                </div>
+            </div>
+            <div class="nav-item">
+                <button type="button" class="nav-trigger" aria-expanded="false">Code</button>
+                <div class="nav-dropdown">
+                    <a href="/code/">Telegram Bots</a>
+                </div>
+            </div>
+            <div class="nav-item">
+                <button type="button" class="nav-trigger" aria-expanded="false">About</button>
+                <div class="nav-dropdown">
+                    <a href="/events/">Events</a>
+                    <a href="/about/">About</a>
+                    <a href="/blog/">Blog</a>
+                    <a href="/map/">Travel Map</a>
+                    <a href="/contact/">Contact</a>
+                </div>
+            </div>
+            <a href="/search/" class="nav-search-link">Search</a>
+            <a href="https://ko-fi.com/victorysparkle" target="_blank" rel="noopener noreferrer" class="nav-shop-link">Shop</a>
+        </nav>
+    </div>
+</header>
+
+<main data-pagefind-body>
+<div class="rhinestone-app" id="rf-app">
+
+  <div class="content-section">
+    <h1 class="rf-h1">Rhinestone Fill Creator</h1>
+    <p>Set the size of your piece, drop a photo underneath as a guide, pick your stone sizes and colors, then fill the area with a grid or radial pattern and add or remove stones by hand. Export true-size SVG files with a circle for every stone.</p>
+    <p>Everything happens right here in your browser — your image never leaves your device.</p>
+  </div>
+
+  <div class="rf-workspace">
+    <div class="rf-settings-column">
+
+      <section class="rf-panel">
+        <h2 class="rf-h2">1. Working area</h2>
+        <div class="rf-field-grid">
+          <label for="rf-area-w">Width</label>
+          <input type="number" id="rf-area-w" min="0.25" max="40" step="any" value="8" inputmode="decimal">
+          <span class="rf-unit">in</span>
+          <label for="rf-area-h">Height</label>
+          <input type="number" id="rf-area-h" min="0.25" max="40" step="any" value="10" inputmode="decimal">
+          <span class="rf-unit">in</span>
+        </div>
+      </section>
+
+      <section class="rf-panel">
+        <h2 class="rf-h2">2. Backing image <span class="rf-optional">(optional)</span></h2>
+        <p class="rf-hint rf-hint-top">A guide to work on top of. It is never part of the fill or the export.</p>
+        <button type="button" id="rf-choose-image" class="rf-btn-secondary">Choose an image</button>
+        <input type="file" id="rf-image-input" accept="image/png,image/jpeg,image/webp,image/gif,image/svg+xml" class="rf-visually-hidden">
+        <p id="rf-image-error" class="rf-error" hidden></p>
+        <div id="rf-image-controls" hidden>
+          <div class="rf-field-grid">
+            <label for="rf-img-w">Width</label>
+            <input type="number" id="rf-img-w" min="0.1" step="any" inputmode="decimal">
+            <span class="rf-unit">in</span>
+            <label for="rf-img-x">Left</label>
+            <input type="number" id="rf-img-x" step="any" inputmode="decimal">
+            <span class="rf-unit">in</span>
+            <label for="rf-img-y">Top</label>
+            <input type="number" id="rf-img-y" step="any" inputmode="decimal">
+            <span class="rf-unit">in</span>
+          </div>
+          <label class="rf-range-label" for="rf-img-opacity">Image opacity <span class="rf-value" id="rf-img-opacity-val">60%</span></label>
+          <input type="range" id="rf-img-opacity" min="5" max="100" step="1" value="60">
+          <div class="rf-btn-row">
+            <button type="button" id="rf-img-fit" class="rf-btn-secondary rf-btn-small">Fit inside</button>
+            <button type="button" id="rf-img-cover" class="rf-btn-secondary rf-btn-small">Cover area</button>
+            <button type="button" id="rf-img-remove" class="rf-btn-secondary rf-btn-small">Remove</button>
+          </div>
+          <p class="rf-hint">Tip: pick the “Move image” tool above the canvas and drag to reposition.</p>
+        </div>
+      </section>
+
+      <section class="rf-panel">
+        <h2 class="rf-h2">3. Stone sizes</h2>
+        <p class="rf-hint rf-hint-top">Tap every ss size you're working with. Sizes are nominal diameters; brands vary slightly.</p>
+        <div class="rf-chips" id="rf-sizes" role="group" aria-label="Stone sizes in your kit"></div>
+        <label class="rf-range-label" for="rf-active-size">Place by hand with</label>
+        <select id="rf-active-size"></select>
+      </section>
+
+      <section class="rf-panel">
+        <h2 class="rf-h2">4. Stone colors</h2>
+        <p class="rf-hint rf-hint-top">Select as many as you like. The most recently tapped is the active color.</p>
+        <div class="rf-swatches" id="rf-colors" role="group" aria-label="Stone colors"></div>
+        <div class="rf-custom-color">
+          <label for="rf-custom-color">Custom</label>
+          <input type="color" id="rf-custom-color" value="#d94f8a">
+          <button type="button" id="rf-add-color" class="rf-btn-secondary rf-btn-small">Add color</button>
+        </div>
+        <label class="rf-check"><input type="checkbox" id="rf-cycle"> Rotate through selected colors</label>
+      </section>
+
+      <section class="rf-panel">
+        <h2 class="rf-h2">5. Fill</h2>
+        <div class="rf-radios" role="radiogroup" aria-label="Fill type">
+          <label class="rf-check"><input type="radio" name="rf-fill" value="none" checked> No fill</label>
+          <label class="rf-check"><input type="radio" name="rf-fill" value="grid"> Grid</label>
+          <label class="rf-check"><input type="radio" name="rf-fill" value="radial"> Radial</label>
+        </div>
+        <label class="rf-range-label" for="rf-fill-size">Fill stone size</label>
+        <select id="rf-fill-size"></select>
+        <label class="rf-range-label" for="rf-alt-size">Alternate with</label>
+        <select id="rf-alt-size"></select>
+        <p class="rf-hint">Pick a second size to alternate stone by stone, switching on every row like a checkerboard.</p>
+        <label class="rf-range-label" for="rf-spacing">Spacing, center to center <span class="rf-value" id="rf-spacing-val"></span></label>
+        <input type="range" id="rf-spacing" min="1" max="30" step="0.05" value="3.2">
+        <p class="rf-hint">Fills the whole working area with the fill size(s) and the active color (or all selected colors if rotating). It ignores the backing image.</p>
+        <button type="button" id="rf-bake" class="rf-btn-secondary" disabled>Convert fill to editable stones</button>
+      </section>
+
+      <section class="rf-panel">
+        <h2 class="rf-h2">6. Export SVG</h2>
+        <div class="rf-radios" role="radiogroup" aria-label="Export layout">
+          <label class="rf-check"><input type="radio" name="rf-export" value="all" checked> One file, all stones</label>
+          <label class="rf-check"><input type="radio" name="rf-export" value="split"> One file per stone size</label>
+        </div>
+        <label class="rf-check"><input type="checkbox" id="rf-export-color"> Color circles with stone colors</label>
+        <button type="button" id="rf-download" class="rf-btn-primary rf-run" disabled>Download SVG</button>
+        <p class="rf-status" id="rf-export-status" role="status" aria-live="polite"></p>
+        <div id="rf-export-links" class="rf-export-links"></div>
+        <p class="rf-hint">Files are exactly your working-area size (width and height in inches), with each circle at its true stone diameter. Per-size exports are zipped, and every file shares the same area so they line up when stacked.</p>
+      </section>
+    </div>
+
+    <div class="rf-canvas-column">
+      <section class="rf-panel rf-preview-panel" aria-label="Canvas">
+        <div class="rf-toolbar">
+          <div class="rf-tools" role="radiogroup" aria-label="Tool">
+            <button type="button" class="rf-tool rf-btn-secondary rf-btn-small" data-tool="place" aria-pressed="true">Place</button>
+            <button type="button" class="rf-tool rf-btn-secondary rf-btn-small" data-tool="delete" aria-pressed="false">Delete</button>
+            <button type="button" class="rf-tool rf-btn-secondary rf-btn-small" data-tool="image" aria-pressed="false" id="rf-tool-image" disabled>Move image</button>
+          </div>
+          <div class="rf-tools">
+            <button type="button" id="rf-undo" class="rf-btn-secondary rf-btn-small" disabled>Undo</button>
+            <button type="button" id="rf-clear" class="rf-btn-secondary rf-btn-small" disabled>Clear placed</button>
+          </div>
+          <div class="rf-tools">
+            <button type="button" id="rf-zoom-out" class="rf-btn-secondary rf-btn-small" aria-label="Zoom out">−</button>
+            <button type="button" id="rf-zoom-fit" class="rf-btn-secondary rf-btn-small">Fit</button>
+            <button type="button" id="rf-zoom-in" class="rf-btn-secondary rf-btn-small" aria-label="Zoom in">+</button>
+          </div>
+        </div>
+        <div class="rf-viewport" id="rf-viewport">
+          <div class="rf-stage" id="rf-stage">
+            <canvas id="rf-canvas"></canvas>
+            <canvas id="rf-ghost" class="rf-ghost"></canvas>
+          </div>
+        </div>
+        <p class="rf-status" id="rf-status" role="status" aria-live="polite"></p>
+      </section>
+    </div>
+  </div>
+
+</div>
+</main>
+
+<script src="/apps/rhinestone-fill-creator/core.js"></script>
+<script src="/apps/rhinestone-fill-creator/rhinestone.js" defer></script>
+<script src="/js/nav.js" defer></script>
+
+<!-- Ko-fi floating support widget -->
+<style>
+  @media (max-width: 768px) {
+    .floatingchat-container-wrap,
+    .floatingchat-container-wrap-mobi { display: none !important; }
+  }
+</style>
+<script src="https://storage.ko-fi.com/cdn/scripts/overlay-widget.js"></script>
+<script>
+  kofiWidgetOverlay.draw('victorysparkle', {
+    'type': 'floating-chat',
+    'floating-chat.donateButton.text': 'Tip Me',
+    'floating-chat.donateButton.background-color': '#6fc9b4',
+    'floating-chat.donateButton.text-color': '#2f2440'
+  });
+</script>
+</body>
+</html>
