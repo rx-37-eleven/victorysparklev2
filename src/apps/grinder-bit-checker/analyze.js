@@ -475,7 +475,21 @@
         for (k = 0; k < n; k++) if (!inside[k]) { allInside = false; startK = k + 1; break; }
         if (allInside) startK = 0;
       }
-      var runBest = -1, runLen = 0;
+      var runBest = -1, runLen = 0, runFirst = -1, runLast = -1;
+      // Net bend of the run, in degrees: signed tangent change from one window
+      // before the run to one window after it (signed so pixel noise cancels).
+      function runAngle() {
+        var a = runFirst - h, b = runLast + h, sum = 0;
+        if (P.closed) { if (runLen + 2 * h >= n) b = a + n; }
+        else { a = Math.max(0, a); b = Math.min(n - 1, b); }
+        for (var q = a; q < b; q++) {
+          var d = ang[at(q + 1)] - ang[at(q)];
+          while (d > Math.PI) d -= 2 * Math.PI;
+          while (d < -Math.PI) d += 2 * Math.PI;
+          sum += d;
+        }
+        return Math.abs(sum) * 180 / Math.PI;
+      }
       function flush() {
         if (runBest >= 0 && runLen >= minRun) {
           var d = dia[runBest], bit = bits[0], bestDiff = Infinity;
@@ -490,15 +504,17 @@
             bit: bit, diameter: d,
             x: sx[runBest] / ppi, y: sy[runBest] / ppi,
             cx: (sx[runBest] + nx2 * rad) / ppi, cy: (sy[runBest] + ny2 * rad) / ppi,
-            minDiameter: d
+            minDiameter: d, angle: runAngle()
           });
         }
-        runBest = -1; runLen = 0;
+        runBest = -1; runLen = 0; runFirst = -1; runLast = -1;
       }
       for (var s = 0; s < n; s++) {
         var kk = P.closed ? (startK + s) % n : s;
         if (inside[kk]) {
           runLen++;
+          if (runFirst < 0) runFirst = s + (P.closed ? startK : 0);
+          runLast = s + (P.closed ? startK : 0);
           if (runBest < 0 || dia[kk] < dia[runBest]) runBest = kk;
         } else flush();
       }

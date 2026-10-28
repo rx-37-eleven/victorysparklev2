@@ -96,3 +96,12 @@ test("large patterns stay fast", async () => {
   await run(12, 8, frame.replace(/5.4/, "11.4").replace(/3.4/, "7.4") + circle(6, 4, 0.5), [1, 0.75, 0.375], 200);
   assert.ok(Date.now() - t < 15000, `took ${Date.now() - t}ms`);
 });
+
+test("each spot reports how far its curve bends", async () => {
+  const [hole] = await run(6, 4, frame + circle(3, 2, 0.5), [1, 0.75, 0.375]);
+  assert.ok(Math.abs(hole.angle - 360) < 40, `hole bend ${hole.angle}`);
+  const rr = await run(6, 4, frame + `<rect x="2" y="1" width="2" height="2" rx="0.2" ry="0.2" ${line}/>`, [1, 0.75, 0.375]);
+  for (const s of rr) assert.ok(s.angle > 60 && s.angle < 130, `corner arc bend ${s.angle}`);
+  const [notch] = await run(6, 4, frame + `<path d="M0.3 2 H2.8 A0.2 0.2 0 0 1 3.2 2 H5.7" ${line}/>`, [1, 0.75, 0.375]);
+  assert.ok(Math.abs(notch.angle - 180) < 40, `notch bend ${notch.angle}`);
+});

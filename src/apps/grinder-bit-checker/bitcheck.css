@@ -216,6 +216,15 @@
 .bitcheck-app .gb-spots li button:hover { border-color: var(--gb-ink); }
 .bitcheck-app .gb-spots .gb-spot-n { font-weight: 700; color: var(--gb-ink); min-width: 2.2em; }
 
+.bitcheck-app .gb-slider-row { margin-bottom: 16px; font-family: "Comic Neue", sans-serif; }
+.bitcheck-app .gb-slider-row label { display: block; font-weight: 700; color: var(--gb-body); font-size: 15px; margin-bottom: 8px; }
+.bitcheck-app input[type="range"] { width: 100%; min-height: 32px; accent-color: var(--gb-ink); }
+.bitcheck-app .gb-spots li { display: flex; align-items: center; gap: 8px; }
+.bitcheck-app .gb-spots li .gb-spot-toggle { width: 22px; height: 22px; accent-color: var(--gb-ink); flex: 0 0 auto; }
+.bitcheck-app .gb-spots li.gb-off button { opacity: 0.5; text-decoration: line-through; }
+.bitcheck-app .gb-spots li button { flex: 1 1 auto; width: auto; }
+.bitcheck-app .gb-overlay .gb-off-dot { fill: none; stroke: #000; stroke-width: 0.012; stroke-dasharray: 0.03 0.03; opacity: 0.45; }
+
 /* --- Focus / motion --- */
 .bitcheck-app button:focus-visible,
 .bitcheck-app input:focus-visible,
