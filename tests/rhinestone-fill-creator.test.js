@@ -81,3 +81,24 @@ test("grid parity alternates along rows and flips on every row", () => {
   rows.forEach((row, j) => row.forEach((p, i) => assert.strictEqual(p.parity, (i + j) & 1)));
   assert.notStrictEqual(rows[0][0].parity, rows[1][0].parity);
 });
+
+test("offset grid is honeycomb: rows shift half a step, neighbours exactly one spacing apart", () => {
+  const w = 4, h = 3, r = core.mmToIn(2.8) / 2, s = core.mmToIn(3.2);
+  const pts = core.gridFill(w, h, s, r, true);
+  assert.ok(pts.length > 100);
+  assert.ok(insideArea(pts, w, h, r));
+  assert.ok(Math.abs(minDistance(pts) - s) < 1e-9, `min ${minDistance(pts)} vs ${s}`);
+  const rowsY = [...new Set(pts.map((p) => p.y.toFixed(6)))].sort((a, b) => a - b);
+  const firstX = (y) => Math.min(...pts.filter((p) => p.y.toFixed(6) === y).map((p) => p.x));
+  assert.ok(Math.abs(Math.abs(firstX(rowsY[1]) - firstX(rowsY[0])) - s / 2) < 1e-9);
+  // no two rows two apart share... i.e. no stone sits directly above a neighbour-row stone
+  const row0 = new Set(pts.filter((p) => p.y.toFixed(6) === rowsY[0]).map((p) => p.x.toFixed(6)));
+  assert.ok(pts.filter((p) => p.y.toFixed(6) === rowsY[1]).every((p) => !row0.has(p.x.toFixed(6))));
+});
+
+test("offset grid still works when the shifted row has no room for an extra stone", () => {
+  const r = 0.05, s = 0.25;
+  const pts = core.gridFill(0.1 + 3 * s, 1, s, r, true); // exactly 4 columns wide, no spare half step
+  assert.ok(insideArea(pts, 0.1 + 3 * s, 1, r));
+  assert.ok(minDistance(pts) >= s - 1e-9);
+});
