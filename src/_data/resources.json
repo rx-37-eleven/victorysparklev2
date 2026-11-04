@@ -4,7 +4,7 @@
     "url": "https://geokash.com/gingham-generator/",
     "dateAdded": "2026-07-13",
     "tags": ["generator", "patterns", "design"],
-    "note": "Makes seamless gingham patterns you can download and use."
+    "note": "Makes seamless gingham patterns you can download and use.",
     "image": "/images/resources/GinghamGenerator.png"
   },
   {
@@ -12,7 +12,7 @@
     "url": "https://split.actionbox.ca/",
     "dateAdded": "2026-07-28",
     "tags": ["3d-printing", "tools", "stl"],
-    "note": "Free, no-signup browser tool that splits large STL/3MF/OBJ files into printable pieces, with optional auto-generated connector pins."
+    "note": "Free, no-signup browser tool that splits large STL/3MF/OBJ files into printable pieces, with optional auto-generated connector pins.",
     "image": "/images/resources/STLSplitter.png"
   },
   {
@@ -20,7 +20,7 @@
     "url": "https://lospec.com/pixel-art-scaler/",
     "dateAdded": "2026-08-16",
     "tags": ["pixel-art", "tools", "generator"],
-    "note": "Scales pixel art up or down cleanly with nearest-neighbor interpolation so edges stay crisp instead of blurry."
+    "note": "Scales pixel art up or down cleanly with nearest-neighbor interpolation so edges stay crisp instead of blurry.",
     "image": "/images/resources/PixelArtScaler.png"
   },
   {
@@ -28,14 +28,14 @@
     "url": "https://ninjatransfers.com",
     "dateAdded": "2026-08-16",
     "tags": ["printing", "apparel", "supplies"],
-    "note": "Custom DTF and screen print transfers for apparel, with no minimum order size."
+    "note": "Custom DTF and screen print transfers for apparel, with no minimum order size.",
     "image": "/images/resources/NinjaTransfers.png"
   },
   {
     "title": "PixelFrame",
     "url": "https://pixelframe.design/",
     "dateAdded": "2026-08-16",
-    "tags": ["design", "tools"]
+    "tags": ["design", "tools"],
     "image": "/images/resources/PixelFrame.png"
   },
 {
@@ -43,7 +43,7 @@
     "url": "https://www.photocollage.com/",
     "dateAdded": "2026-08-16",
     "tags": ["photos", "tools", "design"],
-    "note": "Free collage maker for your photos."
+    "note": "Free collage maker for your photos.",
   "image": "/images/resources/CollageMaker.png"
   }
   
