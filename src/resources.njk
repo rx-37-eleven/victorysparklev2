@@ -10,13 +10,13 @@ permalink: /resources/
   2. Add a new object: {"title", "url", "dateAdded" (YYYY-MM-DD), "tags" (array), "note" (optional), "image" (optional, see src/images/resources/README.txt)}.
   3. Commit — Cloudflare Pages rebuilds automatically and the new tile appears, sorted by date.
 #}
-<div class="content-section resources-page">
+<div class="resources-page">
   <h1>Cool Web Resources</h1>
-  <p>A running list of neat little tools and sites worth bookmarking.</p>
+  <p class="resources-page-intro">A running list of neat little tools and sites worth bookmarking.</p>
 
   {# MY TOOLS: pinned above the filterable list. Edit src/_data/myTools.json
      ("title", "url", "note", optional "image" — same rules as resources). #}
-  <section class="my-tools" aria-labelledby="my-tools-title">
+  <section class="content-section my-tools" aria-labelledby="my-tools-title">
     <h2 id="my-tools-title" class="section-heading">My Tools</h2>
     <p class="my-tools-intro">Free tools I made — they run right in your browser.</p>
     <div class="resource-grid">
@@ -38,7 +38,8 @@ permalink: /resources/
     </div>
   </section>
 
-  <h2 class="section-heading web-resources-heading">Web Resources</h2>
+  <section class="content-section web-resources" aria-labelledby="web-resources-title">
+  <h2 id="web-resources-title" class="section-heading">Web Resources</h2>
 
   <div class="resources-layout">
     <div class="resources-main">
@@ -89,6 +90,7 @@ permalink: /resources/
       </ul>
     </aside>
   </div>
+  </section>
 </div>
 
 <script src="/js/resources.js" defer></script>
