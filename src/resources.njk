@@ -14,6 +14,32 @@ permalink: /resources/
   <h1>Cool Web Resources</h1>
   <p>A running list of neat little tools and sites worth bookmarking.</p>
 
+  {# MY TOOLS: pinned above the filterable list. Edit src/_data/myTools.json
+     ("title", "url", "note", optional "image" — same rules as resources). #}
+  <section class="my-tools" aria-labelledby="my-tools-title">
+    <h2 id="my-tools-title" class="section-heading">My Tools</h2>
+    <p class="my-tools-intro">Free tools I made — they run right in your browser.</p>
+    <div class="resource-grid">
+      {% for tool in myTools %}
+      <article class="tool-tile">
+        <a href="{{ tool.url }}" class="resource-tile-link">
+          <div class="resource-tile-image-wrap">
+            {% if tool.image %}
+            {% image tool.image, "", "(max-width: 700px) 100vw, 350px", "resource-tile-image" %}
+            {% else %}
+            <div class="resource-tile-image resource-tile-placeholder">🛠️</div>
+            {% endif %}
+          </div>
+          <h3 class="resource-tile-title">{{ tool.title }}</h3>
+        </a>
+        {% if tool.note %}<p class="resource-tile-note tool-tile-note">{{ tool.note }}</p>{% endif %}
+      </article>
+      {% endfor %}
+    </div>
+  </section>
+
+  <h2 class="section-heading web-resources-heading">Web Resources</h2>
+
   <div class="resources-layout">
     <div class="resources-main">
       <p class="resource-count" id="resource-count" aria-hidden="false">
