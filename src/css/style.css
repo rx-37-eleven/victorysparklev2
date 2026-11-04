@@ -631,7 +631,31 @@ p a:hover {
     gap: 25px;
 }
 
-.resource-tile {
+.my-tools {
+    margin-top: 20px;
+}
+
+.my-tools-intro {
+    color: var(--color-text-muted);
+    margin-bottom: 15px;
+}
+
+.section-heading {
+    font-family: var(--font-display);
+    color: var(--color-primary);
+    margin: 0 0 10px;
+}
+
+.web-resources-heading {
+    margin-top: 45px;
+}
+
+.tool-tile-note {
+    padding-bottom: 20px;
+}
+
+.resource-tile,
+.tool-tile {
     background: var(--color-surface);
     border: var(--border-width) solid var(--color-ink);
     border-radius: var(--radius-lg);
@@ -642,7 +666,8 @@ p a:hover {
     flex-direction: column;
 }
 
-.resource-tile:hover {
+.resource-tile:hover,
+.tool-tile:hover {
     transform: translateY(-5px);
     box-shadow: var(--shadow-sticker-lg) var(--color-shadow);
 }

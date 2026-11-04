@@ -1,0 +1,37 @@
+[
+  {
+    "title": "Pinpress",
+    "url": "/apps/pinpress/",
+    "note": "Lay out and print custom photo buttons."
+  },
+  {
+    "title": "Seamless Tile Maker",
+    "url": "/apps/tilemaker/",
+    "note": "Swap an image's quadrants to set up a seamless repeating tile."
+  },
+  {
+    "title": "Stained Glass Vectorizer",
+    "url": "/apps/stained-glass-vectorizer/",
+    "note": "Turn an image into stained glass pattern pieces."
+  },
+  {
+    "title": "Weedline",
+    "url": "/apps/weedline/",
+    "note": "Draws a weeding boundary around your design so excess vinyl or HTV comes off in one piece."
+  },
+  {
+    "title": "Watermarker",
+    "url": "/apps/watermarker/",
+    "note": "Batch watermark images and PDFs."
+  },
+  {
+    "title": "Grinder Bit Checker",
+    "url": "/apps/grinder-bit-checker/",
+    "note": "Find stained glass curves that are too tight for your grinder bits."
+  },
+  {
+    "title": "Rhinestone Fill Creator",
+    "url": "/apps/rhinestone-fill-creator/",
+    "note": "Fill an area with stones and export a true-size SVG."
+  }
+]
