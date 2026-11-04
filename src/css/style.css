@@ -631,8 +631,8 @@ p a:hover {
     gap: 25px;
 }
 
-.my-tools {
-    margin-top: 20px;
+.resources-page-intro {
+    margin-bottom: 25px;
 }
 
 .my-tools-intro {
@@ -644,10 +644,6 @@ p a:hover {
     font-family: var(--font-display);
     color: var(--color-primary);
     margin: 0 0 10px;
-}
-
-.web-resources-heading {
-    margin-top: 45px;
 }
 
 .tool-tile-note {
