@@ -5,6 +5,7 @@
     "dateAdded": "2026-07-13",
     "tags": ["generator", "patterns", "design"],
     "note": "Makes seamless gingham patterns you can download and use."
+    "image": "/images/resources/GinghamGenerator.png"
   },
   {
     "title": "STL Splitter",
@@ -12,6 +13,7 @@
     "dateAdded": "2026-07-28",
     "tags": ["3d-printing", "tools", "stl"],
     "note": "Free, no-signup browser tool that splits large STL/3MF/OBJ files into printable pieces, with optional auto-generated connector pins."
+    "image": "/images/resources/STLSplitter.png"
   },
   {
     "title": "Pixel Art Scaler",
@@ -19,6 +21,7 @@
     "dateAdded": "2026-08-16",
     "tags": ["pixel-art", "tools", "generator"],
     "note": "Scales pixel art up or down cleanly with nearest-neighbor interpolation so edges stay crisp instead of blurry."
+    "image": "/images/resources/PixelArtScaler.png"
   },
   {
     "title": "Ninja Transfers",
@@ -26,12 +29,14 @@
     "dateAdded": "2026-08-16",
     "tags": ["printing", "apparel", "supplies"],
     "note": "Custom DTF and screen print transfers for apparel, with no minimum order size."
+    "image": "/images/resources/NinjaTransfers.png"
   },
   {
     "title": "PixelFrame",
     "url": "https://pixelframe.design/",
     "dateAdded": "2026-08-16",
     "tags": ["design", "tools"]
+    "image": "/images/resources/PixelFrame.png"
   },
 {
     "title": "Collage Maker",
@@ -39,6 +44,7 @@
     "dateAdded": "2026-08-16",
     "tags": ["photos", "tools", "design"],
     "note": "Free collage maker for your photos."
+  "image": "/images/resources/CollageMaker.png"
   }
   
 ]
